@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Cambrian Math Quest - California Elementary Mathematics Learning Game for Cambrian School District (Grades K-5)",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5173 --host",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test src/game/*.test.mjs"
