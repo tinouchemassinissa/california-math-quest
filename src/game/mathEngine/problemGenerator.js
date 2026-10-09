@@ -576,12 +576,12 @@ function synthesizeQuestion(standard, prng) {
       const den = prng.choice([2, 3, 4, 6, 8]);
       const num = prng.nextInt(1, den - 1);
       const fracStr = `${num}/${den}`;
-      const wrong = [`${den - num}/${den}`, `${num}/${den === 8 ? 6 : den + 1}`, `1/${den}`];
+      const options = generateDistinctFractionOptions(num, den, 4, prng);
       return {
         ...baseMeta,
         prompt: `What fraction of the visual bar model is shaded?`,
         correctAnswer: fracStr,
-        options: prng.shuffle([fracStr, ...wrong]),
+        options,
         manipulative: { type: 'fraction', numerator: num, denominator: den },
         explanation: `The model is divided into ${den} equal parts, with ${num} shaded parts. Fraction is ${fracStr}.`,
         hint: `Numerator = shaded parts; Denominator = total parts.`,
@@ -592,12 +592,12 @@ function synthesizeQuestion(standard, prng) {
       const den = prng.choice([2, 3, 4, 6, 8]);
       const num = prng.nextInt(1, den - 1);
       const fracStr = `${num}/${den}`;
-      const wrong = [`${den}/${num}`, `1/${den}`, `${num + 1}/${den}`];
+      const options = generateDistinctFractionOptions(num, den, 4, prng);
       return {
         ...baseMeta,
         prompt: `On a number line from 0 to 1 partitioned into ${den} equal segments, what fraction is at point ${num}?`,
         correctAnswer: fracStr,
-        options: prng.shuffle([fracStr, ...wrong]),
+        options,
         explanation: `Each segment is 1/${den}. Counting ${num} segments from 0 lands on ${fracStr}.`,
         hint: `Each interval between 0 and 1 represents 1/${den}.`,
       };
@@ -719,16 +719,23 @@ function synthesizeQuestion(standard, prng) {
     case '4.NF.A.1': {
       const mult = prng.choice([2, 3, 4]);
       const baseNum = prng.choice([1, 2, 3]);
-      const baseDen = prng.choice([2, 3, 4, 5]);
+      const baseDen = prng.choice([baseNum + 1, baseNum + 2, baseNum + 3]);
       const eqNum = baseNum * mult;
       const eqDen = baseDen * mult;
       const targetStr = `${eqNum}/${eqDen}`;
-      const wrong = [`${baseNum + mult}/${baseDen + mult}`, `${eqNum}/${baseDen}`, `${baseNum}/${eqDen}`];
+      const candidates = [
+        `${baseNum + mult}/${baseDen + mult}`,
+        `${eqNum}/${baseDen + 1}`,
+        `${Math.max(1, eqNum - 1)}/${eqDen}`,
+        `${eqNum + 1}/${eqDen}`,
+      ];
+      const fallbackPool = ['1/2', '2/3', '3/4', '3/5', '4/5', '5/6', '7/8', '2/5', '3/8'];
+      const options = generateDistinctStringOptions(targetStr, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `Which fraction is equivalent to ${baseNum}/${baseDen}?`,
         correctAnswer: targetStr,
-        options: prng.shuffle([targetStr, ...wrong]),
+        options,
         manipulative: { type: 'fraction', numerator: baseNum, denominator: baseDen },
         explanation: `Multiply numerator and denominator by ${mult}: (${baseNum}×${mult})/(${baseDen}×${mult}) = ${targetStr}.`,
         hint: `Multiply top and bottom by the same factor.`,
@@ -741,12 +748,19 @@ function synthesizeQuestion(standard, prng) {
       const n2 = prng.nextInt(1, den - n1 - 1);
       const sumN = n1 + n2;
       const ans = `${sumN}/${den}`;
-      const wrong = [`${sumN}/${den * 2}`, `${n1 * n2}/${den}`, `${Math.max(1, sumN - 1)}/${den}`];
+      const candidates = [
+        `${sumN}/${den * 2}`,
+        `${n1 * n2}/${den}`,
+        `${Math.max(1, sumN - 1)}/${den}`,
+        `${sumN + 1}/${den}`,
+      ];
+      const fallbackPool = ['1/2', '2/3', '3/4', '3/5', '5/6', '7/8', '4/5'];
+      const options = generateDistinctStringOptions(ans, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `Add fractions with like denominators: ${n1}/${den} + ${n2}/${den}`,
         correctAnswer: ans,
-        options: prng.shuffle([ans, ...wrong]),
+        options,
         explanation: `With like denominators, add numerators: (${n1} + ${n2})/${den} = ${ans}.`,
         hint: `Add only the numerators; the denominator stays the same.`,
       };
@@ -756,12 +770,14 @@ function synthesizeQuestion(standard, prng) {
       const val = prng.nextInt(12, 89);
       const decStr = `0.${val}`;
       const fracStr = `${val}/100`;
-      const wrong = [`${val}/10`, `${val}/1000`, `1/${val}`];
+      const candidates = [`${val}/10`, `${val}/1000`, `1/${val}`, `${val + 1}/100`];
+      const fallbackPool = ['1/10', '1/100', '25/100', '50/100', '75/100'];
+      const options = generateDistinctStringOptions(fracStr, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `Write the decimal ${decStr} as a fraction:`,
         correctAnswer: fracStr,
-        options: prng.shuffle([fracStr, ...wrong]),
+        options,
         explanation: `The decimal ${decStr} has two digits past the decimal point, meaning hundredths: ${val}/100.`,
         hint: `Two decimal places represent hundredths.`,
       };
@@ -857,13 +873,19 @@ function synthesizeQuestion(standard, prng) {
       const d2 = prng.choice([4, 5]);
       const res = new Rational(n1 * n2, d1 * d2);
       const ansStr = res.toString();
-      const wrong = [`${n1 + n2}/${d1 + d2}`, `${n1}/${d2}`, `1/2`].filter((x) => x !== ansStr);
-      while (wrong.length < 3) wrong.push(`${res.n + 1}/${res.d}`);
+      const candidates = [
+        `${n1 + n2}/${d1 + d2}`,
+        `${n1}/${d2}`,
+        `${res.n}/${Math.max(1, res.d - 1)}`,
+        `${Math.min(res.d - 1, res.n + 1)}/${res.d}`,
+      ];
+      const fallbackPool = ['1/2', '1/3', '2/3', '1/4', '3/4', '1/5', '2/5', '3/10', '7/10'];
+      const options = generateDistinctStringOptions(ansStr, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `Multiply fractions: ${n1}/${d1} × ${n2}/${d2}`,
         correctAnswer: ansStr,
-        options: prng.shuffle([ansStr, ...wrong.slice(0, 3)]),
+        options,
         explanation: `Multiply numerators: (${n1}×${n2} = ${n1 * n2}) and denominators: (${d1}×${d2} = ${d1 * d2}), simplifying to ${ansStr}.`,
         hint: `Multiply across: (top × top) / (bottom × bottom).`,
       };
@@ -887,14 +909,22 @@ function synthesizeQuestion(standard, prng) {
 
     case '5.G.A.1': {
       const x = prng.nextInt(2, 8);
-      const y = prng.nextInt(2, 8);
+      let y = prng.nextInt(2, 8);
+      while (y === x) y = prng.nextInt(2, 8);
       const coordStr = `(${x}, ${y})`;
-      const wrong = [`(${y}, ${x})`, `(${Math.max(1, x - 1)}, ${y})`, `(${x}, ${Math.max(1, y - 1)})`];
+      const candidates = [
+        `(${y}, ${x})`,
+        `(${Math.max(1, x - 1)}, ${y})`,
+        `(${x}, ${Math.max(1, y - 1)})`,
+        `(${x + 1}, ${y})`,
+      ];
+      const fallbackPool = ['(1, 2)', '(3, 4)', '(5, 6)', '(2, 3)', '(4, 5)'];
+      const options = generateDistinctStringOptions(coordStr, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `Identify the coordinates (x, y) of the star plotted in Quadrant 1:`,
         correctAnswer: coordStr,
-        options: prng.shuffle([coordStr, ...wrong]),
+        options,
         manipulative: { type: 'coordinate', x, y, max: 10 },
         explanation: `Move horizontally along the x-axis to ${x}, then vertically up the y-axis to ${y}. Coordinates are (${x}, ${y}).`,
         hint: `X comes first, then Y.`,
@@ -908,23 +938,74 @@ function synthesizeQuestion(standard, prng) {
 }
 
 function createGuaranteedDynamicQuestion(standard, prng) {
-  const a = prng.nextInt(3, 11);
-  const b = prng.nextInt(3, 11);
-  const prod = a * b;
-  const distractors = generateDistinctOptions(prod, 4, 9, 144, prng).filter((x) => x !== prod).slice(0, 3);
+  const g = standard.grade;
+  let prompt, correctAnswer, options, explanation, hint;
+
+  if (g === 'K') {
+    const a = prng.nextInt(1, 5);
+    const b = prng.nextInt(1, 5);
+    correctAnswer = a + b;
+    prompt = `Count the total objects: ${a} + ${b} = ❓`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 1, 10, prng));
+    explanation = `${a} + ${b} = ${correctAnswer}.`;
+    hint = `Count forward from ${a}.`;
+  } else if (g === '1') {
+    const a = prng.nextInt(4, 12);
+    const b = prng.nextInt(3, 8);
+    correctAnswer = a + b;
+    prompt = `What is ${a} + ${b}?`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 5, 20, prng));
+    explanation = `${a} + ${b} = ${correctAnswer}.`;
+    hint = `Make a ten: start at ${a} and add ${b}.`;
+  } else if (g === '2') {
+    const a = prng.nextInt(15, 60);
+    const b = prng.nextInt(12, 38);
+    correctAnswer = a + b;
+    prompt = `Calculate: ${a} + ${b}`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 20, 100, prng));
+    explanation = `${a} + ${b} = ${correctAnswer}.`;
+    hint = `Add ones first, then tens.`;
+  } else if (g === '3') {
+    const a = prng.nextInt(3, 9);
+    const b = prng.nextInt(3, 9);
+    correctAnswer = a * b;
+    prompt = `What is ${a} × ${b}?`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 9, 81, prng));
+    explanation = `${a} groups of ${b} equals ${correctAnswer}.`;
+    hint = `Recall your multiplication facts.`;
+  } else if (g === '4') {
+    const a = prng.nextInt(12, 35);
+    const b = prng.nextInt(4, 9);
+    correctAnswer = a * b;
+    prompt = `Multiply: ${a} × ${b}`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 40, 350, prng));
+    explanation = `${a} × ${b} = ${correctAnswer}.`;
+    hint = `Use the distributive property: (${Math.floor(a / 10) * 10} × ${b}) + (${a % 10} × ${b}).`;
+  } else {
+    // Grade 5
+    const a = prng.nextInt(2, 6);
+    const b = prng.nextInt(3, 8);
+    const c = prng.nextInt(1, 5);
+    correctAnswer = a * b - c;
+    prompt = `Evaluate using order of operations: (${a} × ${b}) - ${c}`;
+    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 1, 60, prng));
+    explanation = `Multiply inside parentheses first: ${a} × ${b} = ${a * b}. Then subtract ${c} = ${correctAnswer}.`;
+    hint = `Perform operations inside parentheses first (PEMDAS).`;
+  }
+
   return {
-    id: `q-dyn-${Date.now()}-${prng.nextInt(100, 999)}`,
+    id: `q-dyn-${standard.code}-${Date.now()}-${prng.nextInt(100, 999)}`,
     grade: standard.grade,
     standard: standard.code,
     domain: standard.domain,
     cluster: standard.cluster,
     title: standard.title,
     module: standard.module,
-    prompt: `Calculate: ${a} × ${b}`,
-    correctAnswer: prod,
-    options: prng.shuffle([prod, ...distractors]),
-    explanation: `${a} groups of ${b} equals ${prod}.`,
-    hint: `${a} × ${b} = ${prod}.`,
+    prompt,
+    correctAnswer,
+    options,
+    explanation,
+    hint,
     verified: true,
   };
 }
@@ -946,4 +1027,55 @@ function generateDistinctOptions(correct, count = 4, min = 0, max = 100, prng) {
     fill += 1;
   }
   return Array.from(set);
+}
+
+function generateDistinctStringOptions(correctStr, candidateWrongArray, fallbackPool, count = 4, prng) {
+  const norm = (s) => String(s).trim().toLowerCase();
+  const seen = new Set([norm(correctStr)]);
+  const result = [correctStr];
+
+  for (const item of candidateWrongArray) {
+    if (result.length >= count) break;
+    if (item && !seen.has(norm(item))) {
+      seen.add(norm(item));
+      result.push(item);
+    }
+  }
+
+  for (const item of fallbackPool) {
+    if (result.length >= count) break;
+    if (item && !seen.has(norm(item))) {
+      seen.add(norm(item));
+      result.push(item);
+    }
+  }
+
+  let fillIndex = 1;
+  while (result.length < count) {
+    const filler = `${correctStr} [${fillIndex}]`;
+    if (!seen.has(norm(filler))) {
+      seen.add(norm(filler));
+      result.push(filler);
+    }
+    fillIndex += 1;
+  }
+
+  return prng.shuffle(result);
+}
+
+function generateDistinctFractionOptions(num, den, count = 4, prng) {
+  const correct = `${num}/${den}`;
+  const candidates = [];
+
+  if (num !== den && den !== 0) candidates.push(`${den}/${num}`);
+  if (den - num > 0 && den - num !== num) candidates.push(`${den - num}/${den}`);
+  if (num + 1 < den) candidates.push(`${num + 1}/${den}`);
+  if (num - 1 > 0) candidates.push(`${num - 1}/${den}`);
+
+  const fallbackFractions = [
+    '1/2', '1/3', '2/3', '1/4', '3/4', '1/5', '2/5', '3/5', '4/5',
+    '1/6', '5/6', '1/8', '3/8', '5/8', '7/8', '2/6', '4/6', '2/8', '6/8'
+  ];
+
+  return generateDistinctStringOptions(correct, candidates, fallbackFractions, count, prng);
 }
