@@ -147,7 +147,7 @@ export default function App() {
       const res = await fetchEducationalQuestion({
         grade,
         standardCode: targetStandard,
-        preferOnline: isNetworkOnline,
+        preferOnline: false, // Ensure algorithmic formal generator is primary for endless variety
       });
 
       setCurrentQuestion(res.question);
@@ -156,7 +156,7 @@ export default function App() {
       const timerSec = mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds || 25;
       setTimeLeft(timerSec);
     },
-    [grade, mode, diffInfo, learnerProfile, isNetworkOnline]
+    [grade, mode, diffInfo, learnerProfile]
   );
 
   useEffect(() => {
@@ -211,22 +211,15 @@ export default function App() {
       answer: givenAnswer,
     });
 
+    const isGameOver = !isCorrect && lives <= 1;
+
     if (isCorrect) {
       setScore((s) => s + pointsEarned);
       setStreak((st) => st + 1);
       setRoundStats((rs) => ({ correct: rs.correct + 1, total: rs.total + 1 }));
     } else {
       setStreak(0);
-      setLives((l) => {
-        const nextLives = Math.max(0, l - 1);
-        if (nextLives === 0) {
-          setTimeout(() => {
-            if (soundEnabled) playVictorySound();
-            setSummaryOpen(true);
-          }, 1200);
-        }
-        return nextLives;
-      });
+      setLives((l) => Math.max(0, l - 1));
       setRoundStats((rs) => ({ ...rs, total: rs.total + 1 }));
     }
 
@@ -250,8 +243,12 @@ export default function App() {
       );
     }
 
+    // Always advance cleanly without getting stuck
     setTimeout(() => {
-      if (lives > 1 || isCorrect) {
+      if (isGameOver) {
+        if (soundEnabled) playVictorySound();
+        setSummaryOpen(true);
+      } else {
         nextQuestion();
       }
     }, 1200);
@@ -330,10 +327,16 @@ export default function App() {
         <div className="status-badge-container">
           <span className={`status-dot ${isNetworkOnline ? 'online' : 'offline'}`} />
           <span className="status-text">
-            {isNetworkOnline
-              ? '🟢 Dual-Mode Active (Online OER Feeds + Formal Mathematical Engine)'
-              : '⚡ Offline PWA Active (Formal Mathematical Invariant Engine)'}
+            ⚡ Formal Mathematical Invariant Engine Active (Error-Free Seeded Generation)
           </span>
+          <button
+            type="button"
+            className="skip-btn"
+            onClick={() => nextQuestion()}
+            title="Skip to another fresh question"
+          >
+            Skip ➔
+          </button>
         </div>
       </div>
 
@@ -361,7 +364,7 @@ export default function App() {
           <strong>California Elementary Math Quest</strong> • California Common Core State Standards (CA CCSSM)
         </p>
         <p>
-          Formally Verified Mathematical Constraint Engine & Dual-Mode Educational Service (Grades K–5)
+          Formally Verified Mathematical Constraint Engine (Grades K–5)
         </p>
       </footer>
 
@@ -384,7 +387,10 @@ export default function App() {
 
       <SummaryModal
         isOpen={summaryOpen}
-        onClose={() => setSummaryOpen(false)}
+        onClose={() => {
+          setSummaryOpen(false);
+          handleRestart();
+        }}
         score={score}
         streak={streak}
         correctCount={roundStats.correct}

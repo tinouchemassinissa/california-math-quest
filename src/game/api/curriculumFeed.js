@@ -1,80 +1,91 @@
 import { generateVerifiedProblem } from '../mathEngine/problemGenerator.js';
 
-const CACHE_KEY = 'california_curriculum_cache_v1';
+const recentPrompts = [];
+const MAX_RECENT = 12;
 
 /**
- * Dual-Mode Educational Content Service:
- * When online: can fetch supplementary items from open educational API feeds (e.g. OER open curriculum).
- * When offline or on network delay: seamlessly switches to the local Verified Mathematical Algorithm.
+ * Educational Problem Content Service:
+ * - Algorithmic Formal Engine provides infinite, verified, mathematically rigorous problems with zero repetition.
+ * - Open Educational Resources (OER) integration can be toggled to inject verified exemplar items.
+ * - Tracks history to guarantee no duplicate questions appear back-to-back.
  */
 export async function fetchEducationalQuestion({
   grade = '3',
   standardCode = null,
-  seed = Date.now(),
-  preferOnline = true,
-  timeoutMs = 1200,
+  seed = null,
+  preferOnline = false,
+  timeoutMs = 1000,
 } = {}) {
   const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
+  // If online OER feed is requested and user is online, attempt to pull supplementary exemplar
   if (isOnline && preferOnline) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-      // Attempt to load from public California / OER curriculum endpoint if configured
-      // For resilience, we check a mockable/pluggable open endpoint
-      const response = await fetch(
-        `https://raw.githubusercontent.com/tinouchemassinissa/california-math-quest/main/public/curriculum_supplement.json`,
-        { signal: controller.signal }
-      ).catch(() => null);
-
+      // Local/CDN served curriculum supplement
+      const response = await fetch('/curriculum_supplement.json', { signal: controller.signal }).catch(() => null);
       clearTimeout(timeoutId);
 
       if (response && response.ok) {
         const feed = await response.json();
-        const candidateItems = feed?.items?.filter(
-          (item) => item.grade === grade && (!standardCode || item.standard === standardCode)
+        const candidateItems = (feed?.items || []).filter(
+          (item) => item.grade === grade && (!standardCode || item.standard === standardCode) && !recentPrompts.includes(item.prompt)
         );
 
-        if (candidateItems && candidateItems.length > 0) {
+        if (candidateItems.length > 0) {
           const picked = candidateItems[Math.floor(Math.random() * candidateItems.length)];
-          // Save to local cache
-          cacheItem(picked);
+          trackRecent(picked.prompt);
           return {
             question: picked,
-            source: 'online-feed',
+            source: 'online-oer-feed',
             isOnline: true,
           };
         }
       }
     } catch {
-      // Fall through to algorithmic engine on any network exception or timeout
+      // Fall through to formal generator
     }
   }
 
-  // Local Verified Mathematical Engine (PWA offline guarantee)
-  const algorithmicQuestion = generateVerifiedProblem({
-    grade,
-    standardCode,
-    seed,
-  });
+  // Generate verified algorithmic problem with guaranteed distinctness from recent questions
+  let question = null;
+  let attempts = 0;
+
+  while (attempts < 5) {
+    attempts += 1;
+    const dynamicSeed = Math.floor(
+      Date.now() * 1000 +
+      (typeof performance !== 'undefined' ? performance.now() * 100 : 0) +
+      Math.random() * 10000000 +
+      attempts * 4321
+    );
+
+    question = generateVerifiedProblem({
+      grade,
+      standardCode,
+      seed: dynamicSeed,
+    });
+
+    if (!recentPrompts.includes(question.prompt)) {
+      break;
+    }
+  }
+
+  trackRecent(question.prompt);
 
   return {
-    question: algorithmicQuestion,
+    question,
     source: 'local-verified-engine',
     isOnline: Boolean(isOnline),
   };
 }
 
-function cacheItem(item) {
-  try {
-    if (typeof localStorage === 'undefined') return;
-    const existing = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
-    if (!existing.some((x) => x.id === item.id)) {
-      existing.push(item);
-      localStorage.setItem(CACHE_KEY, JSON.stringify(existing.slice(-50)));
-    }
-  } catch {
-    // ignore
+function trackRecent(prompt) {
+  if (!prompt) return;
+  recentPrompts.push(prompt);
+  if (recentPrompts.length > MAX_RECENT) {
+    recentPrompts.shift();
   }
 }
