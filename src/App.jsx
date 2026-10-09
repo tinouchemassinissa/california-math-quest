@@ -7,7 +7,6 @@ import CurriculumBrowser from './components/CurriculumBrowser.jsx';
 import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
 import {
-  generateQuestion,
   STANDARDS,
   PROGRAM_INFO,
 } from './data/californiaCurriculum.js';
@@ -23,6 +22,7 @@ import {
   createClassSession,
   recordClassroomAttempt,
 } from './game/classroomSession.js';
+import { fetchEducationalQuestion } from './game/api/curriculumFeed.js';
 import {
   playCorrectSound,
   playIncorrectSound,
@@ -33,11 +33,11 @@ import {
 } from './audio.js';
 
 const STORAGE_KEYS = {
-  PROFILE: 'california_math_profile_v2',
-  THEME: 'california_math_theme_v2',
-  SOUND: 'california_math_sound_v2',
-  MUSIC: 'california_math_music_v2',
-  SESSION: 'california_math_session_v2',
+  PROFILE: 'california_math_profile_v3',
+  THEME: 'california_math_theme_v3',
+  SOUND: 'california_math_sound_v3',
+  MUSIC: 'california_math_music_v3',
+  SESSION: 'california_math_session_v3',
 };
 
 export default function App() {
@@ -57,6 +57,8 @@ export default function App() {
   const [mode, setMode] = useState('grade-quest');
 
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [engineSource, setEngineSource] = useState('local-verified-engine');
+  const [isNetworkOnline, setIsNetworkOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
@@ -90,6 +92,17 @@ export default function App() {
   });
 
   useEffect(() => {
+    const handleOnline = () => setIsNetworkOnline(true);
+    const handleOffline = () => setIsNetworkOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
   }, [theme]);
@@ -118,38 +131,32 @@ export default function App() {
   }, [musicEnabled]);
 
   const nextQuestion = useCallback(
-    (customStandard = null) => {
+    async (customStandard = null) => {
       setFeedback(null);
-      let q = null;
+      let targetStandard = customStandard;
 
-      if (customStandard) {
-        const std = STANDARDS[customStandard];
-        q = generateQuestion(std?.grade || grade, std?.domain);
-      } else if (mode === 'mistake-review') {
-        const mistakes = getMistakeReviewStandards(learnerProfile, grade);
-        if (mistakes.length) {
-          const pickCode = mistakes[Math.floor(Math.random() * mistakes.length)];
-          const std = STANDARDS[pickCode];
-          q = generateQuestion(grade, std?.domain);
-        } else {
-          q = selectAdaptiveQuestion(grade, learnerProfile);
+      if (!targetStandard) {
+        if (mode === 'mistake-review') {
+          const mistakes = getMistakeReviewStandards(learnerProfile, grade);
+          if (mistakes.length) {
+            targetStandard = mistakes[Math.floor(Math.random() * mistakes.length)];
+          }
         }
-      } else if (mode === 'manipulatives') {
-        q = generateQuestion(grade);
-      } else if (mode === 'word-problems') {
-        q = generateQuestion(grade, 'OA');
-      } else if (mode === 'smart-review') {
-        q = selectAdaptiveQuestion(grade, learnerProfile);
-      } else {
-        q = generateQuestion(grade);
       }
 
-      setCurrentQuestion(q);
-      const timerSec =
-        mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds || 25;
+      const res = await fetchEducationalQuestion({
+        grade,
+        standardCode: targetStandard,
+        preferOnline: isNetworkOnline,
+      });
+
+      setCurrentQuestion(res.question);
+      setEngineSource(res.source);
+
+      const timerSec = mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds || 25;
       setTimeLeft(timerSec);
     },
-    [grade, mode, diffInfo, learnerProfile]
+    [grade, mode, diffInfo, learnerProfile, isNetworkOnline]
   );
 
   useEffect(() => {
@@ -319,6 +326,17 @@ export default function App() {
         activeClassSession={classSession}
       />
 
+      <div className="engine-status-strip">
+        <div className="status-badge-container">
+          <span className={`status-dot ${isNetworkOnline ? 'online' : 'offline'}`} />
+          <span className="status-text">
+            {isNetworkOnline
+              ? '🟢 Dual-Mode Active (Online OER Feeds + Formal Mathematical Engine)'
+              : '⚡ Offline PWA Active (Formal Mathematical Invariant Engine)'}
+          </span>
+        </div>
+      </div>
+
       <ModeSelector
         currentMode={mode}
         onSelectMode={(m) => {
@@ -343,7 +361,7 @@ export default function App() {
           <strong>California Elementary Math Quest</strong> • California Common Core State Standards (CA CCSSM)
         </p>
         <p>
-          Open Community Learning Platform for California Students, Families & Tutors (Grades K–5)
+          Formally Verified Mathematical Constraint Engine & Dual-Mode Educational Service (Grades K–5)
         </p>
       </footer>
 

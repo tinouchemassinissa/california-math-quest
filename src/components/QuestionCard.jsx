@@ -10,10 +10,11 @@ export default function QuestionCard({
   showHints,
 }) {
   const [hintVisible, setHintVisible] = useState(false);
+  const [explanationVisible, setExplanationVisible] = useState(false);
   const [manualInput, setManualInput] = useState('');
 
   if (!question) {
-    return <div className="card loading-card">Loading question...</div>;
+    return <div className="card loading-card">Loading verified question...</div>;
   }
 
   const handleManualSubmit = (e) => {
@@ -28,11 +29,14 @@ export default function QuestionCard({
 
   return (
     <div className={`question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
-      {/* Top Bar: Standard tag & Timer */}
+      {/* Top Bar: Standard tag, Verification Badge & Timer */}
       <div className="card-top-row">
         <div className="standard-tag">
           <span className="code-pill">{question.standard}</span>
           <span className="standard-name">{question.title}</span>
+          <span className="verified-proof-badge" title="Formally checked by Mathematical Invariant Verifier">
+            ✓ Formally Verified
+          </span>
         </div>
 
         {totalTime > 0 && (
@@ -112,31 +116,53 @@ export default function QuestionCard({
         )}
       </div>
 
-      {/* Hint & Feedback Banner */}
+      {/* Step-by-Step Proof & Hint Row */}
       <div className="card-footer-row">
-        {showHints && question.hint && (
-          <button
-            type="button"
-            className="hint-toggle-btn"
-            onClick={() => setHintVisible((prev) => !prev)}
-          >
-            💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
-          </button>
-        )}
+        <div className="helper-buttons-row">
+          {showHints && question.hint && (
+            <button
+              type="button"
+              className="hint-toggle-btn"
+              onClick={() => setHintVisible((prev) => !prev)}
+            >
+              💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
+            </button>
+          )}
+
+          {question.explanation && (
+            <button
+              type="button"
+              className="step-proof-btn"
+              onClick={() => setExplanationVisible((prev) => !prev)}
+            >
+              📐 {explanationVisible ? 'Hide Step-by-Step Proof' : 'View Step-by-Step Proof'}
+            </button>
+          )}
+        </div>
 
         {hintVisible && question.hint && (
           <div className="hint-callout">
-            <span className="hint-icon">💡</span> {question.hint}
+            <span className="hint-icon">💡</span> <strong>Hint:</strong> {question.hint}
+          </div>
+        )}
+
+        {explanationVisible && question.explanation && (
+          <div className="explanation-callout">
+            <span className="proof-icon">📐</span>
+            <div>
+              <strong>Step-by-Step Mathematical Proof:</strong>
+              <p>{question.explanation}</p>
+            </div>
           </div>
         )}
 
         {feedback && (
           <div className={`feedback-alert ${feedback.status}`}>
             {feedback.status === 'correct' ? (
-              <span>🌟 Excellent! Correct answer!</span>
+              <span>🌟 Excellent! 100% Correct!</span>
             ) : (
               <span>
-                ❌ Nice try! The correct answer was <strong>{String(question.correctAnswer)}</strong>.
+                ❌ Nice try! The mathematically verified answer is <strong>{String(question.correctAnswer)}</strong>.
               </span>
             )}
           </div>

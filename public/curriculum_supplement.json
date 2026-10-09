@@ -1,0 +1,87 @@
+{
+  "curriculum": "California Common Core State Standards for Mathematics (CA CCSSM)",
+  "version": "1.0.0",
+  "items": [
+    {
+      "id": "oer-K-CC4-01",
+      "grade": "K",
+      "standard": "K.CC.B.4",
+      "domain": "CC",
+      "cluster": "Count to tell the number of objects",
+      "title": "Count Objects and Ten-Frames",
+      "prompt": "How many red counters are shown on the ten-frame below?",
+      "correctAnswer": 8,
+      "options": [6, 7, 8, 9],
+      "explanation": "Five counters fill the top row and three fill the bottom row: 5 + 3 = 8.",
+      "hint": "Count the 5 counters in the top row first, then add the 3 below.",
+      "manipulative": { "type": "ten-frame", "count": 8, "total": 10 }
+    },
+    {
+      "id": "oer-1-OA6-01",
+      "grade": "1",
+      "standard": "1.OA.C.6",
+      "domain": "OA",
+      "cluster": "Add and subtract within 20",
+      "title": "Addition Fluency within 20",
+      "prompt": "What is 8 + 5?",
+      "correctAnswer": 13,
+      "options": [12, 13, 14, 15],
+      "explanation": "Take 2 from 5 to make a 10 with 8: 8 + 2 = 10, then 10 + 3 = 13.",
+      "hint": "Use the make-a-ten strategy: 8 + 2 = 10.",
+      "manipulative": { "type": "number-line", "min": 0, "max": 20, "start": 8, "hop": 5, "target": 13 }
+    },
+    {
+      "id": "oer-2-NBT7-01",
+      "grade": "2",
+      "standard": "2.NBT.B.7",
+      "domain": "NBT",
+      "cluster": "Use place value understanding and properties of operations",
+      "title": "Addition within 1,000",
+      "prompt": "Calculate using vertical regrouping: 258 + 175",
+      "correctAnswer": 433,
+      "options": [423, 433, 443, 333],
+      "explanation": "Add ones: 8+5=13 (write 3, carry 1). Add tens: 5+7+1=13 (write 3, carry 1). Add hundreds: 2+1+1=4. Total = 433.",
+      "hint": "Remember to carry to both the tens and hundreds places."
+    },
+    {
+      "id": "oer-3-OA7-01",
+      "grade": "3",
+      "standard": "3.OA.C.7",
+      "domain": "OA",
+      "cluster": "Multiply and divide within 100",
+      "title": "Multiplication Fact Fluency",
+      "prompt": "What is 9 × 7?",
+      "correctAnswer": 63,
+      "options": [56, 63, 64, 72],
+      "explanation": "9 groups of 7 equals 63. You can also think (10 × 7) - 7 = 70 - 7 = 63.",
+      "hint": "Think of 10 × 7 minus one group of 7."
+    },
+    {
+      "id": "oer-4-NF1-01",
+      "grade": "4",
+      "standard": "4.NF.A.1",
+      "domain": "NF",
+      "cluster": "Extend understanding of fraction equivalence",
+      "title": "Equivalent Fractions",
+      "prompt": "Which fraction is equivalent to 3/4?",
+      "correctAnswer": "6/8",
+      "options": ["5/6", "6/8", "7/9", "9/16"],
+      "explanation": "Multiply numerator and denominator by 2: (3×2)/(4×2) = 6/8.",
+      "hint": "Multiply both the top and bottom by 2.",
+      "manipulative": { "type": "fraction", "numerator": 3, "denominator": 4 }
+    },
+    {
+      "id": "oer-5-OA1-01",
+      "grade": "5",
+      "standard": "5.OA.A.1",
+      "domain": "OA",
+      "cluster": "Write and interpret numerical expressions",
+      "title": "Order of Operations (PEMDAS)",
+      "prompt": "Evaluate: 4 + (6 × 3) - 2",
+      "correctAnswer": 20,
+      "options": [18, 20, 28, 10],
+      "explanation": "1. Parentheses: 6 × 3 = 18. 2. Addition & subtraction left to right: 4 + 18 - 2 = 20.",
+      "hint": "Perform the operation inside the parentheses first."
+    }
+  ]
+}
