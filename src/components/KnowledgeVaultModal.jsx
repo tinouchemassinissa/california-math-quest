@@ -79,6 +79,27 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
     }
   };
 
+  const handleSyncOpenTrivia = async () => {
+    setIsSyncing(true);
+    setSyncMessage(null);
+    try {
+      const res = await syncAndLearnFromFeed('https://opentdb.com/api.php?amount=5&category=19&type=multiple');
+      if (res.success) {
+        setSyncMessage({
+          type: 'success',
+          text: `✓ Connected to Open Trivia DB Math API: Ingested ${res.ingested} verified questions and synthesized ${res.templatesLearned} templates!`,
+        });
+      } else {
+        setSyncMessage({ type: 'error', text: res.error || 'Failed to query Open Trivia DB API.' });
+      }
+    } catch (err) {
+      setSyncMessage({ type: 'error', text: err.message || 'Network error querying Open Trivia DB API.' });
+    } finally {
+      setIsSyncing(false);
+      refreshData();
+    }
+  };
+
   const handleReset = () => {
     if (window.confirm('Reset the offline knowledge vault and clear all learned templates?')) {
       resetKnowledgeVault();
@@ -214,6 +235,20 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
                 style={{ padding: '8px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
               >
                 Learn from URL
+              </button>
+            </div>
+            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12px', color: '#555' }}>
+                Test with live free public math API:
+              </span>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleSyncOpenTrivia}
+                disabled={isSyncing || !isOnline}
+                style={{ fontSize: '11px', padding: '5px 12px' }}
+              >
+                🌐 Ingest from Open Trivia DB Math API
               </button>
             </div>
           </div>
