@@ -1,4 +1,5 @@
 import React from 'react';
+import InteractiveGeometry from './InteractiveGeometry.jsx';
 
 export default function VisualManipulative({ manipulative }) {
   if (!manipulative) return null;
@@ -281,6 +282,11 @@ export default function VisualManipulative({ manipulative }) {
           </svg>
         </div>
       );
+    }
+
+    case 'interactive-geometry':
+    case 'geometry': {
+      return <InteractiveGeometry data={manipulative} />;
     }
 
     default:

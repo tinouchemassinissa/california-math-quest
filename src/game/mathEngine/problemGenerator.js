@@ -623,16 +623,17 @@ function synthesizeQuestion(standard, prng) {
       const l = prng.nextInt(4, 9);
       const w = prng.nextInt(3, 7);
       const area = l * w;
-      const perimeter = 2 * (l + w);
-      const distractors = generateDistinctOptions(area, 4, 10, 80, prng).filter((x) => x !== area).slice(0, 3);
+      const candidates = [`${area + l} sq m`, `${Math.max(6, area - w)} sq m`, `${2 * (l + w)} sq m`, `${area + 10} sq m`];
+      const fallbackPool = ['12 sq m', '20 sq m', '24 sq m', '30 sq m', '36 sq m', '42 sq m', '48 sq m'];
+      const options = generateDistinctStringOptions(`${area} sq m`, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `A community garden bed is ${l} meters long and ${w} meters wide. What is its area in square meters?`,
+        prompt: `A California school learning garden is ${l} meters long and ${w} meters wide. What is its area in square meters? (Use the interactive grid below to count unit tiles!)`,
         correctAnswer: `${area} sq m`,
-        options: prng.shuffle([`${area} sq m`, ...distractors.map((v) => `${v} sq m`)]),
-        manipulative: { type: 'array', rows: w, cols: l, unit: 'm' },
-        explanation: `Area = length × width = ${l} × ${w} = ${area} square meters.`,
-        hint: `Area is length multiplied by width.`,
+        options,
+        manipulative: { type: 'interactive-geometry', width: l, height: w, unit: 'm', showAreaGrid: true },
+        explanation: `Area = length × width = ${l} × ${w} = ${area} square meters. You can also count the ${area} unit squares on the grid.`,
+        hint: `Area is length multiplied by width (L × W).`,
       };
     }
 
@@ -641,34 +642,68 @@ function synthesizeQuestion(standard, prng) {
       const w = prng.nextInt(3, 8);
       const perimeter = 2 * (l + w);
       const area = l * w;
-      const distractors = [area, perimeter - 2, perimeter + 4].filter((x) => x !== perimeter);
-      while (distractors.length < 3) distractors.push(perimeter + distractors.length + 2);
+      const candidates = [`${area} ft`, `${perimeter + 4} ft`, `${Math.max(10, perimeter - 4)} ft`, `${(l + w)} ft`];
+      const fallbackPool = ['18 ft', '22 ft', '26 ft', '30 ft', '32 ft', '36 ft'];
+      const options = generateDistinctStringOptions(`${perimeter} ft`, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `What is the perimeter of a rectangle that is ${l} feet long and ${w} feet wide?`,
+        prompt: `A community playground sandbox is ${l} feet long and ${w} feet wide. What is the total perimeter around the sandbox? (Click the sides below to trace and measure!)`,
         correctAnswer: `${perimeter} ft`,
-        options: prng.shuffle([`${perimeter} ft`, ...distractors.slice(0, 3).map((v) => `${v} ft`)]),
-        explanation: `Perimeter = 2 × (length + width) = 2 × (${l} + ${w}) = 2 × ${l + w} = ${perimeter} ft.`,
-        hint: `Perimeter is the distance all the way around the outside.`,
+        options,
+        manipulative: { type: 'interactive-geometry', width: l, height: w, unit: 'ft', showAreaGrid: false },
+        explanation: `Perimeter = 2 × (length + width) = 2 × (${l} + ${w}) = 2 × ${l + w} = ${perimeter} ft. Adding all 4 sides: ${l} + ${w} + ${l} + ${w} = ${perimeter} ft.`,
+        hint: `Perimeter is the distance all the way around the outside (add all 4 sides).`,
       };
     }
 
     // ==================== 4TH GRADE ====================
     case '4.OA.A.3': {
-      const boxes = prng.nextInt(4, 8);
-      const perBox = prng.nextInt(6, 12);
-      const sold = prng.nextInt(10, 25);
-      const total = boxes * perBox;
-      const left = total - sold;
-      const distractors = generateDistinctOptions(left, 4, 5, 80, prng).filter((x) => x !== left).slice(0, 3);
-      return {
-        ...baseMeta,
-        prompt: `A school STEM fair prepared ${boxes} supply boxes with ${perBox} solar cells in each box. Students used ${sold} solar cells. How many cells remain?`,
-        correctAnswer: left,
-        options: prng.shuffle([left, ...distractors]),
-        explanation: `Total = ${boxes} × ${perBox} = ${total}. Remaining = ${total} - ${sold} = ${left}.`,
-        hint: `Step 1: Multiply to find total. Step 2: Subtract the used amount.`,
-      };
+      const storyType = prng.choice(['stem', 'bus', 'grove']);
+      if (storyType === 'bus') {
+        const buses = prng.nextInt(3, 6);
+        const perBus = prng.nextInt(35, 48);
+        const carRiders = prng.nextInt(15, 30);
+        const total = buses * perBus + carRiders;
+        const distractors = generateDistinctOptions(total, 4, 100, 350, prng).filter((x) => x !== total).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `For an educational field trip to the Monterey Bay Aquarium, ${buses} school buses each carried ${perBus} students. Another ${carRiders} students arrived in carpools. How many total students attended the trip?`,
+          correctAnswer: total,
+          options: prng.shuffle([total, ...distractors]),
+          explanation: `Bus riders: ${buses} × ${perBus} = ${buses * perBus}. Total: ${buses * perBus} + ${carRiders} = ${total} students.`,
+          hint: `Multiply bus count by students per bus, then add carpool students.`,
+        };
+      } else if (storyType === 'grove') {
+        const trees = prng.nextInt(5, 9);
+        const perTree = prng.nextInt(12, 20);
+        const donated = prng.nextInt(15, 35);
+        const totalHarvest = trees * perTree;
+        const left = totalHarvest - donated;
+        const distractors = generateDistinctOptions(left, 4, 30, 180, prng).filter((x) => x !== left).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `In a Central Valley family orchard, ${trees} citrus trees each yielded ${perTree} crates of sweet oranges. The farm donated ${donated} crates to local food banks. How many crates remain for the community farmers market?`,
+          correctAnswer: left,
+          options: prng.shuffle([left, ...distractors]),
+          explanation: `Total harvest: ${trees} × ${perTree} = ${totalHarvest}. Remaining: ${totalHarvest} - ${donated} = ${left} crates.`,
+          hint: `Multiply to find total harvest, then subtract the donated crates.`,
+        };
+      } else {
+        const boxes = prng.nextInt(4, 8);
+        const perBox = prng.nextInt(6, 12);
+        const sold = prng.nextInt(10, 25);
+        const total = boxes * perBox;
+        const left = total - sold;
+        const distractors = generateDistinctOptions(left, 4, 5, 80, prng).filter((x) => x !== left).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `A California school STEM fair prepared ${boxes} supply boxes with ${perBox} solar cells in each box. Students used ${sold} solar cells. How many cells remain?`,
+          correctAnswer: left,
+          options: prng.shuffle([left, ...distractors]),
+          explanation: `Total = ${boxes} × ${perBox} = ${total}. Remaining = ${total} - ${sold} = ${left}.`,
+          hint: `Step 1: Multiply to find total. Step 2: Subtract the used amount.`,
+        };
+      }
     }
 
     case '4.OA.B.4': {
@@ -798,70 +833,134 @@ function synthesizeQuestion(standard, prng) {
 
     // ==================== 5TH GRADE ====================
     case '5.OA.A.1': {
-      const a = prng.nextInt(3, 7);
-      const b = prng.nextInt(3, 7);
-      const c = prng.nextInt(3, 6);
-      const d = prng.nextInt(2, 6);
-      const ans = (a + b) * c - d;
-      const distractors = buildPemdasDistractors(a, b, c, d, ans);
-      return {
-        ...baseMeta,
-        prompt: `Evaluate according to Order of Operations (PEMDAS): (${a} + ${b}) × ${c} - ${d}`,
-        correctAnswer: ans,
-        options: prng.shuffle([ans, ...distractors]),
-        explanation: `Parentheses first: (${a} + ${b} = ${a + b}). Multiply: ${(a + b)} × ${c} = ${(a + b) * c}. Subtract: ${(a + b) * c} - ${d} = ${ans}.`,
-        hint: `PEMDAS: Parentheses, then Multiplication, then Subtraction.`,
-      };
+      if (prng.next() < 0.5) {
+        // Multi-step real-world word problem
+        const teams = prng.nextInt(3, 6);
+        const perTeam = prng.nextInt(4, 8);
+        const added = prng.nextInt(2, 5);
+        const divisor = prng.choice([2, 3]);
+        const subtotal = teams * perTeam + added;
+        // Adjust added so subtotal is divisible
+        const rem = subtotal % divisor;
+        const adjAdded = rem === 0 ? added : added + (divisor - rem);
+        const totalPeople = teams * perTeam + adjAdded;
+        const ans = totalPeople / divisor;
+
+        const candidates = [ans + 2, Math.max(1, ans - 2), ans * divisor, ans + divisor];
+        const fallbackPool = [8, 10, 12, 14, 15, 16, 18, 20];
+        const options = generateDistinctStringOptions(ans, candidates, fallbackPool, 4, prng);
+
+        return {
+          ...baseMeta,
+          prompt: `A California school STEM club organized ${teams} robotics teams with ${perTeam} students each. Then ${adjAdded} new students joined, and the entire group was divided equally into ${divisor} testing stations: [(${teams} × ${perTeam}) + ${adjAdded}] ÷ ${divisor}. How many students are at each station?`,
+          correctAnswer: ans,
+          options,
+          explanation: `Parentheses first: ${teams} × ${perTeam} = ${teams * perTeam}. Add new students: ${teams * perTeam} + ${adjAdded} = ${totalPeople}. Divide into stations: ${totalPeople} ÷ ${divisor} = ${ans} students.`,
+          hint: `Follow PEMDAS: evaluate inside parentheses, then add, then divide.`,
+        };
+      } else {
+        const a = prng.nextInt(3, 7);
+        const b = prng.nextInt(3, 7);
+        const c = prng.nextInt(3, 6);
+        const d = prng.nextInt(2, 6);
+        const ans = (a + b) * c - d;
+        const distractors = buildPemdasDistractors(a, b, c, d, ans);
+        return {
+          ...baseMeta,
+          prompt: `Evaluate according to Order of Operations (PEMDAS): (${a} + ${b}) × ${c} - ${d}`,
+          correctAnswer: ans,
+          options: prng.shuffle([ans, ...distractors]),
+          explanation: `Parentheses first: (${a} + ${b} = ${a + b}). Multiply: ${(a + b)} × ${c} = ${(a + b) * c}. Subtract: ${(a + b) * c} - ${d} = ${ans}.`,
+          hint: `PEMDAS: Parentheses, then Multiplication, then Subtraction.`,
+        };
+      }
     }
 
     case '5.NBT.A.2': {
       const base = prng.nextInt(3, 9);
       const power = prng.choice([10, 100, 1000]);
       const prod = base * power;
-      const distractors = [base * 10, base * 100, base * 1000].filter((x) => x !== prod);
-      while (distractors.length < 3) distractors.push(prod + 10);
+      const candidates = [(base * 10).toLocaleString(), (base * 100).toLocaleString(), (base * 1000).toLocaleString(), ((base + 1) * power).toLocaleString()];
+      const fallbackPool = ['30', '300', '3,000', '500', '5,000', '7,000'];
+      const options = generateDistinctStringOptions(prod.toLocaleString(), candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
         prompt: `What is ${base} × ${power.toLocaleString()}?`,
         correctAnswer: prod.toLocaleString(),
-        options: prng.shuffle([prod.toLocaleString(), ...distractors.slice(0, 3).map((v) => v.toLocaleString())]),
+        options,
         explanation: `Multiplying by ${power} shifts the digits left by the number of zeros: ${prod.toLocaleString()}.`,
         hint: `Count the zeros in ${power}.`,
       };
     }
 
     case '5.NBT.B.7': {
-      const a = (prng.nextInt(20, 60)) / 10;
-      const b = (prng.nextInt(15, 45)) / 10;
-      const sum = +(a + b).toFixed(1);
-      const distractors = [+(sum + 0.1).toFixed(1), +(sum - 0.2).toFixed(1), +(sum + 1.0).toFixed(1)];
-      return {
-        ...baseMeta,
-        prompt: `Decimal Operation: Calculate ${a.toFixed(1)} + ${b.toFixed(1)}`,
-        correctAnswer: sum,
-        options: prng.shuffle([sum, ...distractors]),
-        explanation: `Line up decimal points: ${a.toFixed(1)} + ${b.toFixed(1)} = ${sum}.`,
-        hint: `Align the decimal points vertically before adding.`,
-      };
+      if (prng.next() < 0.5) {
+        // Real-world shopping & financial decimals word problem
+        const items = prng.nextInt(2, 4);
+        const priceEach = +(prng.choice([2.25, 3.50, 4.25, 5.75]));
+        const extraItem = +(prng.choice([3.25, 4.50, 6.00]));
+        const totalCost = +(items * priceEach + extraItem).toFixed(2);
+        const billPaid = totalCost <= 15 ? 20 : 50;
+        const changeDue = +(billPaid - totalCost).toFixed(2);
+
+        const candidates = [
+          `$${(changeDue + 1).toFixed(2)}`,
+          `$${Math.max(0.5, changeDue - 1).toFixed(2)}`,
+          `$${totalCost.toFixed(2)}`,
+          `$${(changeDue + 0.5).toFixed(2)}`,
+        ];
+        const fallbackPool = ['$4.50', '$6.25', '$8.75', '$11.25', '$14.50', '$18.00'];
+        const options = generateDistinctStringOptions(`$${changeDue.toFixed(2)}`, candidates, fallbackPool, 4, prng);
+
+        return {
+          ...baseMeta,
+          prompt: `At a California farmers market, Maya bought ${items} punnets of fresh strawberries for $${priceEach.toFixed(2)} each, plus a jar of raw honey for $${extraItem.toFixed(2)}. She paid with a $${billPaid} bill. How much change did she receive?`,
+          correctAnswer: `$${changeDue.toFixed(2)}`,
+          options,
+          explanation: `Cost of strawberries: ${items} × $${priceEach.toFixed(2)} = $${(items * priceEach).toFixed(2)}. Total spent: $${(items * priceEach).toFixed(2)} + $${extraItem.toFixed(2)} = $${totalCost.toFixed(2)}. Change: $${billPaid} - $${totalCost.toFixed(2)} = $${changeDue.toFixed(2)}.`,
+          hint: `Step 1: Multiply to find strawberry cost. Step 2: Add honey. Step 3: Subtract total from $${billPaid}.`,
+        };
+      } else {
+        const a = (prng.nextInt(20, 60)) / 10;
+        const b = (prng.nextInt(15, 45)) / 10;
+        const sum = +(a + b).toFixed(1);
+        const candidates = [+(sum + 0.1).toFixed(1), +(sum - 0.2).toFixed(1), +(sum + 1.0).toFixed(1), +(sum - 1.0).toFixed(1)];
+        const fallbackPool = [4.5, 5.8, 6.2, 7.5, 8.4, 9.1];
+        const options = generateDistinctStringOptions(sum, candidates, fallbackPool, 4, prng);
+        return {
+          ...baseMeta,
+          prompt: `Decimal Operation: Calculate ${a.toFixed(1)} + ${b.toFixed(1)}`,
+          correctAnswer: sum,
+          options,
+          explanation: `Line up decimal points: ${a.toFixed(1)} + ${b.toFixed(1)} = ${sum}.`,
+          hint: `Align the decimal points vertically before adding.`,
+        };
+      }
     }
 
     case '5.NF.A.1': {
       const pairs = [
-        { f1: [1, 2], f2: [1, 4], ans: '3/4' },
-        { f1: [1, 3], f2: [1, 6], ans: '1/2' },
-        { f1: [2, 5], f2: [3, 10], ans: '7/10' },
-        { f1: [1, 4], f2: [3, 8], ans: '5/8' },
-        { f1: [2, 3], f2: [1, 6], ans: '5/6' },
+        { f1: [1, 2], f2: [1, 4], ans: '3/4', story: 'Marcus walked 1/2 mile in Yosemite Valley and then 1/4 mile to the river overlook.' },
+        { f1: [1, 3], f2: [1, 6], ans: '1/2', story: 'A baker used 1/3 bag of organic oat flour in the morning and 1/6 bag in the afternoon.' },
+        { f1: [2, 5], f2: [3, 10], ans: '7/10', story: 'Elena completed 2/5 of her coastal marine biology report on Monday and 3/10 on Tuesday.' },
+        { f1: [1, 4], f2: [3, 8], ans: '5/8', story: 'A rain gauge in Mendocino collected 1/4 inch of rain before noon and 3/8 inch after noon.' },
+        { f1: [2, 3], f2: [1, 6], ans: '5/6', story: 'Leo spent 2/3 of an hour studying science and 1/6 of an hour studying California history.' },
       ];
       const pick = prng.choice(pairs);
-      const distractors = buildFractionAddDistractors(pick.f1[0], pick.f1[1], pick.f2[0], pick.f2[1], pick.ans);
+      const isWordProblem = prng.next() < 0.5;
+      const candidates = buildFractionAddDistractors(pick.f1[0], pick.f1[1], pick.f2[0], pick.f2[1], pick.ans);
+      const fallbackPool = ['1/2', '2/3', '3/4', '4/5', '5/6', '7/8', '7/10', '9/10'];
+      const options = generateDistinctStringOptions(pick.ans, candidates, fallbackPool, 4, prng);
+
       return {
         ...baseMeta,
-        prompt: `Add fractions with unlike denominators: ${pick.f1[0]}/${pick.f1[1]} + ${pick.f2[0]}/${pick.f2[1]}`,
+        prompt: isWordProblem
+          ? `${pick.story} How much did they complete/use in total?`
+          : `Add fractions with unlike denominators: ${pick.f1[0]}/${pick.f1[1]} + ${pick.f2[0]}/${pick.f2[1]}`,
         correctAnswer: pick.ans,
-        options: prng.shuffle([pick.ans, ...distractors]),
+        options,
         manipulative: { type: 'fraction', numerator: 1, denominator: 2 },
-        explanation: `Find a common denominator, rename fractions, then add numerators to get ${pick.ans}.`,
+        explanation: `Find the common denominator for ${pick.f1[1]} and ${pick.f2[1]}, rename fractions, then add numerators to get ${pick.ans}.`,
         hint: `Find a common denominator before adding.`,
       };
     }
@@ -881,9 +980,15 @@ function synthesizeQuestion(standard, prng) {
       ];
       const fallbackPool = ['1/2', '1/3', '2/3', '1/4', '3/4', '1/5', '2/5', '3/10', '7/10'];
       const options = generateDistinctStringOptions(ansStr, candidates, fallbackPool, 4, prng);
+
+      const isWordProblem = prng.next() < 0.5;
+      const prompt = isWordProblem
+        ? `A community garden plot in Sacramento covers ${n1}/${d1} of an acre. A pollinator sunflower bed occupies ${n2}/${d2} of that plot. What fraction of an acre is the sunflower bed?`
+        : `Multiply fractions: ${n1}/${d1} × ${n2}/${d2}`;
+
       return {
         ...baseMeta,
-        prompt: `Multiply fractions: ${n1}/${d1} × ${n2}/${d2}`,
+        prompt,
         correctAnswer: ansStr,
         options,
         explanation: `Multiply numerators: (${n1}×${n2} = ${n1 * n2}) and denominators: (${d1}×${d2} = ${d1 * d2}), simplifying to ${ansStr}.`,
@@ -892,16 +997,18 @@ function synthesizeQuestion(standard, prng) {
     }
 
     case '5.MD.C.5': {
-      const l = prng.nextInt(4, 7);
+      const l = prng.nextInt(4, 8);
       const w = prng.nextInt(3, 6);
       const h = prng.nextInt(2, 5);
       const vol = l * w * h;
-      const distractors = generateDistinctOptions(vol, 4, 15, 180, prng).filter((x) => x !== vol).slice(0, 3);
+      const candidates = [`${vol + 12} cu ft`, `${Math.max(20, vol - 10)} cu ft`, `${2 * (l * w + w * h + l * h)} cu ft`, `${vol + 20} cu ft`];
+      const fallbackPool = ['48 cu ft', '60 cu ft', '72 cu ft', '80 cu ft', '96 cu ft', '120 cu ft'];
+      const options = generateDistinctStringOptions(`${vol} cu ft`, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `A California marine science tank measures ${l} ft long, ${w} ft wide, and ${h} ft tall. What is its volume in cubic feet?`,
+        prompt: `A California marine science rescue tank is ${l} feet long, ${w} feet wide, and ${h} feet deep. What is the total volume of water it holds in cubic feet?`,
         correctAnswer: `${vol} cu ft`,
-        options: prng.shuffle([`${vol} cu ft`, ...distractors.map((v) => `${v} cu ft`)]),
+        options,
         explanation: `Volume = length × width × height = ${l} × ${w} × ${h} = ${vol} cubic feet.`,
         hint: `Volume = length × width × height.`,
       };
