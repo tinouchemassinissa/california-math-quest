@@ -1111,6 +1111,105 @@ button, input, select {
 }
 
 /* Tabs */
+.modal-sub-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.view-mode-bar {
+  display: flex;
+  margin-bottom: 1.25rem;
+}
+
+.mode-toggle-group {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-input);
+  padding: 0.35rem;
+  border-radius: 12px;
+}
+
+.module-grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.curriculum-module-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.curriculum-module-card:hover {
+  border-color: var(--border-highlight);
+  transform: translateY(-2px);
+}
+
+.mod-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.mod-badge {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.mod-grade-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.mod-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.mod-standards-list {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.mod-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.code-pill.mini {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+}
+
+.mod-practice-btn {
+  width: 100%;
+}
+
+.std-cluster-tag {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
 .help-tabs, .grade-tabs {
   display: flex;
   gap: 0.5rem;
