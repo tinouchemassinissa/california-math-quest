@@ -3,6 +3,10 @@ import { createPRNG } from './prng.js';
 import { Rational } from './rational.js';
 import { verifyQuestion } from './verifier.js';
 import {
+  getLearnedTemplates,
+  synthesizeFromLearnedTemplate,
+} from '../learning/curriculumVault.js';
+import {
   buildPemdasDistractors,
   buildFractionAddDistractors,
   buildSubtractionRegroupingDistractors,
@@ -30,6 +34,28 @@ export function generateVerifiedProblem({
   }
 
   const standard = prng.choice(candidateStandards) || candidateStandards[0];
+
+  // If templates were learned from online feeds/APIs, opportunistically synthesize from them
+  try {
+    const learned = getLearnedTemplates(grade, standard.code);
+    if (learned && learned.length > 0 && prng.next() < 0.35) {
+      const chosenTemplate = prng.choice(learned);
+      const synthesized = synthesizeFromLearnedTemplate(chosenTemplate, prng);
+      if (synthesized) {
+        const check = verifyQuestion(synthesized);
+        if (check.valid) {
+          return {
+            ...synthesized,
+            seed: actualSeed,
+            verified: true,
+            verificationTimestamp: new Date().toISOString(),
+          };
+        }
+      }
+    }
+  } catch (err) {
+    // If template evaluation fails, proceed seamlessly to procedural synthesis
+  }
 
   for (let attempt = 0; attempt < maxVerificationAttempts; attempt += 1) {
     const rawQuestion = synthesizeQuestion(standard, prng);

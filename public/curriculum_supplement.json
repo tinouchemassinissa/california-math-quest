@@ -1,6 +1,7 @@
 {
   "curriculum": "California Common Core State Standards for Mathematics (CA CCSSM)",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "organization": "California Elementary Mathematics Open Curriculum Initiative",
   "items": [
     {
       "id": "oer-K-CC4-01",
@@ -17,6 +18,32 @@
       "manipulative": { "type": "ten-frame", "count": 8, "total": 10 }
     },
     {
+      "id": "oer-K-OA1-01",
+      "grade": "K",
+      "standard": "K.OA.A.1",
+      "domain": "OA",
+      "cluster": "Understand addition and subtraction",
+      "title": "Adding Within 10",
+      "prompt": "There are 4 frogs on a log and 3 frogs jump on. How many frogs in all?",
+      "correctAnswer": 7,
+      "options": [5, 6, 7, 8],
+      "explanation": "Add 4 and 3: 4 + 3 = 7 frogs.",
+      "hint": "Start at 4 and count forward 3 more: 5, 6, 7."
+    },
+    {
+      "id": "oer-K-G2-01",
+      "grade": "K",
+      "standard": "K.G.A.2",
+      "domain": "G",
+      "cluster": "Identify and describe shapes",
+      "title": "2D Shape Identification",
+      "prompt": "Which shape has exactly 3 straight sides and 3 corners (vertices)?",
+      "correctAnswer": "Triangle",
+      "options": ["Circle", "Square", "Triangle", "Rectangle"],
+      "explanation": "A triangle is defined as a closed polygon with exactly 3 sides and 3 angles.",
+      "hint": "The prefix 'tri-' means three."
+    },
+    {
       "id": "oer-1-OA6-01",
       "grade": "1",
       "standard": "1.OA.C.6",
@@ -31,17 +58,69 @@
       "manipulative": { "type": "number-line", "min": 0, "max": 20, "start": 8, "hop": 5, "target": 13 }
     },
     {
+      "id": "oer-1-NBT2-01",
+      "grade": "1",
+      "standard": "1.NBT.B.2",
+      "domain": "NBT",
+      "cluster": "Understand place value",
+      "title": "Tens and Ones Place Value",
+      "prompt": "The number 47 has how many tens and how many ones?",
+      "correctAnswer": "4 tens and 7 ones",
+      "options": ["7 tens and 4 ones", "4 tens and 7 ones", "40 tens and 7 ones", "3 tens and 17 ones"],
+      "explanation": "In 47, the 4 is in the tens place (value 40) and the 7 is in the ones place.",
+      "hint": "Look at the left digit for tens and the right digit for ones."
+    },
+    {
+      "id": "oer-1-MD3-01",
+      "grade": "1",
+      "standard": "1.MD.B.3",
+      "domain": "MD",
+      "cluster": "Tell and write time",
+      "title": "Telling Time to Half Hour",
+      "prompt": "When the short hour hand is halfway between 4 and 5, and the long minute hand points to 6, what time is it?",
+      "correctAnswer": "4:30",
+      "options": ["4:00", "4:30", "5:30", "6:20"],
+      "explanation": "When the minute hand points to 6, 30 minutes have passed. The hour hand is past 4, so it is 4:30.",
+      "hint": "Each number on the clock represents 5 minutes: 6 × 5 = 30 minutes."
+    },
+    {
       "id": "oer-2-NBT7-01",
       "grade": "2",
       "standard": "2.NBT.B.7",
       "domain": "NBT",
       "cluster": "Use place value understanding and properties of operations",
-      "title": "Addition within 1,000",
+      "title": "Addition within 1,000 with Regrouping",
       "prompt": "Calculate using vertical regrouping: 258 + 175",
       "correctAnswer": 433,
       "options": [423, 433, 443, 333],
       "explanation": "Add ones: 8+5=13 (write 3, carry 1). Add tens: 5+7+1=13 (write 3, carry 1). Add hundreds: 2+1+1=4. Total = 433.",
       "hint": "Remember to carry to both the tens and hundreds places."
+    },
+    {
+      "id": "oer-2-OA1-01",
+      "grade": "2",
+      "standard": "2.OA.A.1",
+      "domain": "OA",
+      "cluster": "Represent and solve problems involving addition and subtraction",
+      "title": "Two-Step Word Problem",
+      "prompt": "Maya had 50 markers. She gave 14 to Leo and 16 to Sam. How many markers does Maya have left?",
+      "correctAnswer": 20,
+      "options": [18, 20, 22, 30],
+      "explanation": "Total given away: 14 + 16 = 30 markers. Remaining: 50 - 30 = 20 markers.",
+      "hint": "First find how many markers were given away in total."
+    },
+    {
+      "id": "oer-2-MD8-01",
+      "grade": "2",
+      "standard": "2.MD.C.8",
+      "domain": "MD",
+      "cluster": "Work with time and money",
+      "title": "Counting Money",
+      "prompt": "What is the total value of 2 quarters, 3 dimes, and 4 pennies?",
+      "correctAnswer": "84¢",
+      "options": ["74¢", "80¢", "84¢", "94¢"],
+      "explanation": "2 quarters = 50¢. 3 dimes = 30¢. 4 pennies = 4¢. Total = 50 + 30 + 4 = 84¢.",
+      "hint": "A quarter is 25¢, a dime is 10¢, and a penny is 1¢."
     },
     {
       "id": "oer-3-OA7-01",
@@ -55,6 +134,32 @@
       "options": [56, 63, 64, 72],
       "explanation": "9 groups of 7 equals 63. You can also think (10 × 7) - 7 = 70 - 7 = 63.",
       "hint": "Think of 10 × 7 minus one group of 7."
+    },
+    {
+      "id": "oer-3-NF1-01",
+      "grade": "3",
+      "standard": "3.NF.A.1",
+      "domain": "NF",
+      "cluster": "Develop understanding of fractions as numbers",
+      "title": "Unit Fractions and Parts of a Whole",
+      "prompt": "A pizza is cut into 8 equal slices. Lucas eats 3 slices. What fraction of the pizza did Lucas eat?",
+      "correctAnswer": "3/8",
+      "options": ["3/5", "3/8", "5/8", "8/3"],
+      "explanation": "The denominator is 8 (equal parts) and the numerator is 3 (parts eaten), making 3/8.",
+      "hint": "The bottom number is the total number of equal slices."
+    },
+    {
+      "id": "oer-3-MD7-01",
+      "grade": "3",
+      "standard": "3.MD.C.7",
+      "domain": "MD",
+      "cluster": "Geometric measurement: understand concepts of area",
+      "title": "Area of a Rectangle",
+      "prompt": "A classroom rug is 8 feet long and 6 feet wide. What is its area in square feet?",
+      "correctAnswer": "48 sq ft",
+      "options": ["28 sq ft", "42 sq ft", "48 sq ft", "56 sq ft"],
+      "explanation": "Area of a rectangle = length × width. 8 ft × 6 ft = 48 square feet.",
+      "hint": "Multiply the length by the width."
     },
     {
       "id": "oer-4-NF1-01",
@@ -71,6 +176,32 @@
       "manipulative": { "type": "fraction", "numerator": 3, "denominator": 4 }
     },
     {
+      "id": "oer-4-NBT5-01",
+      "grade": "4",
+      "standard": "4.NBT.B.5",
+      "domain": "NBT",
+      "cluster": "Use place value understanding to perform multi-digit arithmetic",
+      "title": "Multi-Digit Multiplication",
+      "prompt": "Compute: 24 × 15",
+      "correctAnswer": 360,
+      "options": [340, 350, 360, 380],
+      "explanation": "Use the distributive property: 24 × 10 = 240, and 24 × 5 = 120. 240 + 120 = 360.",
+      "hint": "Break 15 into 10 + 5 and multiply each part by 24."
+    },
+    {
+      "id": "oer-4-MD3-01",
+      "grade": "4",
+      "standard": "4.MD.A.3",
+      "domain": "MD",
+      "cluster": "Solve problems involving measurement and conversion",
+      "title": "Perimeter and Area Formulas",
+      "prompt": "A rectangular garden has a perimeter of 30 meters. If the length is 9 meters, what is the width?",
+      "correctAnswer": "6 meters",
+      "options": ["5 meters", "6 meters", "7 meters", "12 meters"],
+      "explanation": "Perimeter = 2 × (L + W) = 30. L + W = 15. If L = 9, then W = 15 - 9 = 6 meters.",
+      "hint": "Two lengths equal 18 m. Subtract 18 from 30, then divide by 2."
+    },
+    {
       "id": "oer-5-OA1-01",
       "grade": "5",
       "standard": "5.OA.A.1",
@@ -82,6 +213,32 @@
       "options": [18, 20, 28, 10],
       "explanation": "1. Parentheses: 6 × 3 = 18. 2. Addition & subtraction left to right: 4 + 18 - 2 = 20.",
       "hint": "Perform the operation inside the parentheses first."
+    },
+    {
+      "id": "oer-5-NF1-01",
+      "grade": "5",
+      "standard": "5.NF.A.1",
+      "domain": "NF",
+      "cluster": "Use equivalent fractions as a strategy to add and subtract fractions",
+      "title": "Adding Fractions with Unlike Denominators",
+      "prompt": "What is 1/3 + 2/5?",
+      "correctAnswer": "11/15",
+      "options": ["3/8", "7/15", "11/15", "13/15"],
+      "explanation": "Common denominator is 15. 1/3 = 5/15, 2/5 = 6/15. 5/15 + 6/15 = 11/15.",
+      "hint": "Find the least common multiple of 3 and 5, which is 15."
+    },
+    {
+      "id": "oer-5-MD5-01",
+      "grade": "5",
+      "standard": "5.MD.C.5",
+      "domain": "MD",
+      "cluster": "Geometric measurement: understand concepts of volume",
+      "title": "Volume of Right Rectangular Prisms",
+      "prompt": "A storage container is 5 meters long, 4 meters wide, and 3 meters high. What is its volume?",
+      "correctAnswer": "60 cubic meters",
+      "options": ["45 cubic meters", "50 cubic meters", "60 cubic meters", "72 cubic meters"],
+      "explanation": "Volume = length × width × height = 5 × 4 × 3 = 60 cubic meters.",
+      "hint": "Multiply length × width × height."
     }
   ]
 }

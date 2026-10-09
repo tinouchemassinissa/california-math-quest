@@ -22,6 +22,7 @@ export default function Header({
   onOpenClassroom,
   onOpenCurriculum,
   onOpenHelp,
+  onOpenVault,
   activeClassSession,
 }) {
   const currentLeague = PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
@@ -157,6 +158,15 @@ export default function Header({
             onClick={onOpenClassroom}
           >
             Study Groups
+          </button>
+
+          <button
+            type="button"
+            className="text-link-btn vault-link"
+            onClick={onOpenVault}
+            title="Knowledge Vault: Inspect learned templates, sync APIs, and review AI learning"
+          >
+            🧠 AI Knowledge Vault
           </button>
         </div>
 

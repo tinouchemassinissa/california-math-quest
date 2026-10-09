@@ -6,6 +6,7 @@ import ClassroomModal from './components/ClassroomModal.jsx';
 import CurriculumBrowser from './components/CurriculumBrowser.jsx';
 import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
+import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
 import {
   STANDARDS,
   PROGRAM_INFO,
@@ -72,6 +73,7 @@ export default function App() {
   const [curriculumOpen, setCurriculumOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const [vaultOpen, setVaultOpen] = useState(false);
 
   const [learnerProfile, setLearnerProfile] = useState(() => {
     try {
@@ -320,6 +322,7 @@ export default function App() {
         onOpenClassroom={() => setClassroomOpen(true)}
         onOpenCurriculum={() => setCurriculumOpen(true)}
         onOpenHelp={() => setHelpOpen(true)}
+        onOpenVault={() => setVaultOpen(true)}
         activeClassSession={classSession}
       />
 
@@ -329,6 +332,15 @@ export default function App() {
           <span className="status-text">
             ⚡ Formal Mathematical Invariant Engine Active (Error-Free Seeded Generation)
           </span>
+          <button
+            type="button"
+            className="skip-btn vault-quick-btn"
+            onClick={() => setVaultOpen(true)}
+            title="Inspect learned templates and sync online curriculum APIs"
+            style={{ background: '#e8f0fe', color: '#1a73e8', borderColor: '#1a73e8' }}
+          >
+            🧠 AI Knowledge Vault
+          </button>
           <button
             type="button"
             className="skip-btn"
@@ -384,6 +396,11 @@ export default function App() {
       />
 
       <HelpGuide isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+
+      <KnowledgeVaultModal
+        isOpen={vaultOpen}
+        onClose={() => setVaultOpen(false)}
+      />
 
       <SummaryModal
         isOpen={summaryOpen}
