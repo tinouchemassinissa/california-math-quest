@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GRADES, DOMAINS, STANDARDS } from '../data/cambrianCurriculum.js';
+import { GRADES, DOMAINS, STANDARDS } from '../data/californiaCurriculum.js';
 
 export default function CurriculumBrowser({
   isOpen,
@@ -24,7 +24,7 @@ export default function CurriculumBrowser({
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-icon">📐</span>
-            <h2>California Elementary Standards Map (Cambrian CCSS-M)</h2>
+            <h2>California CCSS-M Standards Map (Official CDE Framework)</h2>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
             ✕
@@ -91,6 +91,10 @@ export default function CurriculumBrowser({
                         <span className="unseen-badge">⚪ Unseen</span>
                       )}
                     </div>
+                  </div>
+
+                  <div className="std-cluster-tag">
+                    <strong>Cluster:</strong> {std.cluster}
                   </div>
 
                   <p className="std-desc">{std.desc}</p>

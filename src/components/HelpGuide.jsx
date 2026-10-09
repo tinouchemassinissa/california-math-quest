@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DISTRICT_INFO } from '../data/cambrianCurriculum.js';
+import { PROGRAM_INFO } from '../data/californiaCurriculum.js';
 
 export default function HelpGuide({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -12,7 +12,7 @@ export default function HelpGuide({ isOpen, onClose }) {
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-icon">📘</span>
-            <h2>Cambrian Math Quest — Guide & Documentation</h2>
+            <h2>California Math Quest — Guide & Official Standards</h2>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
             ✕
@@ -30,140 +30,116 @@ export default function HelpGuide({ isOpen, onClose }) {
             </button>
             <button
               type="button"
-              className={`tab-btn ${activeTab === 'teacher' ? 'active' : ''}`}
-              onClick={() => setActiveTab('teacher')}
+              className={`tab-btn ${activeTab === 'facilitator' ? 'active' : ''}`}
+              onClick={() => setActiveTab('facilitator')}
             >
-              👩‍🏫 Teacher & Classroom
+              👥 Study Groups & Tutors
             </button>
             <button
               type="button"
               className={`tab-btn ${activeTab === 'curriculum' ? 'active' : ''}`}
               onClick={() => setActiveTab('curriculum')}
             >
-              🏫 Cambrian District Program
+              📜 California CCSS-M Standards
             </button>
             <button
               type="button"
               className={`tab-btn ${activeTab === 'offline' ? 'active' : ''}`}
               onClick={() => setActiveTab('offline')}
             >
-              📱 Offline & Devices
+              📱 Privacy & Offline
             </button>
           </div>
 
           <div className="help-content-pane">
             {activeTab === 'student' && (
               <div className="help-section">
-                <h3>Welcome to Cambrian Math Quest!</h3>
+                <h3>Welcome to California Math Quest!</h3>
                 <p>
-                  Cambrian Math Quest makes math fun, interactive, and rewarding! Choose your elementary
-                  school mascot, pick your grade (Kindergarten through 5th Grade), and embark on standard quests.
+                  California Math Quest is a free, interactive community platform designed to help California elementary
+                  students master mathematics with confidence, visual understanding, and deep fluency.
                 </p>
+
+                <h4>Choose Your Scholar League:</h4>
+                <div className="schools-grid">
+                  {PROGRAM_INFO.leagues.map((l) => (
+                    <div key={l.id} className="school-info-card">
+                      <span className="school-card-badge">{l.badge}</span>
+                      <div>
+                        <strong>{l.name}</strong>
+                        <div className="school-focus-text">{l.focus}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
                 <h4>Game Modes:</h4>
                 <ul>
-                  <li>
-                    <strong>Grade Quest:</strong> Core California standard roadmap with progressive difficulty.
-                  </li>
-                  <li>
-                    <strong>Speed Sprint:</strong> 60-second Cambrian Park Math Dash! Score combos and speed bonuses.
-                  </li>
-                  <li>
-                    <strong>Manipulatives Lab:</strong> Hands-on visual models like ten-frames, number lines, clocks, fraction bars, and coins.
-                  </li>
-                  <li>
-                    <strong>California Word Problems:</strong> Real-world story problems set in Cambrian Park, San Jose, and Silicon Valley.
-                  </li>
-                  <li>
-                    <strong>Smart Review:</strong> Spaced repetition system that reviews standards right when your brain needs practice.
-                  </li>
-                  <li>
-                    <strong>Mistake Review:</strong> Instant retry mode to turn mistakes into masteries.
-                  </li>
+                  <li><strong>Grade Quest:</strong> Step-by-step progress through official California state standards for your grade.</li>
+                  <li><strong>Speed Sprint:</strong> 60-second math sprint to build rapid calculation fluency.</li>
+                  <li><strong>Manipulatives Lab:</strong> Interactive visual math with ten-frames, number lines, clocks, fraction bars, and coin trays.</li>
+                  <li><strong>California Word Problems:</strong> Real-world scenarios set in California redwoods, state beaches, farm markets, and science centers.</li>
+                  <li><strong>Smart Review:</strong> Spaced-repetition engine that brings back concepts right when you need practice.</li>
+                  <li><strong>Mistake Review:</strong> Instant retry mode so you learn from your mistakes and achieve 100% mastery.</li>
                 </ul>
-
-                <h4>Hearts, Streaks & Multipliers:</h4>
-                <p>
-                  Keep answering correctly to build up your streak multiplier (up to 5x!). Watch your lives (hearts) —
-                  if you run out of lives, you can review your mistakes and try again.
-                </p>
               </div>
             )}
 
-            {activeTab === 'teacher' && (
+            {activeTab === 'facilitator' && (
               <div className="help-section">
-                <h3>Teacher & Classroom Workflow</h3>
+                <h3>For Parents, Tutors & Study Groups</h3>
                 <p>
-                  Cambrian Math Quest includes an in-browser classroom management system designed for Cambrian
-                  elementary classrooms (Fammatre, Farnham, Sartorette, Bagby, Steindorf).
+                  Whether working with a single student at home, in an after-school tutoring circle, or in a community study group,
+                  this platform gives you instant, privacy-respecting diagnostic tracking.
                 </p>
 
-                <h4>Privacy First:</h4>
+                <h4>100% Privacy Guarantee:</h4>
                 <p>
-                  No student account creation or third-party cloud data transmission is required. All session
-                  analytics are kept 100% locally on the device.
+                  No student accounts, passwords, email addresses, or cloud servers are used. Everything runs locally inside the browser.
                 </p>
 
-                <h4>Instant Excel (.xlsx) Export:</h4>
+                <h4>Multi-Sheet Excel (.xlsx) Reports:</h4>
                 <p>
-                  At the end of your lesson, tap <strong>Export Session to Excel</strong> in the Teacher Portal.
-                  The app generates a complete 3-sheet Excel workbook without external network requests:
+                  Download complete lesson summaries at any point with one tap:
                 </p>
                 <ol>
-                  <li><strong>Class Session Summary:</strong> Metrics, total problems, overall accuracy, school and teacher info.</li>
-                  <li><strong>Student Roster & Accuracy:</strong> Performance grouped by student with accuracy % and points.</li>
-                  <li><strong>Detailed Item Log:</strong> Individual question attempts with standard code (e.g. <code>CCSS.MATH 3.OA.C.7</code>), timestamp, student answer, and speed.</li>
+                  <li><strong>Session Summary:</strong> Overall questions answered, accuracy rate, and time.</li>
+                  <li><strong>Learner Performance:</strong> Detailed stats broken down per learner.</li>
+                  <li><strong>Detailed Item Log:</strong> Timestamped record of every problem, student response, correctness, and exact California CCSS-M standard code (e.g. <code>3.OA.C.7</code>).</li>
                 </ol>
               </div>
             )}
 
             {activeTab === 'curriculum' && (
               <div className="help-section">
-                <h3>Cambrian School District & California CCSS-M</h3>
+                <h3>Official California Common Core State Standards for Mathematics (CA CCSSM)</h3>
                 <p>
-                  The mathematics standards in this program are directly aligned with the California
-                  Common Core State Standards for Mathematics (CCSS-M) and the California Mathematics Framework.
+                  All learning objectives and questions strictly reflect the California Department of Education (CDE) mathematics standards:
                 </p>
 
-                <h4>Participating Cambrian Schools:</h4>
-                <div className="schools-grid">
-                  {DISTRICT_INFO.schools.map((s) => (
-                    <div key={s.id} className="school-info-card">
-                      <span className="school-card-badge">{s.badge}</span>
-                      <div>
-                        <strong>{s.name}</strong> ({s.mascot})
-                        <div className="school-focus-text">{s.focus}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <h4>Grade Level Coverage:</h4>
+                <h4>Grade Progression Overview:</h4>
                 <ul>
-                  <li><strong>Kindergarten (K):</strong> Counting & Cardinality (K.CC), Ten-frames, Sums to 10, Shapes.</li>
-                  <li><strong>1st Grade (1):</strong> Addition & Subtraction to 20, Tens and Ones, Analog clocks to half hour.</li>
-                  <li><strong>2nd Grade (2):</strong> 2-digit regrouping, Skip counting (5s, 10s, 100s), Money (coins & bills), Clock to 5 min.</li>
-                  <li><strong>3rd Grade (3):</strong> Multiplication & Division fluency (0-12), Fractions on number line, Area & Perimeter.</li>
-                  <li><strong>4th Grade (4):</strong> Multi-digit multiplication, Multi-step word problems, Equivalent fractions, Angles & Protractors.</li>
-                  <li><strong>5th Grade (5):</strong> PEMDAS order of operations, Decimals (+ - × ÷), Unlike fraction addition, Volume, Coordinate Plane (x, y).</li>
+                  <li><strong>Kindergarten (K):</strong> Counting & Cardinality (K.CC), Partners of 10, Teen numbers as 10 and ones (K.NBT), Comparing sizes (K.MD), 2D/3D shapes (K.G).</li>
+                  <li><strong>1st Grade (1):</strong> Addition & Subtraction within 20 (1.OA), Unknown addends, Tens & ones place value to 120 (1.NBT), Telling time to hour/half-hour (1.MD), Halves & fourths (1.G).</li>
+                  <li><strong>2nd Grade (2):</strong> Fluency within 20, 2-digit regrouping to 1,000 (2.NBT), Skip counting (5s, 10s, 100s), Money (coins & bills) (2.MD), Clock to 5 min.</li>
+                  <li><strong>3rd Grade (3):</strong> Multiplication & Division fact fluency (0–12) (3.OA), Array models, Fractions on number lines (3.NF), Rounding to 10/100, Area & perimeter (3.MD).</li>
+                  <li><strong>4th Grade (4):</strong> Multi-digit multiplication & division (4.NBT), Multi-step word problems (4.OA), Prime & composite numbers, Equivalent fractions & decimals (4.NF), Angle measurement with protractors (4.MD).</li>
+                  <li><strong>5th Grade (5):</strong> Order of Operations with parentheses (PEMDAS) (5.OA), Decimals to thousandths (+, -, ×, ÷) (5.NBT), Adding unlike fractions (5.NF), Volume ($V = l \times w \times h$) (5.MD), Coordinate plane graphing $(x, y)$ (5.G).</li>
                 </ul>
               </div>
             )}
 
             {activeTab === 'offline' && (
               <div className="help-section">
-                <h3>Offline-First & Universal Device Compatibility</h3>
+                <h3>Progressive Web App & Zero Dependencies</h3>
                 <p>
-                  Cambrian Math Quest is built as a Progressive Web Application (PWA). Once loaded, all game logic,
-                  audio synthesizers, question generators, and Excel export engines operate fully offline without an internet connection.
-                </p>
-                <p>
-                  <strong>Tested and optimized for:</strong>
+                  Built as a standalone, offline-first Progressive Web App (PWA). Once loaded, no internet connection is required:
                 </p>
                 <ul>
-                  <li>Chromebooks (common in Cambrian elementary classrooms)</li>
-                  <li>Apple iPads and Android tablets (touch-friendly on-screen keypad included)</li>
-                  <li>Windows, macOS, and Linux desktop browsers</li>
+                  <li>Fully compatible with school Chromebooks, iPads, tablets, and desktop browsers.</li>
+                  <li>On-screen numeric keypad for touchscreens.</li>
+                  <li>Native Web Audio API sound generator (no external audio files to fetch).</li>
+                  <li>Pure JavaScript Open Packaging Convention spreadsheet engine for instant Excel export.</li>
                 </ul>
               </div>
             )}

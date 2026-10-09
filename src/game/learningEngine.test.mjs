@@ -3,28 +3,25 @@ import assert from 'node:assert/strict';
 import {
   createInitialProfile,
   updateLearnerProfile,
-  getDueStandards,
   getMistakeReviewStandards,
-  selectAdaptiveQuestion,
   calculatePoints,
   getProgressSummary,
   computeAchievements,
 } from './learningEngine.js';
 
 test('createInitialProfile initializes default student profile', () => {
-  const profile = createInitialProfile('2', 'fammatre');
+  const profile = createInitialProfile('2', 'golden-bears');
   assert.equal(profile.grade, '2');
-  assert.equal(profile.school, 'fammatre');
+  assert.equal(profile.league, 'golden-bears');
   assert.equal(profile.totalAttempts, 0);
   assert.equal(profile.currentStreak, 0);
   assert.deepEqual(profile.standards, {});
 });
 
 test('updateLearnerProfile updates mastery and streaks accurately', () => {
-  let profile = createInitialProfile('3', 'steindorf');
+  let profile = createInitialProfile('3', 'redwood-explorers');
   const now = 1700000000000;
 
-  // Correct answer
   profile = updateLearnerProfile(profile, '3.OA.C.7', true, now);
   assert.equal(profile.totalAttempts, 1);
   assert.equal(profile.totalCorrect, 1);
@@ -33,7 +30,6 @@ test('updateLearnerProfile updates mastery and streaks accurately', () => {
   assert.equal(profile.standards['3.OA.C.7'].correct, 1);
   assert.ok(profile.standards['3.OA.C.7'].mastery > 0);
 
-  // Incorrect answer resets streak
   profile = updateLearnerProfile(profile, '3.OA.C.7', false, now + 1000);
   assert.equal(profile.totalAttempts, 2);
   assert.equal(profile.totalCorrect, 1);
@@ -42,7 +38,7 @@ test('updateLearnerProfile updates mastery and streaks accurately', () => {
 });
 
 test('getMistakeReviewStandards filters and orders standards by mistakes', () => {
-  let profile = createInitialProfile('3', 'farnham');
+  let profile = createInitialProfile('3', 'pacific-voyagers');
   profile = updateLearnerProfile(profile, '3.OA.C.7', false);
   profile = updateLearnerProfile(profile, '3.OA.C.7', false);
   profile = updateLearnerProfile(profile, '3.NF.A.1', false);
@@ -63,11 +59,11 @@ test('calculatePoints handles streak and difficulty multiplier', () => {
 });
 
 test('getProgressSummary and computeAchievements evaluate unlocked badges', () => {
-  let profile = createInitialProfile('K', 'bagby');
+  let profile = createInitialProfile('K', 'golden-bears');
   let achievements = computeAchievements(profile);
   assert.equal(achievements[0].unlocked, false);
 
   profile = updateLearnerProfile(profile, 'K.CC.B.4', true);
   achievements = computeAchievements(profile);
-  assert.equal(achievements[0].unlocked, true); // First step unlocked!
+  assert.equal(achievements[0].unlocked, true);
 });

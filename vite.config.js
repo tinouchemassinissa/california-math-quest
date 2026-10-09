@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'Cambrian Math Quest',
-        short_name: 'CambrianMath',
-        description: 'California Elementary School Mathematics Academy (Cambrian School District TK-5)',
+        name: 'California Elementary Math Quest',
+        short_name: 'CAMathQuest',
+        description: 'California Elementary Mathematics Learning Platform aligned with CA CCSSM (Grades K-5)',
         theme_color: '#4f46e5',
         background_color: '#0f172a',
         display: 'standalone',

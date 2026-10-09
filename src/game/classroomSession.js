@@ -1,25 +1,25 @@
 import { downloadWorkbook } from '../export/xlsxExport.js';
-import { DISTRICT_INFO, STANDARDS } from '../data/cambrianCurriculum.js';
+import { PROGRAM_INFO, STANDARDS } from '../data/californiaCurriculum.js';
 
 export function createClassSession({
-  teacherName = 'Cambrian Teacher',
-  className = 'Grade 3 Room A',
-  schoolId = 'fammatre',
+  leaderName = 'Study Group Lead',
+  groupName = 'California Math Group',
+  leagueId = 'golden-bears',
   now = Date.now(),
 } = {}) {
-  const school = DISTRICT_INFO.schools.find((s) => s.id === schoolId) || DISTRICT_INFO.schools[0];
+  const league = PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
   const dateStr = new Date(now).toISOString().slice(0, 10).replace(/-/g, '');
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  const sessionId = `CAMB-${dateStr}-${randomSuffix}`;
+  const sessionId = `CA-MATH-${dateStr}-${randomSuffix}`;
 
   return {
     sessionId,
-    teacherName: teacherName.trim() || 'Teacher',
-    className: className.trim() || 'Classroom',
-    schoolId: school.id,
-    schoolName: school.name,
-    schoolMascot: school.mascot,
-    activeStudent: 'Student 1',
+    leaderName: leaderName.trim() || 'Lead',
+    groupName: groupName.trim() || 'Study Group',
+    leagueId: league.id,
+    leagueName: league.name,
+    leagueBadge: league.badge,
+    activeStudent: 'Learner 1',
     startedAt: new Date(now).toISOString(),
     endedAt: null,
     attempts: [],
@@ -40,13 +40,15 @@ export function recordClassroomAttempt(session, {
 }) {
   if (!session) return session;
 
+  const stdObj = STANDARDS[standard];
   const attemptEntry = {
     id: `att-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     timestamp: new Date(now).toISOString(),
-    studentName: (studentName || session.activeStudent || 'Student').trim(),
+    studentName: (studentName || session.activeStudent || 'Learner').trim(),
     grade: String(grade || '3'),
     standard: String(standard || '3.OA.C.7'),
-    standardTitle: STANDARDS[standard]?.title || 'Elementary Standard',
+    standardTitle: stdObj?.title || 'California Standard',
+    cluster: stdObj?.cluster || 'CCSS-M Cluster',
     prompt: String(prompt || ''),
     studentAnswer: String(studentAnswer ?? ''),
     correctAnswer: String(correctAnswer ?? ''),
@@ -67,7 +69,6 @@ export function buildClassroomWorksheets(session) {
   const totalCorrect = attempts.filter((a) => a.isCorrect).length;
   const overallAccuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
 
-  // Aggregate by student
   const studentMap = {};
   attempts.forEach((a) => {
     if (!studentMap[a.studentName]) {
@@ -93,39 +94,38 @@ export function buildClassroomWorksheets(session) {
 
   // Sheet 1: Session Summary
   const summaryRows = [
-    ['CAMBRIAN SCHOOL DISTRICT — ELEMENTARY MATH SESSION REPORT'],
+    ['CALIFORNIA ELEMENTARY MATH QUEST — COMMUNITY STUDY SESSION REPORT'],
     ['Generated', new Date().toLocaleString()],
-    ['District', DISTRICT_INFO.districtName],
-    ['Location', DISTRICT_INFO.location],
-    ['Curriculum', DISTRICT_INFO.framework],
+    ['Curriculum', PROGRAM_INFO.framework],
+    ['Jurisdiction', PROGRAM_INFO.jurisdiction],
     [''],
     ['Session Metric', 'Value'],
     ['Session ID', session.sessionId],
-    ['School', session.schoolName],
-    ['School Mascot', session.schoolMascot],
-    ['Teacher', session.teacherName],
-    ['Classroom', session.className],
+    ['Study Group / Class', session.groupName],
+    ['Lead / Facilitator', session.leaderName],
+    ['Learning League', `${session.leagueBadge} ${session.leagueName}`],
     ['Session Started', session.startedAt],
-    ['Total Students Active', Object.keys(studentMap).length],
+    ['Total Active Learners', Object.keys(studentMap).length],
     ['Total Problems Attempted', totalAttempts],
     ['Total Correct', totalCorrect],
     ['Overall Accuracy', `${overallAccuracy}%`],
   ];
 
-  // Sheet 2: Student Performance
+  // Sheet 2: Student Roster
   const rosterRows = [
-    ['Student Name', 'Questions Attempted', 'Questions Correct', 'Accuracy Rate', 'Total Points Earned'],
-    ...(studentRows.length ? studentRows : [['No student activity recorded', 0, 0, '0%', 0]]),
+    ['Learner Name', 'Questions Attempted', 'Questions Correct', 'Accuracy Rate', 'Total Points Earned'],
+    ...(studentRows.length ? studentRows : [['No activity recorded', 0, 0, '0%', 0]]),
   ];
 
-  // Sheet 3: Detailed Question Attempts Log
+  // Sheet 3: Detailed Item Log
   const attemptRows = [
     [
       'Timestamp',
-      'Student Name',
+      'Learner Name',
       'Grade Level',
-      'CCSS Standard',
-      'Standard Domain/Topic',
+      'California CCSS-M Standard',
+      'Standard Title',
+      'Curriculum Cluster',
       'Question Prompt',
       'Student Answer',
       'Correct Answer',
@@ -139,6 +139,7 @@ export function buildClassroomWorksheets(session) {
       `Grade ${a.grade}`,
       a.standard,
       a.standardTitle,
+      a.cluster,
       a.prompt,
       a.studentAnswer,
       a.correctAnswer,
@@ -150,7 +151,7 @@ export function buildClassroomWorksheets(session) {
 
   return [
     { name: 'Session Summary', rows: summaryRows },
-    { name: 'Student Roster & Accuracy', rows: rosterRows },
+    { name: 'Learner Performance', rows: rosterRows },
     { name: 'Detailed Item Log', rows: attemptRows },
   ];
 }
@@ -158,7 +159,7 @@ export function buildClassroomWorksheets(session) {
 export function exportClassroomSessionToXlsx(session) {
   if (!session) return;
   const sheets = buildClassroomWorksheets(session);
-  const cleanSchool = (session.schoolName || 'Cambrian').replace(/\s+/g, '_');
-  const filename = `${cleanSchool}_MathSession_${session.sessionId}.xlsx`;
+  const cleanGroup = (session.groupName || 'MathGroup').replace(/\s+/g, '_');
+  const filename = `${cleanGroup}_SessionReport_${session.sessionId}.xlsx`;
   downloadWorkbook(filename, sheets);
 }

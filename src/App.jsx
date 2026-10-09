@@ -9,8 +9,8 @@ import SummaryModal from './components/SummaryModal.jsx';
 import {
   generateQuestion,
   STANDARDS,
-  DISTRICT_INFO,
-} from './data/cambrianCurriculum.js';
+  PROGRAM_INFO,
+} from './data/californiaCurriculum.js';
 import {
   createInitialProfile,
   updateLearnerProfile,
@@ -33,15 +33,14 @@ import {
 } from './audio.js';
 
 const STORAGE_KEYS = {
-  PROFILE: 'cambrian_math_profile_v1',
-  THEME: 'cambrian_math_theme_v1',
-  SOUND: 'cambrian_math_sound_v1',
-  MUSIC: 'cambrian_math_music_v1',
-  SESSION: 'cambrian_math_session_v1',
+  PROFILE: 'california_math_profile_v2',
+  THEME: 'california_math_theme_v2',
+  SOUND: 'california_math_sound_v2',
+  MUSIC: 'california_math_music_v2',
+  SESSION: 'california_math_session_v2',
 };
 
 export default function App() {
-  // Theme & Audio state
   const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEYS.THEME) || 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.SOUND);
@@ -52,36 +51,32 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
-  // Curriculum & District settings
   const [grade, setGrade] = useState('3');
-  const [schoolId, setSchoolId] = useState('fammatre');
+  const [leagueId, setLeagueId] = useState('golden-bears');
   const [difficulty, setDifficulty] = useState('intermediate');
   const [mode, setMode] = useState('grade-quest');
 
-  // Gameplay state
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
   const [lives, setLives] = useState(diffInfo.lives);
-  const [feedback, setFeedback] = useState(null); // { status, answer }
+  const [feedback, setFeedback] = useState(null);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
   const timerRef = useRef(null);
 
-  // Modals state
   const [classroomOpen, setClassroomOpen] = useState(false);
   const [curriculumOpen, setCurriculumOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
 
-  // Persistent Learner Profile & Classroom Session
   const [learnerProfile, setLearnerProfile] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PROFILE);
-      return saved ? JSON.parse(saved) : createInitialProfile('3', 'fammatre');
+      return saved ? JSON.parse(saved) : createInitialProfile('3', 'golden-bears');
     } catch {
-      return createInitialProfile('3', 'fammatre');
+      return createInitialProfile('3', 'golden-bears');
     }
   });
 
@@ -94,7 +89,6 @@ export default function App() {
     }
   });
 
-  // Save profile and theme changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
@@ -123,7 +117,6 @@ export default function App() {
     }
   }, [musicEnabled]);
 
-  // Generate question based on current mode & grade
   const nextQuestion = useCallback(
     (customStandard = null) => {
       setFeedback(null);
@@ -142,15 +135,12 @@ export default function App() {
           q = selectAdaptiveQuestion(grade, learnerProfile);
         }
       } else if (mode === 'manipulatives') {
-        // Generate with manipulatives priority
         q = generateQuestion(grade);
       } else if (mode === 'word-problems') {
-        // Prefer OA or MD word problems
         q = generateQuestion(grade, 'OA');
       } else if (mode === 'smart-review') {
         q = selectAdaptiveQuestion(grade, learnerProfile);
       } else {
-        // Grade Quest default
         q = generateQuestion(grade);
       }
 
@@ -162,12 +152,10 @@ export default function App() {
     [grade, mode, diffInfo, learnerProfile]
   );
 
-  // Initialize first question
   useEffect(() => {
     nextQuestion();
   }, [grade, mode, difficulty]);
 
-  // Timer countdown
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion) return;
 
@@ -199,7 +187,6 @@ export default function App() {
     const responseTime = (diffInfo.timerSeconds || 25) - timeLeft;
     const pointsEarned = isCorrect ? calculatePoints(streak, difficulty) : 0;
 
-    // Audio Feedback
     if (soundEnabled) {
       if (isCorrect) {
         if (streak > 0 && streak % 3 === 0) {
@@ -217,7 +204,6 @@ export default function App() {
       answer: givenAnswer,
     });
 
-    // Update Scores & Lives
     if (isCorrect) {
       setScore((s) => s + pointsEarned);
       setStreak((st) => st + 1);
@@ -237,12 +223,10 @@ export default function App() {
       setRoundStats((rs) => ({ ...rs, total: rs.total + 1 }));
     }
 
-    // Update Learner Profile
     setLearnerProfile((prev) =>
       updateLearnerProfile(prev, currentQuestion.standard, isCorrect)
     );
 
-    // Record in active classroom session if enabled
     if (classSession) {
       setClassSession((prev) =>
         recordClassroomAttempt(prev, {
@@ -259,7 +243,6 @@ export default function App() {
       );
     }
 
-    // Advance to next question after delay
     setTimeout(() => {
       if (lives > 1 || isCorrect) {
         nextQuestion();
@@ -267,7 +250,6 @@ export default function App() {
     }, 1200);
   };
 
-  // Keyboard navigation support (1, 2, 3, 4 for options A, B, C, D)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (feedback || !currentQuestion?.options || summaryOpen) return;
@@ -283,11 +265,11 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentQuestion, feedback, summaryOpen]);
 
-  const handleStartClassSession = ({ teacherName, className, schoolId }) => {
+  const handleStartClassSession = ({ leaderName, groupName, leagueId }) => {
     const newSession = createClassSession({
-      teacherName,
-      className,
-      schoolId,
+      leaderName,
+      groupName,
+      leagueId,
     });
     setClassSession(newSession);
   };
@@ -314,8 +296,8 @@ export default function App() {
       <Header
         grade={grade}
         onGradeChange={setGrade}
-        schoolId={schoolId}
-        onSchoolChange={setSchoolId}
+        leagueId={leagueId}
+        onLeagueChange={setLeagueId}
         difficulty={difficulty}
         onDifficultyChange={(d) => {
           setDifficulty(d);
@@ -358,15 +340,13 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>Cambrian Math Quest</strong> • California Common Core State Standards (CCSS-M)
-          Elementary Program
+          <strong>California Elementary Math Quest</strong> • California Common Core State Standards (CA CCSSM)
         </p>
         <p>
-          Serving Fammatre, Farnham, Sartorette, Bagby & Steindorf STEAM School • Cambrian Park, San Jose, CA
+          Open Community Learning Platform for California Students, Families & Tutors (Grades K–5)
         </p>
       </footer>
 
-      {/* Classroom Portal Modal */}
       <ClassroomModal
         isOpen={classroomOpen}
         onClose={() => setClassroomOpen(false)}
@@ -375,7 +355,6 @@ export default function App() {
         onUpdateActiveStudent={handleUpdateActiveStudent}
       />
 
-      {/* Standards Curriculum Map Modal */}
       <CurriculumBrowser
         isOpen={curriculumOpen}
         onClose={() => setCurriculumOpen(false)}
@@ -383,10 +362,8 @@ export default function App() {
         onPracticeStandard={(code) => nextQuestion(code)}
       />
 
-      {/* Help Guide Modal */}
       <HelpGuide isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
 
-      {/* Round Complete Summary Modal */}
       <SummaryModal
         isOpen={summaryOpen}
         onClose={() => setSummaryOpen(false)}

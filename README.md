@@ -1,76 +1,76 @@
-# Cambrian Math Quest 📐
+# California Elementary Math Quest 📐
 
-[![CI](https://github.com/tinouchemassinissa/cambrian-math-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/cambrian-math-quest/actions/workflows/ci.yml)
+[![CI](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Standards: CCSS-M](https://img.shields.io/badge/Standards-California_CCSS--M-emerald)](https://www.cde.ca.gov/ci/ma/cf/)
+[![Standards: CA CCSSM](https://img.shields.io/badge/Standards-California_CCSS--M-emerald)](https://www.cde.ca.gov/ci/ma/cf/)
 [![Platform](https://img.shields.io/badge/Platform-PWA_Offline--First-indigo)](https://web.dev/progressive-web-apps/)
 
-An interactive, standards-aligned elementary school mathematics learning game engineered for **Cambrian School District** in **Cambrian Park / San Jose, California**, spanning **Kindergarten through 5th Grade** aligned with the **California Common Core State Standards for Mathematics (CCSS-M)** and California Mathematics Framework.
+An open, community-driven elementary school mathematics learning platform engineered for **California student communities, families, homeschoolers, and tutoring groups**, spanning **Kindergarten through 5th Grade** strictly aligned with the **California Common Core State Standards for Mathematics (CA CCSSM)** published by the **California Department of Education (CDE)**.
 
 ---
 
-## 🏫 Participating Cambrian Schools & Programs
+## 🌟 California Community Scholar Leagues
 
-Cambrian Math Quest celebrates each elementary school community across the Cambrian School District:
+Students can choose and represent California regional scholar leagues designed to foster collaborative growth:
 
-- **🦅 Fammatre Elementary School** — *Home of the Falcons* (Focus: Science, Technology, Engineering, Arts, and Math — STEAM exploration)
-- **🦊 Farnham Elementary School** — *Home of the Foxes* (Focus: Leadership, Inquiry-Based Mathematics, Student Agency)
-- **⭐ Sartorette Elementary School** — *Home of the Superstars* (Focus: Discovery, Creative Problem Solving & Collaborative Learning)
-- **🐟 Bagby Elementary School** — *Home of the Barracudas* (Focus: Community, Character & Growth Mindset)
-- **🦈 Steindorf STEAM School** — *Home of the Sharks* (Focus: K-8 Project-Based Learning, Engineering Design & Applied Math)
+- **🐻 California Golden Bears**: Foundational Number Sense, Number Talks & Mathematical Fluency.
+- **🌲 Redwood Explorers**: Deep Inquiry, Conservation Themes & Multi-Step Word Problems.
+- **🌊 Pacific Voyagers**: Spatial Reasoning, Geometry & Interactive Visual Manipulatives.
+- **🏔️ Sierra Navigators**: Fractions, Decimals, Measurement & Proportional Thinking.
+- **⚡ Silicon Innovators**: Applied Mathematics, Data, Patterns & STEAM Problem Solving.
 
 ---
 
-## 🎯 California CCSS-M Curriculum Strands
+## 🎯 Official California CCSS-M Curriculum & Cluster Alignment
 
-The game procedural curriculum covers all elementary grade levels from TK/Kindergarten to 5th Grade:
+The platform's procedural learning engine covers the core clusters outlined in the California Mathematics Framework:
 
-| Grade | CCSS-M Domains Covered | Key Learning Milestones |
+| Grade | CCSS-M Domains | Key Official Clusters & Competencies |
 | :--- | :--- | :--- |
-| **Kindergarten (K)** | Counting & Cardinality (`CC`), Operations (`OA`), Base Ten (`NBT`), Geometry (`G`), Measurement (`MD`) | Ten-frame quantities, teen number decomposition ($10 + n$), addition/subtraction within 10, 2D/3D shape attributes |
-| **1st Grade (G1)** | Operations & Algebraic Thinking (`OA`), Base Ten (`NBT`), Measurement & Data (`MD`), Geometry (`G`) | Fluency within 20, missing addends, place value tens and ones to 120, telling time to hour and half-hour, halves & fourths |
-| **2nd Grade (G2)** | Operations (`OA`), Base Ten (`NBT`), Measurement (`MD`), Geometry (`G`) | Mental math within 20, addition & subtraction with regrouping up to 1,000, skip-counting (5s, 10s, 100s), money (coins & bills), clocks to 5 minutes |
-| **3rd Grade (G3)** | Operations & Algebraic Thinking (`OA`), Fractions (`NF`), Base Ten (`NBT`), Measurement (`MD`) | Multiplication & division facts (0–12), array models, unit fractions ($1/b$) on number lines, rounding to 10/100, area & perimeter |
-| **4th Grade (G4)** | Multi-Step Operations (`OA`), Base Ten (`NBT`), Fractions & Decimals (`NF`), Measurement (`MD`) | Multi-digit multiplication & long division, real-world multi-step story problems, equivalent fractions, adding fractions with like denominators, protractor angles |
-| **5th Grade (G5)** | Order of Operations (`OA`), Decimals (`NBT`), Unlike Fractions (`NF`), Measurement (`MD`), Coordinate Plane (`G`) | PEMDAS with parentheses, decimal operations ($+ - \times \div$), unlike denominator fraction addition, rectangular prism volume ($V = l \times w \times h$), coordinate grid plotting $(x, y)$ |
+| **Kindergarten (K)** | Counting & Cardinality (`K.CC`), Operations & Algebraic Thinking (`K.OA`), Number & Base Ten (`K.NBT`), Measurement & Data (`K.MD`), Geometry (`K.G`) | Count to 100 by 1s & 10s (`K.CC.1`), Cardinality with ten-frames (`K.CC.4`), Comparing quantities (`K.CC.6`), Addition/subtraction within 10 (`K.OA.2`), Partners to make 10 (`K.OA.4`), Teen number composition ($10 + n$) (`K.NBT.1`), 2D & 3D shapes (`K.G.2`). |
+| **1st Grade (G1)** | Operations & Algebraic Thinking (`1.OA`), Number & Base Ten (`1.NBT`), Measurement & Data (`1.MD`), Geometry (`1.G`) | Word problems within 20 (`1.OA.1`), Addition/subtraction fluency within 10 and strategy to 20 (`1.OA.6`), Unknown numbers in equations ($8 + ? = 14$) (`1.OA.8`), Place value tens & ones to 120 (`1.NBT.2`), 10 more/10 less mentally (`1.NBT.5`), Time to hour and half-hour (`1.MD.3`), Halves & fourths (`1.G.3`). |
+| **2nd Grade (G2)** | Operations (`2.OA`), Number & Base Ten (`2.NBT`), Measurement (`2.MD`), Geometry (`2.G`) | Fluency within 20 (`2.OA.2`), Odd & even numbers (`2.OA.3`), Skip-counting by 5s, 10s, 100s up to 1,000 (`2.NBT.2`), Regrouping addition & subtraction within 1,000 (`2.NBT.7`), Time to 5 minutes (`2.MD.7`), US coins & bills ($25¢, 10¢, 5¢, 1¢, \$1$) (`2.MD.8`), Polygon attributes (`2.G.1`). |
+| **3rd Grade (G3)** | Operations (`3.OA`), Number & Base Ten (`3.NBT`), Fractions (`3.NF`), Measurement (`3.MD`) | Multiplication & division word problems (`3.OA.3`), Fact fluency 0–12 (`3.OA.7`), Rounding to nearest 10 & 100 (`3.NBT.1`), Unit fractions ($1/b$) & number lines (`3.NF.1`, `3.NF.2`), Area in square units ($l \times w$) (`3.MD.7`), Perimeter of polygons (`3.MD.8`). |
+| **4th Grade (G4)** | Operations (`4.OA`), Base Ten (`4.NBT`), Fractions & Decimals (`4.NF`), Measurement (`4.MD`) | Multi-step word problems with remainders (`4.OA.3`), Prime & composite numbers (`4.OA.4`), Multi-digit multiplication (`4.NBT.5`), Equivalent fractions (`4.NF.1`), Adding fractions with like denominators (`4.NF.3`), Decimals as tenths & hundredths (`4.NF.6`), Angle measurement with protractors (`4.MD.6`). |
+| **5th Grade (G5)** | Operations (`5.OA`), Decimals & Base Ten (`5.NBT`), Unlike Fractions (`5.NF`), Measurement (`5.MD`), Geometry (`5.G`) | Order of operations with parentheses (PEMDAS) (`5.OA.1`), Decimal place value & operations ($+ - \times \div$) (`5.NBT.7`), Adding & subtracting unlike denominator fractions (`5.NF.1`), Rectangular prism volume ($V = l \times w \times h$) (`5.MD.5`), Coordinate plane plotting $(x, y)$ in Quadrant 1 (`5.G.1`). |
 
 ---
 
-## 🧩 Interactive Visual Manipulatives
+## 🧩 Visual Manipulatives (Concrete-Pictorial-Abstract)
 
-Research in elementary mathematics education (such as Eureka Math and Bridges in Mathematics) emphasizes concrete and pictorial representations before abstract formulas. Cambrian Math Quest includes built-in interactive visual models:
+Built-in interactive visual models support conceptual clarity before procedural fluency:
 
 1. **Interactive Ten-Frames & Double Ten-Frames**: Tactile visual counters showing 5-structures and base-10 groupings.
-2. **Number Line Hops**: Dynamic number lines with forward jumps, intervals, and missing hop values.
+2. **Number Line Hops**: Dynamic number line jumping arcs showing start, hops, and target numbers.
 3. **Fraction Strips & Bars**: Segmented parts representing denominators and shaded numerators.
-4. **Analog Clock Face**: Clear SVG clock face with distinguishable hour and minute hands for time-telling standards.
-5. **US Coin & Bill Tray**: Quarters (25¢), dimes (10¢), nickels (5¢), and pennies (1¢) with realistic scale and styling.
+4. **Analog Clock Face**: SVG clock with distinct hour and minute hands.
+5. **Coin & Bill Tray**: Scaled, realistic US currency (quarters, dimes, nickels, pennies, bills).
 6. **Multiplication Array Grid**: Visual grid demonstrating rectangular arrays and area models.
-7. **Coordinate Plane Grid**: First-quadrant $(x, y)$ coordinate system with target star markers.
+7. **Coordinate Plane Grid**: First-quadrant $(x, y)$ coordinate system with plotted target stars.
 
 ---
 
 ## 🎮 Game Modes
 
 - **🗺️ Grade Quest**: The primary campaign navigating through California standards for the selected grade with adaptive difficulty.
-- **⚡ Speed Sprint (Cambrian Park Math Dash)**: A 60-second high-energy math sprint with combo streak multipliers.
+- **⚡ Speed Sprint (California Math Dash)**: A 60-second high-energy math sprint with combo streak multipliers.
 - **🧩 Manipulatives Lab**: Problem sets specifically pairing each question with interactive visual models.
-- **📖 California Word Problems**: Story-based problems featuring Cambrian Park landmarks (Camden Ave farmers market, Los Gatos Creek Trail, Steindorf robotics kits, school carnivals).
+- **📖 California Word Problems**: Real-world story problems set in California redwoods, state parks, farm markets, science museums, and coastal sanctuaries.
 - **🧠 Smart Review**: Spaced-repetition engine that automatically identifies due standards and weak spots.
 - **🎯 Mistake Review**: Dedicated targeted review queue allowing students to retry missed questions and build a growth mindset.
 
 ---
 
-## 👩‍🏫 Teacher Portal & Zero-Dependency Excel (.xlsx) Reports
+## 👥 Study Group / Tutor Portal & Zero-Dependency Excel (.xlsx) Reports
 
-Classroom mode is built specifically for teachers in Cambrian School District:
+Classroom and study group mode is built with **100% student privacy**:
 
-- **100% Student Privacy**: Operates entirely in the browser. No student accounts, passwords, or cloud data transfers are required.
-- **Live Classroom HUD**: Teachers can set School, Teacher Name, Class Name, and switch active students with a single tap.
-- **Instant Excel (.xlsx) Export**: Built using a zero-dependency ZIP/XML open-standards engine:
-  - **Sheet 1 — Class Session Summary**: District information, active school, total problems attempted, correct rate, and class accuracy %.
-  - **Sheet 2 — Student Roster & Accuracy**: Aggregated metrics per student with attempts, correct answers, and points earned.
-  - **Sheet 3 — Detailed Item Log**: Itemized row for every question answered, timestamped with the exact California CCSS-M standard code (e.g. `CCSS.MATH.CONTENT.3.OA.C.7`), prompt, student answer, correct answer, speed, and result.
+- **No Student Accounts or Cloud Tracking**: Runs completely in-browser without sending student data to third-party servers.
+- **Live Study Session HUD**: Facilitators can switch active learners with a single tap.
+- **Instant Excel (.xlsx) Export**: Built using a zero-dependency open-standards ZIP/XML generator:
+  - **Sheet 1 — Session Summary**: Group metrics, total problems attempted, correct rate, and accuracy %.
+  - **Sheet 2 — Learner Performance**: Grouped metrics per student with attempts, correct answers, and points earned.
+  - **Sheet 3 — Detailed Item Log**: Itemized row for every question answered, timestamped with the exact California CCSS-M standard code (e.g. `CCSS.MATH.CONTENT.3.OA.C.7`), cluster, prompt, student answer, correct answer, time, and points.
 
 ---
 
@@ -99,14 +99,10 @@ Classroom mode is built specifically for teachers in Cambrian School District:
 
 ## 💻 Local Development & Verification
 
-### Prerequisites
-- Node.js 20+ (tested on Node v22)
-- npm 10+
-
 ### Setup
 ```bash
-git clone https://github.com/tinouchemassinissa/cambrian-math-quest.git
-cd cambrian-math-quest
+git clone https://github.com/tinouchemassinissa/california-math-quest.git
+cd california-math-quest
 npm install
 npm run dev
 ```
@@ -121,4 +117,4 @@ npm run build
 
 ## 👤 Author
 
-Developed by **Massinissa TINOUCHE** for the students and teachers of the Cambrian School District.
+Developed by **Massinissa TINOUCHE** for California student learning communities.

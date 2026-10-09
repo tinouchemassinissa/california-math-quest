@@ -1,4 +1,4 @@
-import { STANDARDS, generateQuestion } from '../data/cambrianCurriculum.js';
+import { STANDARDS, generateQuestion } from '../data/californiaCurriculum.js';
 
 export const EMPTY_STANDARD_STATS = {
   attempts: 0,
@@ -11,10 +11,10 @@ export const EMPTY_STANDARD_STATS = {
   intervalDays: 0,
 };
 
-export const createInitialProfile = (grade = '3', school = 'fammatre') => ({
+export const createInitialProfile = (grade = '3', league = 'golden-bears') => ({
   grade,
-  school,
-  playerName: 'Cambrian Scholar',
+  league,
+  playerName: 'California Math Scholar',
   totalAttempts: 0,
   totalCorrect: 0,
   currentStreak: 0,
@@ -26,21 +26,20 @@ export const createInitialProfile = (grade = '3', school = 'fammatre') => ({
 export function updateLearnerProfile(profile, standardCode, isCorrect, now = Date.now()) {
   const current = profile.standards[standardCode] || { ...EMPTY_STANDARD_STATS };
   const nextCorrectStreak = isCorrect ? current.correctStreak + 1 : 0;
-  
-  // Spaced repetition intervals: 1 day, 3 days, 7 days, 14 days, 30 days
+
+  // Spaced repetition interval curve
   const intervals = [1, 3, 7, 14, 30];
   const intervalDays = isCorrect
     ? intervals[Math.min(nextCorrectStreak - 1, intervals.length - 1)]
     : 0;
 
-  // Adaptive mastery score (smooth exponential moving update)
   const mastery = isCorrect
     ? Math.min(1, current.mastery + (1 - current.mastery) * 0.25)
     : Math.max(0, current.mastery * 0.7);
 
   const reviewDelayMs = isCorrect
     ? intervalDays * 24 * 60 * 60 * 1000
-    : 10 * 60 * 1000; // review quickly after 10 mins if mistake
+    : 10 * 60 * 1000;
 
   const nextLearningStreak = isCorrect ? profile.currentStreak + 1 : 0;
 
@@ -76,7 +75,7 @@ export function getDueStandards(profile, grade = null, now = Date.now()) {
 
   return allCodes.filter((code) => {
     const stats = profile.standards[code] || EMPTY_STANDARD_STATS;
-    if (!stats.attempts) return true; // unseen is due
+    if (!stats.attempts) return true;
     if (!stats.nextReview) return true;
     return Date.parse(stats.nextReview) <= now;
   });
@@ -100,7 +99,6 @@ export function selectAdaptiveQuestion(grade, profile, random = Math.random, now
 
   const due = new Set(getDueStandards(profile, grade, now));
 
-  // Compute adaptive selection weights
   const weights = standardsForGrade.map((code) => {
     const stats = profile.standards[code] || EMPTY_STANDARD_STATS;
     const weakness = 1 - stats.mastery;
@@ -134,7 +132,7 @@ export const DIFFICULTY_PRESETS = {
     timerSeconds: 45,
     multiplier: 1.0,
     showHints: true,
-    description: 'Gentle pace, generous timer & visual hints',
+    description: 'Gentle pace, untimed option & conceptual hints',
   },
   intermediate: {
     id: 'intermediate',
@@ -143,7 +141,7 @@ export const DIFFICULTY_PRESETS = {
     timerSeconds: 25,
     multiplier: 1.25,
     showHints: true,
-    description: 'Standard Cambrian classroom challenge',
+    description: 'Standard California classroom challenge',
   },
   expert: {
     id: 'expert',
@@ -161,7 +159,7 @@ export const DIFFICULTY_PRESETS = {
     timerSeconds: 10,
     multiplier: 2.0,
     showHints: false,
-    description: 'High-stakes district tournament mode',
+    description: 'High-speed California math tournament',
   },
 };
 
@@ -218,7 +216,7 @@ export function computeAchievements(profile, modeRecords = {}) {
   const summary = getProgressSummary(profile);
   const allStats = Object.values(profile.standards);
 
-  const achievements = [
+  return [
     {
       id: 'first-step',
       title: 'First Step',
@@ -248,29 +246,18 @@ export function computeAchievements(profile, modeRecords = {}) {
       unlocked: allStats.some((s) => s.mistakes >= 2 && s.mastery >= 0.8),
     },
     {
-      id: 'grade-scholar',
-      title: 'Cambrian Scholar',
+      id: 'golden-scholar',
+      title: 'California Scholar',
       desc: 'Master at least 3 distinct grade standards.',
       icon: '🎓',
       unlocked: summary.masteredCount >= 3,
     },
     {
-      id: 'speed-demon',
-      title: 'Cambrian Park Dash',
-      desc: 'Win or achieve 500+ points in Speed Sprint mode.',
+      id: 'speed-dash',
+      title: 'California Math Dash',
+      desc: 'Achieve 500+ points in Speed Sprint mode.',
       icon: '⏱️',
       unlocked: (modeRecords['speed-sprint']?.bestScore || 0) >= 500,
     },
-    {
-      id: 'perfect-run',
-      title: 'Flawless Run',
-      desc: 'Complete a session with 100% accuracy (at least 10 attempts).',
-      icon: '🌟',
-      unlocked: Object.values(modeRecords).some(
-        (r) => r.bestAccuracy >= 100 && r.attempts >= 10
-      ),
-    },
   ];
-
-  return achievements;
 }

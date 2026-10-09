@@ -1,9 +1,9 @@
 {
-  "name": "cambrian-math-quest",
+  "name": "california-math-quest",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Cambrian Math Quest - California Elementary Mathematics Learning Game for Cambrian School District (Grades K-5)",
+  "description": "California Elementary Math Quest - Community Mathematics Learning Platform aligned with California Common Core State Standards (Grades K-5)",
   "scripts": {
     "dev": "vite --port 5173 --host",
     "build": "vite build",

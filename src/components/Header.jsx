@@ -1,12 +1,12 @@
 import React from 'react';
-import { DISTRICT_INFO, GRADES } from '../data/cambrianCurriculum.js';
+import { PROGRAM_INFO, GRADES } from '../data/californiaCurriculum.js';
 import { DIFFICULTY_PRESETS } from '../game/learningEngine.js';
 
 export default function Header({
   grade,
   onGradeChange,
-  schoolId,
-  onSchoolChange,
+  leagueId,
+  onLeagueChange,
   difficulty,
   onDifficultyChange,
   score,
@@ -24,20 +24,19 @@ export default function Header({
   onOpenHelp,
   activeClassSession,
 }) {
-  const currentSchool = DISTRICT_INFO.schools.find((s) => s.id === schoolId) || DISTRICT_INFO.schools[0];
-  const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
+  const currentLeague = PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
 
   return (
     <header className="app-header">
       <div className="header-top">
         <div className="brand-group">
-          <div className="school-badge-icon" style={{ borderColor: currentSchool.color }}>
-            {currentSchool.badge}
+          <div className="school-badge-icon" style={{ borderColor: currentLeague.color }}>
+            {currentLeague.badge}
           </div>
           <div className="brand-titles">
-            <h1 className="district-title">Cambrian Math Quest</h1>
+            <h1 className="district-title">California Math Quest</h1>
             <div className="district-sub">
-              <span>{currentSchool.name}</span> • <span>{DISTRICT_INFO.location}</span>
+              <span>{currentLeague.name}</span> • <span>CA Common Core (CCSS-M)</span>
             </div>
           </div>
         </div>
@@ -49,9 +48,9 @@ export default function Header({
               type="button"
               className="badge-pill class-pill"
               onClick={onOpenClassroom}
-              title="Classroom Session Active"
+              title="Study Group Active"
             >
-              🏫 {activeClassSession.className} ({activeClassSession.activeStudent})
+              👥 {activeClassSession.groupName} ({activeClassSession.activeStudent})
             </button>
           )}
 
@@ -86,7 +85,7 @@ export default function Header({
             type="button"
             className="icon-btn help-btn"
             onClick={onOpenHelp}
-            title="Help & Curriculum Guide"
+            title="Help & Official California CCSS-M Guide"
           >
             ❓
           </button>
@@ -97,16 +96,16 @@ export default function Header({
         {/* Selectors */}
         <div className="selectors-group">
           <div className="select-wrapper">
-            <label htmlFor="school-select">School:</label>
+            <label htmlFor="league-select">Scholar League:</label>
             <select
-              id="school-select"
-              value={schoolId}
-              onChange={(e) => onSchoolChange(e.target.value)}
+              id="league-select"
+              value={leagueId}
+              onChange={(e) => onLeagueChange(e.target.value)}
               className="styled-select"
             >
-              {DISTRICT_INFO.schools.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.badge} {s.name} ({s.mascot})
+              {PROGRAM_INFO.leagues.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.badge} {l.name}
                 </option>
               ))}
             </select>
@@ -157,7 +156,7 @@ export default function Header({
             className="text-link-btn teacher-link"
             onClick={onOpenClassroom}
           >
-            Teacher Portal
+            Study Groups
           </button>
         </div>
 
