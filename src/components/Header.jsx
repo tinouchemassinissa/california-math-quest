@@ -23,6 +23,7 @@ export default function Header({
   onOpenCurriculum,
   onOpenHelp,
   onOpenVault,
+  onOpenAchievements,
   activeClassSession,
 }) {
   const currentLeague = PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
@@ -150,6 +151,15 @@ export default function Header({
             onClick={onOpenCurriculum}
           >
             Standards Map
+          </button>
+
+          <button
+            type="button"
+            className="text-link-btn"
+            onClick={onOpenAchievements}
+            title="View California CCSS-M Mastery Progress & Badges"
+          >
+            🏆 Mastery & Badges
           </button>
 
           <button

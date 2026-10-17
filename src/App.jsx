@@ -7,15 +7,12 @@ import CurriculumBrowser from './components/CurriculumBrowser.jsx';
 import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
 import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
-import {
-  STANDARDS,
-  PROGRAM_INFO,
-} from './data/californiaCurriculum.js';
+import AchievementsModal from './components/AchievementsModal.jsx';
 import {
   createInitialProfile,
   updateLearnerProfile,
+  getDueStandards,
   getMistakeReviewStandards,
-  selectAdaptiveQuestion,
   calculatePoints,
   DIFFICULTY_PRESETS,
 } from './game/learningEngine.js';
@@ -39,7 +36,24 @@ const STORAGE_KEYS = {
   SOUND: 'california_math_sound_v3',
   MUSIC: 'california_math_music_v3',
   SESSION: 'california_math_session_v3',
+  RECORDS: 'california_math_records_v3',
 };
+
+function isAnswerEquivalent(given, correct) {
+  const gNorm = String(given ?? '').trim().toLowerCase();
+  const cNorm = String(correct ?? '').trim().toLowerCase();
+  if (gNorm === cNorm) return true;
+
+  // Allow free-response numeric entry when correct answer has units or commas (e.g., "24" for "24 sq m" or "3000" for "3,000")
+  const stripCommas = (s) => s.replace(/,/g, '');
+  if (stripCommas(gNorm) === stripCommas(cNorm)) return true;
+
+  const numericOnlyC = stripCommas(cNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
+  const numericOnlyG = stripCommas(gNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
+  if (numericOnlyG && numericOnlyG === numericOnlyC) return true;
+
+  return false;
+}
 
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEYS.THEME) || 'dark');
@@ -74,6 +88,7 @@ export default function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [vaultOpen, setVaultOpen] = useState(false);
+  const [achievementsOpen, setAchievementsOpen] = useState(false);
 
   const [learnerProfile, setLearnerProfile] = useState(() => {
     try {
@@ -81,6 +96,15 @@ export default function App() {
       return saved ? JSON.parse(saved) : createInitialProfile('3', 'golden-bears');
     } catch {
       return createInitialProfile('3', 'golden-bears');
+    }
+  });
+
+  const [modeRecords, setModeRecords] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.RECORDS);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
     }
   });
 
@@ -114,6 +138,10 @@ export default function App() {
   }, [learnerProfile]);
 
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(modeRecords));
+  }, [modeRecords]);
+
+  useEffect(() => {
     if (classSession) {
       localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(classSession));
     }
@@ -133,7 +161,7 @@ export default function App() {
   }, [musicEnabled]);
 
   const nextQuestion = useCallback(
-    async (customStandard = null) => {
+    async (customStandard = null, resetSprintClock = false) => {
       setFeedback(null);
       let targetStandard = customStandard;
 
@@ -143,26 +171,40 @@ export default function App() {
           if (mistakes.length) {
             targetStandard = mistakes[Math.floor(Math.random() * mistakes.length)];
           }
+        } else if (mode === 'smart-review') {
+          const due = getDueStandards(learnerProfile, grade);
+          if (due.length) {
+            targetStandard = due[Math.floor(Math.random() * due.length)];
+          }
         }
       }
 
       const res = await fetchEducationalQuestion({
         grade,
         standardCode: targetStandard,
-        preferOnline: false, // Ensure algorithmic formal generator is primary for endless variety
+        mode,
+        preferOnline: false,
       });
 
       setCurrentQuestion(res.question);
       setEngineSource(res.source);
 
-      const timerSec = mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds || 25;
-      setTimeLeft(timerSec);
+      if (mode === 'speed-sprint') {
+        if (resetSprintClock) {
+          setTimeLeft(60);
+        }
+      } else {
+        setTimeLeft(diffInfo.timerSeconds || 25);
+      }
     },
     [grade, mode, diffInfo, learnerProfile]
   );
 
   useEffect(() => {
-    nextQuestion();
+    if (mode === 'speed-sprint') {
+      setTimeLeft(60);
+    }
+    nextQuestion(null, mode === 'speed-sprint');
   }, [grade, mode, difficulty]);
 
   useEffect(() => {
@@ -172,7 +214,12 @@ export default function App() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          handleTimeOut();
+          if (mode === 'speed-sprint') {
+            if (soundEnabled) playVictorySound();
+            setSummaryOpen(true);
+          } else {
+            handleTimeOut();
+          }
           return 0;
         }
         return prev - 1;
@@ -180,7 +227,7 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [currentQuestion, feedback, summaryOpen]);
+  }, [currentQuestion, feedback, summaryOpen, mode, soundEnabled]);
 
   const handleTimeOut = () => {
     handleAnswer('TIMEOUT_EXPIRED');
@@ -189,11 +236,9 @@ export default function App() {
   const handleAnswer = (givenAnswer) => {
     if (feedback || !currentQuestion) return;
 
-    const isCorrect =
-      String(givenAnswer).trim().toLowerCase() ===
-      String(currentQuestion.correctAnswer).trim().toLowerCase();
+    const isCorrect = isAnswerEquivalent(givenAnswer, currentQuestion.correctAnswer);
 
-    const responseTime = (diffInfo.timerSeconds || 25) - timeLeft;
+    const responseTime = Math.max(1, (diffInfo.timerSeconds || 25) - timeLeft);
     const pointsEarned = isCorrect ? calculatePoints(streak, difficulty) : 0;
 
     if (soundEnabled) {
@@ -213,15 +258,27 @@ export default function App() {
       answer: givenAnswer,
     });
 
-    const isGameOver = !isCorrect && lives <= 1;
+    const isGameOver = mode !== 'speed-sprint' && !isCorrect && lives <= 1;
 
     if (isCorrect) {
-      setScore((s) => s + pointsEarned);
+      setScore((s) => {
+        const nextScore = s + pointsEarned;
+        setModeRecords((prev) => {
+          const prevBest = prev[mode]?.bestScore || 0;
+          return {
+            ...prev,
+            [mode]: { bestScore: Math.max(prevBest, nextScore) },
+          };
+        });
+        return nextScore;
+      });
       setStreak((st) => st + 1);
       setRoundStats((rs) => ({ correct: rs.correct + 1, total: rs.total + 1 }));
     } else {
       setStreak(0);
-      setLives((l) => Math.max(0, l - 1));
+      if (mode !== 'speed-sprint') {
+        setLives((l) => Math.max(0, l - 1));
+      }
       setRoundStats((rs) => ({ ...rs, total: rs.total + 1 }));
     }
 
@@ -245,20 +302,20 @@ export default function App() {
       );
     }
 
-    // Always advance cleanly without getting stuck
     setTimeout(() => {
       if (isGameOver) {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
       } else {
-        nextQuestion();
+        nextQuestion(null, false);
       }
-    }, 1200);
+    }, mode === 'speed-sprint' ? 650 : 1200);
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (feedback || !currentQuestion?.options || summaryOpen) return;
+      if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
       const key = e.key;
       if (['1', '2', '3', '4'].includes(key)) {
         const idx = parseInt(key, 10) - 1;
@@ -292,7 +349,7 @@ export default function App() {
     setStreak(0);
     setRoundStats({ correct: 0, total: 0 });
     setSummaryOpen(false);
-    nextQuestion();
+    nextQuestion(null, mode === 'speed-sprint');
   };
 
   const mistakeStandards = getMistakeReviewStandards(learnerProfile, grade);
@@ -323,6 +380,7 @@ export default function App() {
         onOpenCurriculum={() => setCurriculumOpen(true)}
         onOpenHelp={() => setHelpOpen(true)}
         onOpenVault={() => setVaultOpen(true)}
+        onOpenAchievements={() => setAchievementsOpen(true)}
         activeClassSession={classSession}
       />
 
@@ -330,7 +388,7 @@ export default function App() {
         <div className="status-badge-container">
           <span className={`status-dot ${isNetworkOnline ? 'online' : 'offline'}`} />
           <span className="status-text">
-            ⚡ Formal Mathematical Invariant Engine Active (Error-Free Seeded Generation)
+            ⚡ Formal Mathematical Invariant Engine Active (69 CA CCSS-M Standards • Error-Free Seeded Generation)
           </span>
           <button
             type="button"
@@ -344,7 +402,7 @@ export default function App() {
           <button
             type="button"
             className="skip-btn"
-            onClick={() => nextQuestion()}
+            onClick={() => nextQuestion(null, false)}
             title="Skip to another fresh question"
           >
             Skip ➔
@@ -376,7 +434,7 @@ export default function App() {
           <strong>California Elementary Math Quest</strong> • California Common Core State Standards (CA CCSSM)
         </p>
         <p>
-          Formally Verified Mathematical Constraint Engine (Grades K–5)
+          Formally Verified Mathematical Constraint Engine (Grades K–5 • 40 Eureka Modules • 69 Standards)
         </p>
       </footer>
 
@@ -392,7 +450,15 @@ export default function App() {
         isOpen={curriculumOpen}
         onClose={() => setCurriculumOpen(false)}
         learnerProfile={learnerProfile}
-        onPracticeStandard={(code) => nextQuestion(code)}
+        onPracticeStandard={(code) => nextQuestion(code, false)}
+      />
+
+      <AchievementsModal
+        isOpen={achievementsOpen}
+        onClose={() => setAchievementsOpen(false)}
+        learnerProfile={learnerProfile}
+        currentGrade={grade}
+        modeRecords={modeRecords}
       />
 
       <HelpGuide isOpen={helpOpen} onClose={() => setHelpOpen(false)} />

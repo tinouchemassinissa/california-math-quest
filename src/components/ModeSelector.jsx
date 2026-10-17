@@ -12,7 +12,7 @@ export const GAME_MODES = [
   {
     id: 'speed-sprint',
     title: 'Speed Sprint',
-    subtitle: '60s Cambrian Park Math Dash',
+    subtitle: '60s California Math Fluency Dash',
     icon: '⚡',
     badge: 'Timed Challenge',
     color: '#e11d48',
@@ -20,7 +20,7 @@ export const GAME_MODES = [
   {
     id: 'manipulatives',
     title: 'Manipulatives Lab',
-    subtitle: 'Ten-Frames, Number Lines, Clocks & Fractions',
+    subtitle: 'Ten-Frames, Number Lines, Clocks & Geometry',
     icon: '🧩',
     badge: 'Hands-On Visuals',
     color: '#0891b2',
@@ -28,7 +28,7 @@ export const GAME_MODES = [
   {
     id: 'word-problems',
     title: 'California Word Problems',
-    subtitle: 'Silicon Valley & Cambrian Park Real-World Scenarios',
+    subtitle: 'Golden State Real-World Math Scenarios',
     icon: '📖',
     badge: 'Applied Math',
     color: '#d97706',

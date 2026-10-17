@@ -8,7 +8,7 @@ test('createWorkbookBlob creates a valid XLSX Blob without external dependencies
       name: 'Classroom Summary',
       rows: [
         ['Metric', 'Value'],
-        ['School', 'Fammatre Elementary'],
+        ['Study Group', 'Golden State Math Scholars'],
         ['Total Students', 24],
         ['Accuracy', 92.5],
       ],

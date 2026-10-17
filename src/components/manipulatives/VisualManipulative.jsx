@@ -285,7 +285,10 @@ export default function VisualManipulative({ manipulative }) {
     }
 
     case 'interactive-geometry':
-    case 'geometry': {
+    case 'geometry':
+    case 'protractor':
+    case 'volume-prism':
+    case 'polygon-inspector': {
       return <InteractiveGeometry data={manipulative} />;
     }
 

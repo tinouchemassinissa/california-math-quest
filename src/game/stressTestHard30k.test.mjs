@@ -29,7 +29,7 @@ test('30,000-CYCLE HARD STRESS TEST: Interactive Geometry, Multi-Step Word Probl
 
   // Gameplay simulation
   assert.equal(result.totalAttempts, 30000);
-  assert.equal(result.standardsPracticedCount, 47);
+  assert.equal(result.standardsPracticedCount, 69);
   assert.equal(result.classroomWorksheetsValid, true);
   assert.equal(result.livesCycles.gameOversTriggered, result.livesCycles.cleanResets);
 });

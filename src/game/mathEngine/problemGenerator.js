@@ -13,52 +13,127 @@ import {
   buildProtractorDistractors,
 } from './misconceptions.js';
 
+export const MANIPULATIVE_STANDARDS = new Set([
+  'K.CC.B.4',
+  'K.OA.A.2',
+  'K.OA.A.4',
+  'K.NBT.A.1',
+  'K.G.A.2',
+  '1.OA.C.6',
+  '1.MD.A.2',
+  '1.MD.B.3',
+  '1.G.A.3',
+  '2.OA.C.4',
+  '2.NBT.A.2',
+  '2.MD.C.7',
+  '2.MD.C.8',
+  '2.G.A.1',
+  '3.OA.A.3',
+  '3.OA.C.7',
+  '3.NF.A.1',
+  '3.NF.A.2',
+  '3.NF.A.3',
+  '3.MD.C.7',
+  '3.MD.D.8',
+  '3.G.A.1',
+  '4.NF.A.1',
+  '4.MD.A.3',
+  '4.MD.C.6',
+  '4.G.A.1',
+  '5.NF.A.1',
+  '5.MD.C.5',
+  '5.G.A.1',
+]);
+
+export const WORD_PROBLEM_STANDARDS = new Set([
+  'K.OA.A.2',
+  '1.OA.A.1',
+  '1.MD.A.2',
+  '2.OA.A.1',
+  '2.MD.C.8',
+  '3.OA.A.3',
+  '3.OA.D.8',
+  '3.MD.A.1',
+  '3.MD.C.7',
+  '3.MD.D.8',
+  '4.OA.A.2',
+  '4.OA.A.3',
+  '4.NF.B.4',
+  '4.MD.A.1',
+  '4.MD.A.3',
+  '5.OA.A.1',
+  '5.NBT.B.6',
+  '5.NBT.B.7',
+  '5.NF.A.1',
+  '5.NF.B.4',
+  '5.NF.B.7',
+  '5.MD.A.1',
+  '5.MD.C.5',
+]);
+
 /**
  * Robust, Verified Mathematical Problem Generator
- * Every single standard in CA CCSS-M Grades K through 5 has a dedicated, verified generator.
+ * Every single standard in CA CCSS-M Grades K through 5 (56 standards) has a dedicated, verified generator.
  * No dummy fallback is ever used.
  */
 export function generateVerifiedProblem({
   grade = '3',
   standardCode = null,
+  mode = 'grade-quest',
   seed = null,
   maxVerificationAttempts = 15,
 } = {}) {
-  const actualSeed = seed ?? Math.floor(Date.now() * 1000 + (typeof performance !== 'undefined' ? performance.now() * 100 : 0) + Math.random() * 1000000);
+  const actualSeed =
+    seed ??
+    Math.floor(
+      Date.now() * 1000 +
+        (typeof performance !== 'undefined' ? performance.now() * 100 : 0) +
+        Math.random() * 1000000
+    );
   const prng = createPRNG(actualSeed);
 
   // Pick candidate standard
   let candidateStandards = Object.values(STANDARDS).filter((s) => s.grade === grade);
   if (standardCode && STANDARDS[standardCode]) {
     candidateStandards = [STANDARDS[standardCode]];
+  } else if (mode === 'manipulatives') {
+    const manipFiltered = candidateStandards.filter((s) => MANIPULATIVE_STANDARDS.has(s.code));
+    if (manipFiltered.length > 0) candidateStandards = manipFiltered;
+  } else if (mode === 'word-problems') {
+    const wpFiltered = candidateStandards.filter((s) => WORD_PROBLEM_STANDARDS.has(s.code));
+    if (wpFiltered.length > 0) candidateStandards = wpFiltered;
   }
 
   const standard = prng.choice(candidateStandards) || candidateStandards[0];
 
   // If templates were learned from online feeds/APIs, opportunistically synthesize from them
-  try {
-    const learned = getLearnedTemplates(grade, standard.code);
-    if (learned && learned.length > 0 && prng.next() < 0.35) {
-      const chosenTemplate = prng.choice(learned);
-      const synthesized = synthesizeFromLearnedTemplate(chosenTemplate, prng);
-      if (synthesized) {
-        const check = verifyQuestion(synthesized);
-        if (check.valid) {
-          return {
-            ...synthesized,
-            seed: actualSeed,
-            verified: true,
-            verificationTimestamp: new Date().toISOString(),
-          };
+  if (mode !== 'manipulatives') {
+    try {
+      const learned = getLearnedTemplates(grade, standard.code);
+      if (learned && learned.length > 0 && prng.next() < 0.35) {
+        const chosenTemplate = prng.choice(learned);
+        const synthesized = synthesizeFromLearnedTemplate(chosenTemplate, prng);
+        if (synthesized) {
+          const check = verifyQuestion(synthesized);
+          if (check.valid) {
+            return {
+              ...synthesized,
+              seed: actualSeed,
+              verified: true,
+              verificationTimestamp: new Date().toISOString(),
+            };
+          }
         }
       }
+    } catch {
+      // If template evaluation fails, proceed seamlessly to procedural synthesis
     }
-  } catch (err) {
-    // If template evaluation fails, proceed seamlessly to procedural synthesis
   }
 
+  const forceWordProblem = mode === 'word-problems';
+
   for (let attempt = 0; attempt < maxVerificationAttempts; attempt += 1) {
-    const rawQuestion = synthesizeQuestion(standard, prng);
+    const rawQuestion = synthesizeQuestion(standard, prng, { forceWordProblem });
     const verification = verifyQuestion(rawQuestion);
 
     if (verification.valid) {
@@ -69,15 +144,13 @@ export function generateVerifiedProblem({
         verificationTimestamp: new Date().toISOString(),
       };
     }
-    // Advance PRNG state and retry if invariant assertion failed
     prng.next();
   }
 
-  // If retries exceeded, create a dynamically randomized multiplication or addition
   return createGuaranteedDynamicQuestion(standard, prng);
 }
 
-function synthesizeQuestion(standard, prng) {
+function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
   const qId = `q-${standard.code}-${Date.now()}-${prng.nextInt(1000, 9999)}`;
   const baseMeta = {
     id: qId,
@@ -157,9 +230,14 @@ function synthesizeQuestion(standard, prng) {
       if (isAdd) {
         const sum = a + b;
         const distractors = generateDistinctOptions(sum, 4, 1, 10, prng).filter((x) => x !== sum).slice(0, 3);
+        const stories = [
+          `California park rangers saw ${a} sea otters and ${b} more joined them. How many sea otters in all?`,
+          `Maya picked ${a} golden poppies and her brother picked ${b} more. How many poppies altogether?`,
+          `There are ${a} ladybugs on a leaf and ${b} more land on it. How many ladybugs now?`,
+        ];
         return {
           ...baseMeta,
-          prompt: `California park rangers saw ${a} sea otters and ${b} more joined them. How many sea otters in all?`,
+          prompt: prng.choice(stories),
           correctAnswer: sum,
           options: prng.shuffle([sum, ...distractors]),
           manipulative: { type: 'ten-frame', count: sum, groups: [a, b], total: 10 },
@@ -215,9 +293,9 @@ function synthesizeQuestion(standard, prng) {
     case 'K.MD.A.2': {
       const attributes = [
         { objA: 'Giant Redwood Tree', objB: 'Flower', compare: 'TALLER', answer: 'Giant Redwood Tree' },
-        { objA: 'Feather', objB: 'Rock', compare: 'HEAVIER', answer: 'Rock' },
-        { objA: 'School Bus', objB: 'Bicycle', compare: 'LONGER', answer: 'School Bus' },
-        { objA: 'Elephant', objB: 'Puppy', compare: 'LIGHTER', answer: 'Puppy' },
+        { objA: 'Feather', objB: 'Granite Boulders', compare: 'HEAVIER', answer: 'Granite Boulders' },
+        { objA: 'School Bus', objB: 'Skateboard', compare: 'LONGER', answer: 'School Bus' },
+        { objA: 'Elephant Seal', objB: 'Butterfly', compare: 'LIGHTER', answer: 'Butterfly' },
       ];
       const pick = prng.choice(attributes);
       const options = prng.shuffle([pick.objA, pick.objB, 'Both are equal', 'Cannot tell']);
@@ -237,45 +315,53 @@ function synthesizeQuestion(standard, prng) {
         { name: 'Rectangle', sides: 4 },
         { name: 'Square', sides: 4 },
         { name: 'Hexagon', sides: 6 },
-        { name: 'Circle', sides: 0 },
       ];
       const pick = prng.choice(shapes);
-      if (pick.sides > 0) {
-        const distractors = generateDistinctOptions(pick.sides, 4, 0, 8, prng).filter((x) => x !== pick.sides).slice(0, 3);
-        return {
-          ...baseMeta,
-          prompt: `How many straight sides does a ${pick.name.toLowerCase()} have?`,
-          correctAnswer: pick.sides,
-          options: prng.shuffle([pick.sides, ...distractors]),
-          explanation: `A ${pick.name.toLowerCase()} has ${pick.sides} straight outer sides.`,
-          hint: `Count the straight edges of a ${pick.name.toLowerCase()}.`,
-        };
-      } else {
-        return {
-          ...baseMeta,
-          prompt: `Which shape is curved all the way around with zero straight edges?`,
-          correctAnswer: 'Circle',
-          options: prng.shuffle(['Circle', 'Triangle', 'Square', 'Hexagon']),
-          explanation: `A circle curves continuously with no straight sides or corners.`,
-          hint: `A circle has no sharp corners.`,
-        };
-      }
+      const distractors = generateDistinctOptions(pick.sides, 4, 0, 8, prng).filter((x) => x !== pick.sides).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `How many straight sides and corners does a ${pick.name.toLowerCase()} have? (Click the shape below to count!)`,
+        correctAnswer: pick.sides,
+        options: prng.shuffle([pick.sides, ...distractors]),
+        manipulative: { type: 'polygon-inspector', sides: pick.sides, shapeName: pick.name },
+        explanation: `A ${pick.name.toLowerCase()} has ${pick.sides} straight outer sides and ${pick.sides} corners (vertices).`,
+        hint: `Count the straight edges of the ${pick.name.toLowerCase()}.`,
+      };
     }
 
     // ==================== 1ST GRADE ====================
     case '1.OA.A.1': {
-      const a = prng.nextInt(4, 11);
-      const b = prng.nextInt(3, 9);
-      const sum = a + b;
-      const distractors = generateDistinctOptions(sum, 4, 5, 20, prng).filter((x) => x !== sum).slice(0, 3);
-      return {
-        ...baseMeta,
-        prompt: `California Redwood Explorers found ${a} pinecones in Big Basin and ${b} in Muir Woods. How many total pinecones?`,
-        correctAnswer: sum,
-        options: prng.shuffle([sum, ...distractors]),
-        explanation: `Add the two quantities: ${a} + ${b} = ${sum}.`,
-        hint: `Add: ${a} + ${b} = ${sum}.`,
-      };
+      const a = prng.nextInt(5, 12);
+      const b = prng.nextInt(3, 8);
+      if (prng.next() < 0.6) {
+        const sum = a + b;
+        const distractors = generateDistinctOptions(sum, 4, 6, 20, prng).filter((x) => x !== sum).slice(0, 3);
+        const stories = [
+          `California Redwood Explorers found ${a} pinecones in Big Basin and ${b} in Muir Woods. How many total pinecones?`,
+          `Leo saw ${a} pelicans at Santa Cruz Beach and ${b} more flying over the pier. How many pelicans in all?`,
+          `A classroom library has ${a} science books and ${b} nature books. How many books altogether?`,
+        ];
+        return {
+          ...baseMeta,
+          prompt: prng.choice(stories),
+          correctAnswer: sum,
+          options: prng.shuffle([sum, ...distractors]),
+          explanation: `Add the two quantities: ${a} + ${b} = ${sum}.`,
+          hint: `Add: ${a} + ${b} = ${sum}.`,
+        };
+      } else {
+        const total = a + b;
+        const diff = total - b;
+        const distractors = generateDistinctOptions(diff, 4, 2, 18, prng).filter((x) => x !== diff).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `There were ${total} monarch butterflies resting on a branch in Pacific Grove. Then ${b} flew away. How many butterflies are left?`,
+          correctAnswer: diff,
+          options: prng.shuffle([diff, ...distractors]),
+          explanation: `Subtract the butterflies that flew away: ${total} - ${b} = ${diff}.`,
+          hint: `Subtract: ${total} - ${b} = ${diff}.`,
+        };
+      }
     }
 
     case '1.OA.C.6': {
@@ -283,13 +369,17 @@ function synthesizeQuestion(standard, prng) {
       const b = prng.nextInt(3, 9);
       const sum = a + b;
       const distractors = generateDistinctOptions(sum, 4, 6, 20, prng).filter((x) => x !== sum).slice(0, 3);
+      const makeTenExp =
+        sum >= 10
+          ? `Make a ten: ${a} + ${10 - a} = 10, then add ${b - (10 - a)} to get ${sum}.`
+          : `Start at ${a} and count on ${b} more to reach ${sum}.`;
       return {
         ...baseMeta,
         prompt: `Addition Fluency: What is ${a} + ${b}?`,
         correctAnswer: sum,
         options: prng.shuffle([sum, ...distractors]),
         manipulative: { type: 'number-line', min: 0, max: 20, start: a, hop: b, target: sum },
-        explanation: `Make a ten: ${a} + ${10 - a} = 10, then add ${b - (10 - a)} to get ${sum}.`,
+        explanation: makeTenExp,
         hint: `Start at ${a} and count forward ${b}.`,
       };
     }
@@ -356,6 +446,22 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '1.MD.A.2': {
+      const lenA = prng.nextInt(4, 9);
+      const lenB = prng.nextInt(2, 6);
+      const total = lenA + lenB;
+      const distractors = generateDistinctOptions(total, 4, 4, 18, prng).filter((x) => x !== total).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `A blue crayon is ${lenA} centimeter cubes long and a red crayon is ${lenB} centimeter cubes long. If placed end-to-end, how many centimeter cubes long are they together?`,
+        correctAnswer: total,
+        options: prng.shuffle([total, ...distractors]),
+        manipulative: { type: 'number-line', min: 0, max: 16, start: lenA, hop: lenB, target: total },
+        explanation: `Laying the two objects end-to-end combines their lengths: ${lenA} + ${lenB} = ${total} centimeter cubes.`,
+        hint: `Add the two lengths together: ${lenA} + ${lenB}.`,
+      };
+    }
+
     case '1.MD.B.3': {
       const hour = prng.nextInt(1, 12);
       const isHalf = prng.next() > 0.5;
@@ -382,15 +488,44 @@ function synthesizeQuestion(standard, prng) {
       const word = parts === 2 ? 'halves' : 'fourths (quarters)';
       return {
         ...baseMeta,
-        prompt: `When an apple is sliced into ${parts} equal parts, each part is called:`,
+        prompt: `When a circular pizza is partitioned into ${parts} equal shares, each share is called:`,
         correctAnswer: word,
         options: prng.shuffle(['halves', 'fourths (quarters)', 'thirds', 'sixths']),
+        manipulative: { type: 'fraction', numerator: 1, denominator: parts },
         explanation: `2 equal parts are halves; 4 equal parts are fourths or quarters.`,
         hint: `2 parts = halves; 4 parts = fourths.`,
       };
     }
 
     // ==================== 2ND GRADE ====================
+    case '2.OA.A.1': {
+      const a = prng.nextInt(24, 58);
+      const b = prng.nextInt(15, 36);
+      if (prng.next() < 0.5) {
+        const sum = a + b;
+        const distractors = generateDistinctOptions(sum, 4, 30, 100, prng).filter((x) => x !== sum).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `During the California Coastal Cleanup, 2nd graders collected ${a} plastic bottles in the morning and ${b} in the afternoon. How many bottles did they collect in all?`,
+          correctAnswer: sum,
+          options: prng.shuffle([sum, ...distractors]),
+          explanation: `Add tens and ones: ${a} + ${b} = ${sum} bottles.`,
+          hint: `Add ${a} + ${b}.`,
+        };
+      } else {
+        const diff = a - b;
+        const distractors = generateDistinctOptions(diff, 4, 5, 60, prng).filter((x) => x !== diff).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `A school garden in Fresno grew ${a} sunflowers. Students gave ${b} sunflowers to neighbors. How many sunflowers are left in the garden?`,
+          correctAnswer: diff,
+          options: prng.shuffle([diff, ...distractors]),
+          explanation: `Subtract ${b} from ${a}: ${a} - ${b} = ${diff} sunflowers.`,
+          hint: `Subtract: ${a} - ${b}.`,
+        };
+      }
+    }
+
     case '2.OA.B.2': {
       const a = prng.nextInt(6, 14);
       const b = prng.nextInt(5, 9);
@@ -426,12 +561,40 @@ function synthesizeQuestion(standard, prng) {
       const distractors = generateDistinctOptions(total, 4, 4, 25, prng).filter((x) => x !== total).slice(0, 3);
       return {
         ...baseMeta,
-        prompt: `An array has ${rows} rows of tiles with ${cols} tiles in each row. How many total tiles?`,
+        prompt: `An array has ${rows} rows of solar tiles with ${cols} tiles in each row. How many total solar tiles?`,
         correctAnswer: total,
         options: prng.shuffle([total, ...distractors]),
         manipulative: { type: 'array', rows, cols },
-        explanation: `Use repeated addition or multiplication: ${rows} rows × ${cols} = ${total}.`,
+        explanation: `Use repeated addition: ${rows} rows of ${cols} = ${total}.`,
         hint: `Add ${cols} repeated ${rows} times.`,
+      };
+    }
+
+    case '2.NBT.A.1': {
+      const h = prng.nextInt(2, 9);
+      const t = prng.nextInt(0, 9);
+      const o = prng.nextInt(1, 9);
+      const val = h * 100 + t * 10 + o;
+      const distractors = [
+        h * 100 + o * 10 + t,
+        t * 100 + h * 10 + o,
+        val + 10,
+        val - 100,
+      ].filter((x) => x !== val && x > 100);
+      const options = generateDistinctStringOptions(
+        val,
+        distractors,
+        [245, 381, 509, 672, 814],
+        4,
+        prng
+      );
+      return {
+        ...baseMeta,
+        prompt: `Place Value: What 3-digit number has ${h} hundreds, ${t} tens, and ${o} ones?`,
+        correctAnswer: val,
+        options,
+        explanation: `${h} hundreds (${h * 100}) + ${t} tens (${t * 10}) + ${o} ones (${o}) = ${val}.`,
+        hint: `Combine hundreds (${h}00), tens (${t}0), and ones (${o}).`,
       };
     }
 
@@ -462,8 +625,8 @@ function synthesizeQuestion(standard, prng) {
         prompt: `Subtract with place value regrouping: ${top} - ${bottom}`,
         correctAnswer: diff,
         options: prng.shuffle([diff, ...distractors]),
-        explanation: `Regroup 1 ten into 10 ones, then subtract ones and tens: ${top} - ${bottom} = ${diff}.`,
-        hint: `Unbundle 1 ten into 10 ones.`,
+        explanation: `Regroup 1 ten into 10 ones where needed, then subtract ones and tens: ${top} - ${bottom} = ${diff}.`,
+        hint: `If ones on top are smaller than bottom, unbundle 1 ten into 10 ones.`,
       };
     }
 
@@ -479,12 +642,12 @@ function synthesizeQuestion(standard, prng) {
       ];
       return {
         ...baseMeta,
-        prompt: `What time is shown to the nearest 5 minutes?`,
+        prompt: `What time is shown on the clock to the nearest 5 minutes?`,
         correctAnswer: timeStr,
         options: prng.shuffle([timeStr, ...distractors]),
         manipulative: { type: 'clock', hour, minute },
         explanation: `The hour hand is past ${hour}. The minute hand at ${minute / 5} represents ${minute} minutes. Time: ${timeStr}.`,
-        hint: `Each clock number is 5 minutes.`,
+        hint: `Skip-count by 5s around the clock for the minute hand.`,
       };
     }
 
@@ -519,25 +682,54 @@ function synthesizeQuestion(standard, prng) {
         prompt: `A polygon with exactly ${pick.angles} angles and ${pick.angles} sides is called a:`,
         correctAnswer: pick.name,
         options: prng.shuffle(['Triangle', 'Quadrilateral', 'Pentagon', 'Hexagon']),
-        explanation: `By definition, a polygon with ${pick.angles} angles and sides is a ${pick.name}.`,
-        hint: `Triangle=3, Quadrilateral=4, Pentagon=5, Hexagon=6.`,
+        manipulative: { type: 'polygon-inspector', sides: pick.angles, shapeName: pick.name },
+        explanation: `By geometric definition, a polygon with ${pick.angles} angles and ${pick.angles} sides is a ${pick.name}.`,
+        hint: `Triangle = 3, Quadrilateral = 4, Pentagon = 5, Hexagon = 6.`,
       };
     }
 
     // ==================== 3RD GRADE ====================
     case '3.OA.A.3': {
       const groups = prng.nextInt(4, 9);
-      const perGroup = prng.nextInt(4, 8);
+      const perGroup = prng.nextInt(3, 8);
       const total = groups * perGroup;
-      const distractors = generateDistinctOptions(total, 4, 12, 100, prng).filter((x) => x !== total).slice(0, 3);
+      if (prng.next() < 0.6) {
+        const distractors = generateDistinctOptions(total, 4, 12, 100, prng).filter((x) => x !== total).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `A California elementary library organized ${groups} shelves with ${perGroup} books on each shelf. How many total books?`,
+          correctAnswer: total,
+          options: prng.shuffle([total, ...distractors]),
+          manipulative: { type: 'array', rows: groups, cols: perGroup },
+          explanation: `Multiply the equal groups: ${groups} × ${perGroup} = ${total} books.`,
+          hint: `Multiply: ${groups} × ${perGroup} = ${total}.`,
+        };
+      } else {
+        const distractors = generateDistinctOptions(perGroup, 4, 2, 15, prng).filter((x) => x !== perGroup).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `A ranger station in Sequoia National Park shared ${total} trail maps equally among ${groups} hiking groups. How many maps did each group receive?`,
+          correctAnswer: perGroup,
+          options: prng.shuffle([perGroup, ...distractors]),
+          manipulative: { type: 'array', rows: groups, cols: perGroup },
+          explanation: `Divide total maps by the number of groups: ${total} ÷ ${groups} = ${perGroup} maps.`,
+          hint: `Think: ${groups} × ❓ = ${total}.`,
+        };
+      }
+    }
+
+    case '3.OA.A.4': {
+      const factorA = prng.nextInt(3, 9);
+      const unknown = prng.nextInt(3, 9);
+      const product = factorA * unknown;
+      const distractors = generateDistinctOptions(unknown, 4, 2, 12, prng).filter((x) => x !== unknown).slice(0, 3);
       return {
         ...baseMeta,
-        prompt: `A California elementary library organized ${groups} shelves with ${perGroup} books on each shelf. How many total books?`,
-        correctAnswer: total,
-        options: prng.shuffle([total, ...distractors]),
-        manipulative: { type: 'array', rows: groups, cols: perGroup },
-        explanation: `Multiply the equal groups: ${groups} × ${perGroup} = ${total} books.`,
-        hint: `Multiply: ${groups} × ${perGroup} = ${total}.`,
+        prompt: `Find the unknown factor that makes the equation true: ${factorA} × ❓ = ${product}`,
+        correctAnswer: unknown,
+        options: prng.shuffle([unknown, ...distractors]),
+        explanation: `Use the inverse operation (division): ${product} ÷ ${factorA} = ${unknown}.`,
+        hint: `Divide ${product} by ${factorA}.`,
       };
     }
 
@@ -557,6 +749,22 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '3.OA.D.8': {
+      const packs = prng.nextInt(3, 7);
+      const perPack = prng.nextInt(4, 8);
+      const extra = prng.nextInt(5, 18);
+      const total = packs * perPack + extra;
+      const distractors = generateDistinctOptions(total, 4, 15, 90, prng).filter((x) => x !== total).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `Two-Step Word Problem: An art teacher in San Diego bought ${packs} boxes of markers with ${perPack} markers in each box, plus ${extra} loose markers. How many markers does the teacher have in all?`,
+        correctAnswer: total,
+        options: prng.shuffle([total, ...distractors]),
+        explanation: `Step 1: Multiply boxes by markers per box (${packs} × ${perPack} = ${packs * perPack}). Step 2: Add loose markers (${packs * perPack} + ${extra} = ${total}).`,
+        hint: `First multiply ${packs} × ${perPack}, then add ${extra}.`,
+      };
+    }
+
     case '3.NBT.A.1': {
       const roundTo = prng.choice([10, 100]);
       const val = prng.nextInt(125, 875);
@@ -567,8 +775,26 @@ function synthesizeQuestion(standard, prng) {
         prompt: `Round ${val} to the nearest ${roundTo}.`,
         correctAnswer: rounded,
         options: prng.shuffle([rounded, ...distractors]),
-        explanation: `To round to the nearest ${roundTo}, inspect the place to the right. 5 or more rounds up to ${rounded}.`,
+        explanation: `To round to the nearest ${roundTo}, inspect the digit to the right. 5 or more rounds up to ${rounded}.`,
         hint: `Look at the digit immediately to the right of the ${roundTo}s place.`,
+      };
+    }
+
+    case '3.NBT.A.2': {
+      const a = prng.nextInt(245, 620);
+      const b = prng.nextInt(138, 349);
+      const isAdd = prng.next() < 0.55;
+      const ans = isAdd ? a + b : a - b;
+      const distractors = generateDistinctOptions(ans, 4, 50, 999, prng).filter((x) => x !== ans).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: isAdd
+          ? `Fluently add within 1,000: ${a} + ${b}`
+          : `Fluently subtract within 1,000: ${a} - ${b}`,
+        correctAnswer: ans,
+        options: prng.shuffle([ans, ...distractors]),
+        explanation: `Align hundreds, tens, and ones vertically: ${a} ${isAdd ? '+' : '-'} ${b} = ${ans}.`,
+        hint: `Work from the ones place to the tens place, then the hundreds place.`,
       };
     }
 
@@ -583,8 +809,8 @@ function synthesizeQuestion(standard, prng) {
         correctAnswer: fracStr,
         options,
         manipulative: { type: 'fraction', numerator: num, denominator: den },
-        explanation: `The model is divided into ${den} equal parts, with ${num} shaded parts. Fraction is ${fracStr}.`,
-        hint: `Numerator = shaded parts; Denominator = total parts.`,
+        explanation: `The model is partitioned into ${den} equal parts, with ${num} shaded parts. The fraction is ${fracStr}.`,
+        hint: `Numerator = shaded parts; Denominator = total equal parts.`,
       };
     }
 
@@ -595,27 +821,47 @@ function synthesizeQuestion(standard, prng) {
       const options = generateDistinctFractionOptions(num, den, 4, prng);
       return {
         ...baseMeta,
-        prompt: `On a number line from 0 to 1 partitioned into ${den} equal segments, what fraction is at point ${num}?`,
+        prompt: `On a number line from 0 to 1 partitioned into ${den} equal intervals, what fraction is located at tick mark ${num}?`,
         correctAnswer: fracStr,
         options,
-        explanation: `Each segment is 1/${den}. Counting ${num} segments from 0 lands on ${fracStr}.`,
+        manipulative: { type: 'fraction', numerator: num, denominator: den },
+        explanation: `Each interval is 1/${den}. Moving ${num} intervals from 0 lands on ${fracStr}.`,
         hint: `Each interval between 0 and 1 represents 1/${den}.`,
+      };
+    }
+
+    case '3.NF.A.3': {
+      const denA = prng.choice([3, 4, 6, 8]);
+      let denB = prng.choice([2, 3, 4, 6, 8]);
+      while (denB === denA) denB = prng.choice([2, 3, 4, 6, 8]);
+      const num = 1;
+      const greaterFrac = denA < denB ? `${num}/${denA}` : `${num}/${denB}`;
+      const smallerDen = Math.min(denA, denB);
+      const largerDen = Math.max(denA, denB);
+      return {
+        ...baseMeta,
+        prompt: `Compare unit fractions: Which fraction is GREATER, 1/${denA} or 1/${denB}?`,
+        correctAnswer: greaterFrac,
+        options: prng.shuffle([`1/${denA}`, `1/${denB}`, 'They are equal', `1/${denA + denB}`]),
+        manipulative: { type: 'fraction', numerator: 1, denominator: smallerDen },
+        explanation: `When numerators are the same, a smaller denominator means larger equal shares: 1/${smallerDen} > 1/${largerDen}.`,
+        hint: `Sharing a whole among fewer parts makes each part larger!`,
       };
     }
 
     case '3.MD.A.1': {
       const startMin = prng.nextInt(10, 35);
-      const elapsed = prng.nextInt(15, 25);
+      const elapsed = prng.nextInt(15, 24);
       const endMin = startMin + elapsed;
       const startStr = `2:${startMin}`;
       const endStr = `2:${endMin}`;
       return {
         ...baseMeta,
-        prompt: `A student began reading at ${startStr} and finished at ${endStr}. How many minutes did they read?`,
+        prompt: `A student began reading at ${startStr} p.m. and finished at ${endStr} p.m. How many minutes did they read?`,
         correctAnswer: `${elapsed} min`,
         options: prng.shuffle([`${elapsed} min`, `${elapsed + 5} min`, `${elapsed - 5} min`, `${elapsed + 10} min`]),
         explanation: `Elapsed time = ${endMin} - ${startMin} = ${elapsed} minutes.`,
-        hint: `Subtract the start time from the end time.`,
+        hint: `Subtract the starting minutes (${startMin}) from the ending minutes (${endMin}).`,
       };
     }
 
@@ -642,7 +888,7 @@ function synthesizeQuestion(standard, prng) {
       const w = prng.nextInt(3, 8);
       const perimeter = 2 * (l + w);
       const area = l * w;
-      const candidates = [`${area} ft`, `${perimeter + 4} ft`, `${Math.max(10, perimeter - 4)} ft`, `${(l + w)} ft`];
+      const candidates = [`${area} ft`, `${perimeter + 4} ft`, `${Math.max(10, perimeter - 4)} ft`, `${l + w} ft`];
       const fallbackPool = ['18 ft', '22 ft', '26 ft', '30 ft', '32 ft', '36 ft'];
       const options = generateDistinctStringOptions(`${perimeter} ft`, candidates, fallbackPool, 4, prng);
       return {
@@ -656,7 +902,61 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '3.G.A.1': {
+      const quadQuestions = [
+        {
+          prompt: 'Which geometric category describes ALL 4-sided polygons (including squares, rectangles, rhombuses, and trapezoids)?',
+          ans: 'Quadrilateral',
+          options: ['Quadrilateral', 'Pentagon', 'Hexagon', 'Triangle'],
+          exp: 'Any closed 2D figure with 4 straight sides and 4 vertices belongs to the category of quadrilaterals.',
+        },
+        {
+          prompt: 'A quadrilateral with 4 equal side lengths is ALWAYS called a:',
+          ans: 'Rhombus',
+          options: ['Rhombus', 'Trapezoid', 'Pentagon', 'Triangle'],
+          exp: 'A rhombus is a quadrilateral whose 4 sides all have the same length (a square is a special rhombus with right angles).',
+        },
+        {
+          prompt: 'A quadrilateral with 4 right (90°) angles and 4 equal sides is a:',
+          ans: 'Square',
+          options: ['Square', 'Trapezoid', 'Hexagon', 'Scalene Triangle'],
+          exp: 'A square has both 4 right angles (like a rectangle) and 4 equal sides (like a rhombus).',
+        },
+      ];
+      const pick = prng.choice(quadQuestions);
+      return {
+        ...baseMeta,
+        prompt: pick.prompt,
+        correctAnswer: pick.ans,
+        options: prng.shuffle(pick.options),
+        manipulative: { type: 'polygon-inspector', sides: 4, shapeName: pick.ans },
+        explanation: pick.exp,
+        hint: `'Quad-' means 4 sides.`,
+      };
+    }
+
     // ==================== 4TH GRADE ====================
+    case '4.OA.A.2': {
+      const base = prng.nextInt(6, 14);
+      const times = prng.nextInt(3, 7);
+      const total = base * times;
+      const distractors = [base + times, total + base, Math.max(4, total - times)].filter((x) => x !== total);
+      return {
+        ...baseMeta,
+        prompt: `Multiplicative Comparison: A young coastal redwood tree is ${base} feet tall. A mature redwood tree nearby is ${times} times as tall. How tall is the mature redwood tree?`,
+        correctAnswer: `${total} ft`,
+        options: generateDistinctStringOptions(
+          `${total} ft`,
+          distractors.map((d) => `${d} ft`),
+          ['24 ft', '36 ft', '42 ft', '48 ft', '56 ft'],
+          4,
+          prng
+        ),
+        explanation: `"${times} times as tall as ${base}" means ${times} × ${base} = ${total} feet.`,
+        hint: `Multiply ${base} × ${times}.`,
+      };
+    }
+
     case '4.OA.A.3': {
       const storyType = prng.choice(['stem', 'bus', 'grove']);
       if (storyType === 'bus') {
@@ -721,6 +1021,29 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '4.NBT.A.2': {
+      const th = prng.nextInt(2, 9);
+      const h = prng.nextInt(1, 8);
+      const t = prng.nextInt(1, 9);
+      const o = prng.nextInt(1, 9);
+      const standardVal = th * 1000 + h * 100 + t * 10 + o;
+      const ansStr = standardVal.toLocaleString();
+      const candidates = [
+        (th * 10000 + h * 100 + t * 10 + o).toLocaleString(),
+        (th * 1000 + t * 100 + h * 10 + o).toLocaleString(),
+        (standardVal + 100).toLocaleString(),
+      ];
+      const options = generateDistinctStringOptions(ansStr, candidates, ['3,425', '5,812', '7,209', '8,641'], 4, prng);
+      return {
+        ...baseMeta,
+        prompt: `Write the expanded form number in standard form: ${(th * 1000).toLocaleString()} + ${h * 100} + ${t * 10} + ${o}`,
+        correctAnswer: ansStr,
+        options,
+        explanation: `Combine each place value: ${th} thousands, ${h} hundreds, ${t} tens, and ${o} ones = ${ansStr}.`,
+        hint: `Place each digit in its corresponding place-value column.`,
+      };
+    }
+
     case '4.NBT.A.3': {
       const num = prng.nextInt(12500, 87900);
       const rounded = Math.round(num / 1000) * 1000;
@@ -736,6 +1059,31 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '4.NBT.B.4': {
+      const a = prng.nextInt(1240, 5890);
+      const b = prng.nextInt(1120, 3450);
+      const isAdd = prng.next() < 0.5;
+      const ans = isAdd ? a + b : Math.max(a, b) - Math.min(a, b);
+      const top = isAdd ? a : Math.max(a, b);
+      const bot = isAdd ? b : Math.min(a, b);
+      const ansStr = ans.toLocaleString();
+      const candidates = [
+        (ans + 100).toLocaleString(),
+        (ans - 100).toLocaleString(),
+        (ans + 10).toLocaleString(),
+        (ans - 10).toLocaleString(),
+      ];
+      const options = generateDistinctStringOptions(ansStr, candidates, ['2,450', '3,810', '4,920', '6,120'], 4, prng);
+      return {
+        ...baseMeta,
+        prompt: `Use the standard algorithm to calculate: ${top.toLocaleString()} ${isAdd ? '+' : '-'} ${bot.toLocaleString()}`,
+        correctAnswer: ansStr,
+        options,
+        explanation: `Using place-value alignment from ones to thousands: ${top.toLocaleString()} ${isAdd ? '+' : '-'} ${bot.toLocaleString()} = ${ansStr}.`,
+        hint: `Work column by column from right (ones) to left (thousands).`,
+      };
+    }
+
     case '4.NBT.B.5': {
       const a = prng.nextInt(24, 75);
       const b = prng.nextInt(4, 9);
@@ -743,11 +1091,26 @@ function synthesizeQuestion(standard, prng) {
       const distractors = generateDistinctOptions(prod, 4, 50, 700, prng).filter((x) => x !== prod).slice(0, 3);
       return {
         ...baseMeta,
-        prompt: `Multiply using the standard algorithm: ${a} × ${b}`,
+        prompt: `Multiply using partial products or the standard algorithm: ${a} × ${b}`,
         correctAnswer: prod,
         options: prng.shuffle([prod, ...distractors]),
-        explanation: `Multiply ones: (${a % 10} × ${b}), then tens: (${Math.floor(a / 10) * 10} × ${b}), giving ${prod}.`,
-        hint: `Break ${a} into tens and ones.`,
+        explanation: `Multiply tens: (${Math.floor(a / 10) * 10} × ${b} = ${Math.floor(a / 10) * 10 * b}), then ones: (${a % 10} × ${b} = ${(a % 10) * b}). Sum = ${prod}.`,
+        hint: `Break ${a} into ${Math.floor(a / 10) * 10} + ${a % 10} and multiply each by ${b}.`,
+      };
+    }
+
+    case '4.NBT.B.6': {
+      const divisor = prng.nextInt(3, 8);
+      const quotient = prng.nextInt(14, 45);
+      const dividend = divisor * quotient;
+      const distractors = generateDistinctOptions(quotient, 4, 8, 60, prng).filter((x) => x !== quotient).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `Find the exact quotient: ${dividend} ÷ ${divisor}`,
+        correctAnswer: quotient,
+        options: prng.shuffle([quotient, ...distractors]),
+        explanation: `Break ${dividend} into friendly multiples of ${divisor}: ${divisor} × ${quotient} = ${dividend}, so ${dividend} ÷ ${divisor} = ${quotient}.`,
+        hint: `Think: ${divisor} × ❓ = ${dividend}.`,
       };
     }
 
@@ -773,7 +1136,7 @@ function synthesizeQuestion(standard, prng) {
         options,
         manipulative: { type: 'fraction', numerator: baseNum, denominator: baseDen },
         explanation: `Multiply numerator and denominator by ${mult}: (${baseNum}×${mult})/(${baseDen}×${mult}) = ${targetStr}.`,
-        hint: `Multiply top and bottom by the same factor.`,
+        hint: `Multiply top and bottom by the same factor (${mult}).`,
       };
     }
 
@@ -801,6 +1164,29 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '4.NF.B.4': {
+      const den = prng.choice([3, 4, 5, 6, 8]);
+      const whole = prng.nextInt(2, 5);
+      const unitNum = 1;
+      const prodNum = whole * unitNum;
+      const ansStr = `${prodNum}/${den}`;
+      const candidates = [
+        `${whole}/${whole * den}`,
+        `${prodNum + 1}/${den}`,
+        `${Math.max(1, prodNum - 1)}/${den}`,
+        `1/${whole * den}`,
+      ];
+      const options = generateDistinctStringOptions(ansStr, candidates, ['2/3', '3/4', '4/5', '5/6', '7/8'], 4, prng);
+      return {
+        ...baseMeta,
+        prompt: `A recipe for California berry smoothies uses 1/${den} cup of blueberries per smoothie. How many cups are needed to make ${whole} smoothies? (${whole} × 1/${den})`,
+        correctAnswer: ansStr,
+        options,
+        explanation: `${whole} groups of 1/${den} equals (${whole} × 1)/${den} = ${ansStr} cups.`,
+        hint: `Multiply the whole number (${whole}) by the unit numerator (1) and keep the denominator (${den}).`,
+      };
+    }
+
     case '4.NF.C.6': {
       const val = prng.nextInt(12, 89);
       const decStr = `0.${val}`;
@@ -818,29 +1204,123 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '4.MD.A.1': {
+      const conversions = [
+        { fromUnit: 'kilometers', toUnit: 'meters', factor: 1000, short: 'm', range: [2, 9] },
+        { fromUnit: 'meters', toUnit: 'centimeters', factor: 100, short: 'cm', range: [3, 12] },
+        { fromUnit: 'kilograms', toUnit: 'grams', factor: 1000, short: 'g', range: [2, 8] },
+        { fromUnit: 'liters', toUnit: 'milliliters', factor: 1000, short: 'mL', range: [2, 7] },
+        { fromUnit: 'hours', toUnit: 'minutes', factor: 60, short: 'min', range: [2, 5] },
+      ];
+      const pick = prng.choice(conversions);
+      const qty = prng.nextInt(pick.range[0], pick.range[1]);
+      const ans = qty * pick.factor;
+      const ansStr = `${ans.toLocaleString()} ${pick.short}`;
+      const candidates = [
+        `${(qty * 10).toLocaleString()} ${pick.short}`,
+        `${(qty * 100).toLocaleString()} ${pick.short}`,
+        `${(ans + pick.factor).toLocaleString()} ${pick.short}`,
+        `${(qty + pick.factor).toLocaleString()} ${pick.short}`,
+      ];
+      const options = generateDistinctStringOptions(
+        ansStr,
+        candidates,
+        ['200 cm', '500 cm', '1,000 m', '2,500 g', '120 min'],
+        4,
+        prng
+      );
+      return {
+        ...baseMeta,
+        prompt: `Unit Conversion: Convert ${qty} ${pick.fromUnit} into ${pick.toUnit}. (1 ${pick.fromUnit.slice(0, -1)} = ${pick.factor.toLocaleString()} ${pick.toUnit})`,
+        correctAnswer: ansStr,
+        options,
+        explanation: `Multiply ${qty} by ${pick.factor.toLocaleString()}: ${qty} × ${pick.factor.toLocaleString()} = ${ansStr}.`,
+        hint: `Multiply ${qty} × ${pick.factor.toLocaleString()}.`,
+      };
+    }
+
+    case '4.MD.A.3': {
+      const l = prng.nextInt(6, 12);
+      const w = prng.nextInt(4, 8);
+      const area = l * w;
+      const distractors = generateDistinctOptions(w, 4, 2, 15, prng).filter((x) => x !== w).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `Missing Dimension Formula: A rectangular solar panel array has an area of ${area} sq ft and a length of ${l} ft. What is its width?`,
+        correctAnswer: `${w} ft`,
+        options: prng.shuffle([`${w} ft`, ...distractors.map((v) => `${v} ft`)]),
+        manipulative: { type: 'interactive-geometry', width: l, height: w, unit: 'ft', showAreaGrid: true },
+        explanation: `Since Area = length × width, divide Area by length: ${area} ÷ ${l} = ${w} ft.`,
+        hint: `Divide the total area (${area}) by the known length (${l}).`,
+      };
+    }
+
     case '4.MD.C.6': {
       const angle = prng.choice([30, 45, 60, 90, 120, 135, 150]);
       const distractors = buildProtractorDistractors(angle);
+      const kind = angle < 90 ? 'acute' : angle === 90 ? 'right' : 'obtuse';
       return {
         ...baseMeta,
-        prompt: `What is the degree measure of this angle?`,
+        prompt: `Use the interactive protractor below: What is the degree measure of this ${kind} angle?`,
         correctAnswer: `${angle}°`,
         options: prng.shuffle([`${angle}°`, ...distractors]),
-        explanation: `Acute angles are < 90°, right angles are exactly 90°, and obtuse angles are > 90°. This angle measures ${angle}°.`,
-        hint: `A right angle is 90°.`,
+        manipulative: { type: 'protractor', angle },
+        explanation: `Reading the inner scale starting from 0° on the right ray, the second ray aligns with ${angle}° (${kind} angle).`,
+        hint: `A right angle is 90°. Acute angles are < 90°, obtuse angles are > 90°.`,
+      };
+    }
+
+    case '4.G.A.1': {
+      const items = [
+        {
+          prompt: 'Two lines in the same plane that never intersect and are always the same distance apart are called:',
+          ans: 'Parallel lines',
+          options: ['Parallel lines', 'Perpendicular lines', 'Intersecting acute lines', 'Rays'],
+          angle: 45,
+          exp: 'Parallel lines never cross and remain equidistant forever.',
+        },
+        {
+          prompt: 'Two lines that intersect to form a 90° right angle are called:',
+          ans: 'Perpendicular lines',
+          options: ['Perpendicular lines', 'Parallel lines', 'Obtuse segments', 'Skew rays'],
+          angle: 90,
+          exp: 'Perpendicular lines meet at an exact 90° right angle.',
+        },
+        {
+          prompt: 'An angle that measures strictly between 90° and 180° (such as 135°) is classified as:',
+          ans: 'Obtuse angle',
+          options: ['Obtuse angle', 'Acute angle', 'Right angle', 'Straight angle'],
+          angle: 135,
+          exp: 'Angles greater than 90° and less than 180° are obtuse angles.',
+        },
+        {
+          prompt: 'An angle that measures less than 90° (such as 45°) is classified as:',
+          ans: 'Acute angle',
+          options: ['Acute angle', 'Obtuse angle', 'Right angle', 'Reflex angle'],
+          angle: 45,
+          exp: 'Angles measuring between 0° and 90° are acute angles.',
+        },
+      ];
+      const pick = prng.choice(items);
+      return {
+        ...baseMeta,
+        prompt: pick.prompt,
+        correctAnswer: pick.ans,
+        options: prng.shuffle(pick.options),
+        manipulative: { type: 'protractor', angle: pick.angle },
+        explanation: pick.exp,
+        hint: `Inspect the angle and rays on the visual model.`,
       };
     }
 
     // ==================== 5TH GRADE ====================
     case '5.OA.A.1': {
-      if (prng.next() < 0.5) {
-        // Multi-step real-world word problem
+      if (forceWordProblem || prng.next() < 0.5) {
         const teams = prng.nextInt(3, 6);
         const perTeam = prng.nextInt(4, 8);
         const added = prng.nextInt(2, 5);
         const divisor = prng.choice([2, 3]);
         const subtotal = teams * perTeam + added;
-        // Adjust added so subtotal is divisible
         const rem = subtotal % divisor;
         const adjAdded = rem === 0 ? added : added + (divisor - rem);
         const totalPeople = teams * perTeam + adjAdded;
@@ -870,35 +1350,113 @@ function synthesizeQuestion(standard, prng) {
           prompt: `Evaluate according to Order of Operations (PEMDAS): (${a} + ${b}) × ${c} - ${d}`,
           correctAnswer: ans,
           options: prng.shuffle([ans, ...distractors]),
-          explanation: `Parentheses first: (${a} + ${b} = ${a + b}). Multiply: ${(a + b)} × ${c} = ${(a + b) * c}. Subtract: ${(a + b) * c} - ${d} = ${ans}.`,
+          explanation: `Parentheses first: (${a} + ${b} = ${a + b}). Multiply: ${a + b} × ${c} = ${(a + b) * c}. Subtract: ${(a + b) * c} - ${d} = ${ans}.`,
           hint: `PEMDAS: Parentheses, then Multiplication, then Subtraction.`,
         };
       }
     }
 
+    case '5.OA.A.2': {
+      const a = prng.nextInt(4, 12);
+      const b = prng.nextInt(3, 9);
+      const mult = prng.nextInt(2, 6);
+      const correctExpr = `${mult} × (${a} + ${b})`;
+      const options = prng.shuffle([
+        correctExpr,
+        `${mult} × ${a} + ${b}`,
+        `(${mult} + ${a}) × ${b}`,
+        `${a} + ${b} ÷ ${mult}`,
+      ]);
+      return {
+        ...baseMeta,
+        prompt: `Write the numerical expression for: "Add ${a} and ${b}, then multiply the sum by ${mult}."`,
+        correctAnswer: correctExpr,
+        options,
+        explanation: `To ensure ${a} and ${b} are added first before multiplying by ${mult}, enclose (${a} + ${b}) in parentheses: ${correctExpr}.`,
+        hint: `Use parentheses around the addition so it happens first.`,
+      };
+    }
+
     case '5.NBT.A.2': {
       const base = prng.nextInt(3, 9);
-      const power = prng.choice([10, 100, 1000]);
+      const exp = prng.choice([2, 3, 4]);
+      const power = Math.pow(10, exp);
       const prod = base * power;
-      const candidates = [(base * 10).toLocaleString(), (base * 100).toLocaleString(), (base * 1000).toLocaleString(), ((base + 1) * power).toLocaleString()];
-      const fallbackPool = ['30', '300', '3,000', '500', '5,000', '7,000'];
+      const candidates = [
+        (base * 10).toLocaleString(),
+        (base * 100).toLocaleString(),
+        (base * 1000).toLocaleString(),
+        ((base + 1) * power).toLocaleString(),
+      ];
+      const fallbackPool = ['300', '3,000', '5,000', '70,000', '90,000'];
       const options = generateDistinctStringOptions(prod.toLocaleString(), candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `What is ${base} × ${power.toLocaleString()}?`,
+        prompt: `Powers of 10: What is ${base} × 10^${exp} (${base} × ${power.toLocaleString()})?`,
         correctAnswer: prod.toLocaleString(),
         options,
-        explanation: `Multiplying by ${power} shifts the digits left by the number of zeros: ${prod.toLocaleString()}.`,
-        hint: `Count the zeros in ${power}.`,
+        explanation: `10^${exp} has ${exp} zeros (${power.toLocaleString()}). Multiplying ${base} by 10^${exp} shifts the digits ${exp} places left: ${prod.toLocaleString()}.`,
+        hint: `10^${exp} means 1 followed by ${exp} zeros.`,
+      };
+    }
+
+    case '5.NBT.A.3': {
+      const whole = prng.nextInt(2, 9);
+      const tenths = prng.nextInt(1, 8);
+      const hundredths = prng.nextInt(1, 8);
+      const thousandths = prng.nextInt(1, 9);
+      const decStr = `${whole}.${tenths}${hundredths}${thousandths}`;
+      const candidates = [
+        `${whole}.${hundredths}${tenths}${thousandths}`,
+        `${whole}.${tenths}0${thousandths}`,
+        `${whole}.${thousandths}${hundredths}${tenths}`,
+      ];
+      const options = generateDistinctStringOptions(decStr, candidates, ['3.425', '5.189', '7.604', '8.251'], 4, prng);
+      return {
+        ...baseMeta,
+        prompt: `Write in standard decimal form: ${whole} + ${tenths}/10 + ${hundredths}/100 + ${thousandths}/1000`,
+        correctAnswer: decStr,
+        options,
+        explanation: `${whole} ones, ${tenths} tenths, ${hundredths} hundredths, and ${thousandths} thousandths is written as ${decStr}.`,
+        hint: `Tenths = 1st decimal place, hundredths = 2nd, thousandths = 3rd.`,
+      };
+    }
+
+    case '5.NBT.B.5': {
+      const a = prng.nextInt(12, 35);
+      const b = prng.nextInt(11, 24);
+      const prod = a * b;
+      const distractors = generateDistinctOptions(prod, 4, 120, 900, prng).filter((x) => x !== prod).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `Multi-Digit Multiplication: Calculate ${a} × ${b}`,
+        correctAnswer: prod,
+        options: prng.shuffle([prod, ...distractors]),
+        explanation: `Using partial products: (${a} × ${Math.floor(b / 10) * 10} = ${a * Math.floor(b / 10) * 10}) + (${a} × ${b % 10} = ${a * (b % 10)}) = ${prod}.`,
+        hint: `Multiply ${a} by the ones digit of ${b}, then by the tens digit of ${b}, and add.`,
+      };
+    }
+
+    case '5.NBT.B.6': {
+      const divisor = prng.choice([12, 15, 16, 20, 24, 25]);
+      const quotient = prng.nextInt(11, 32);
+      const dividend = divisor * quotient;
+      const distractors = generateDistinctOptions(quotient, 4, 8, 45, prng).filter((x) => x !== quotient).slice(0, 3);
+      return {
+        ...baseMeta,
+        prompt: `A California solar farm generated ${dividend} megawatt-hours of clean energy equally across ${divisor} turbines. How many megawatt-hours did each turbine generate? (${dividend} ÷ ${divisor})`,
+        correctAnswer: quotient,
+        options: prng.shuffle([quotient, ...distractors]),
+        explanation: `Divide ${dividend} by the two-digit divisor ${divisor}: ${dividend} ÷ ${divisor} = ${quotient}.`,
+        hint: `Estimate first: ${divisor} × ${Math.floor(quotient / 10) * 10} = ${divisor * Math.floor(quotient / 10) * 10}.`,
       };
     }
 
     case '5.NBT.B.7': {
-      if (prng.next() < 0.5) {
-        // Real-world shopping & financial decimals word problem
+      if (forceWordProblem || prng.next() < 0.5) {
         const items = prng.nextInt(2, 4);
-        const priceEach = +(prng.choice([2.25, 3.50, 4.25, 5.75]));
-        const extraItem = +(prng.choice([3.25, 4.50, 6.00]));
+        const priceEach = +prng.choice([2.25, 3.5, 4.25, 5.75]);
+        const extraItem = +prng.choice([3.25, 4.5, 6.0]);
         const totalCost = +(items * priceEach + extraItem).toFixed(2);
         const billPaid = totalCost <= 15 ? 20 : 50;
         const changeDue = +(billPaid - totalCost).toFixed(2);
@@ -921,8 +1479,8 @@ function synthesizeQuestion(standard, prng) {
           hint: `Step 1: Multiply to find strawberry cost. Step 2: Add honey. Step 3: Subtract total from $${billPaid}.`,
         };
       } else {
-        const a = (prng.nextInt(20, 60)) / 10;
-        const b = (prng.nextInt(15, 45)) / 10;
+        const a = prng.nextInt(20, 60) / 10;
+        const b = prng.nextInt(15, 45) / 10;
         const sum = +(a + b).toFixed(1);
         const candidates = [+(sum + 0.1).toFixed(1), +(sum - 0.2).toFixed(1), +(sum + 1.0).toFixed(1), +(sum - 1.0).toFixed(1)];
         const fallbackPool = [4.5, 5.8, 6.2, 7.5, 8.4, 9.1];
@@ -940,14 +1498,14 @@ function synthesizeQuestion(standard, prng) {
 
     case '5.NF.A.1': {
       const pairs = [
-        { f1: [1, 2], f2: [1, 4], ans: '3/4', story: 'Marcus walked 1/2 mile in Yosemite Valley and then 1/4 mile to the river overlook.' },
-        { f1: [1, 3], f2: [1, 6], ans: '1/2', story: 'A baker used 1/3 bag of organic oat flour in the morning and 1/6 bag in the afternoon.' },
-        { f1: [2, 5], f2: [3, 10], ans: '7/10', story: 'Elena completed 2/5 of her coastal marine biology report on Monday and 3/10 on Tuesday.' },
-        { f1: [1, 4], f2: [3, 8], ans: '5/8', story: 'A rain gauge in Mendocino collected 1/4 inch of rain before noon and 3/8 inch after noon.' },
-        { f1: [2, 3], f2: [1, 6], ans: '5/6', story: 'Leo spent 2/3 of an hour studying science and 1/6 of an hour studying California history.' },
+        { f1: [1, 2], f2: [1, 4], ans: '3/4', num: 3, den: 4, story: 'Marcus walked 1/2 mile in Yosemite Valley and then 1/4 mile to the river overlook.' },
+        { f1: [1, 3], f2: [1, 6], ans: '1/2', num: 1, den: 2, story: 'A baker used 1/3 bag of organic oat flour in the morning and 1/6 bag in the afternoon.' },
+        { f1: [2, 5], f2: [3, 10], ans: '7/10', num: 7, den: 10, story: 'Elena completed 2/5 of her coastal marine biology report on Monday and 3/10 on Tuesday.' },
+        { f1: [1, 4], f2: [3, 8], ans: '5/8', num: 5, den: 8, story: 'A rain gauge in Mendocino collected 1/4 inch of rain before noon and 3/8 inch after noon.' },
+        { f1: [2, 3], f2: [1, 6], ans: '5/6', num: 5, den: 6, story: 'Leo spent 2/3 of an hour studying science and 1/6 of an hour studying California history.' },
       ];
       const pick = prng.choice(pairs);
-      const isWordProblem = prng.next() < 0.5;
+      const isWordProblem = forceWordProblem || prng.next() < 0.5;
       const candidates = buildFractionAddDistractors(pick.f1[0], pick.f1[1], pick.f2[0], pick.f2[1], pick.ans);
       const fallbackPool = ['1/2', '2/3', '3/4', '4/5', '5/6', '7/8', '7/10', '9/10'];
       const options = generateDistinctStringOptions(pick.ans, candidates, fallbackPool, 4, prng);
@@ -959,7 +1517,7 @@ function synthesizeQuestion(standard, prng) {
           : `Add fractions with unlike denominators: ${pick.f1[0]}/${pick.f1[1]} + ${pick.f2[0]}/${pick.f2[1]}`,
         correctAnswer: pick.ans,
         options,
-        manipulative: { type: 'fraction', numerator: 1, denominator: 2 },
+        manipulative: { type: 'fraction', numerator: pick.num, denominator: pick.den },
         explanation: `Find the common denominator for ${pick.f1[1]} and ${pick.f2[1]}, rename fractions, then add numerators to get ${pick.ans}.`,
         hint: `Find a common denominator before adding.`,
       };
@@ -981,7 +1539,7 @@ function synthesizeQuestion(standard, prng) {
       const fallbackPool = ['1/2', '1/3', '2/3', '1/4', '3/4', '1/5', '2/5', '3/10', '7/10'];
       const options = generateDistinctStringOptions(ansStr, candidates, fallbackPool, 4, prng);
 
-      const isWordProblem = prng.next() < 0.5;
+      const isWordProblem = forceWordProblem || prng.next() < 0.5;
       const prompt = isWordProblem
         ? `A community garden plot in Sacramento covers ${n1}/${d1} of an acre. A pollinator sunflower bed occupies ${n2}/${d2} of that plot. What fraction of an acre is the sunflower bed?`
         : `Multiply fractions: ${n1}/${d1} × ${n2}/${d2}`;
@@ -996,21 +1554,76 @@ function synthesizeQuestion(standard, prng) {
       };
     }
 
+    case '5.NF.B.7': {
+      const whole = prng.nextInt(3, 8);
+      const den = prng.choice([2, 3, 4, 5]);
+      if (prng.next() < 0.5) {
+        // Whole number divided by unit fraction: whole ÷ (1/den) = whole * den
+        const ans = whole * den;
+        const distractors = generateDistinctOptions(ans, 4, 4, 45, prng).filter((x) => x !== ans).slice(0, 3);
+        return {
+          ...baseMeta,
+          prompt: `A chef in San Francisco has ${whole} cups of olive oil and pours 1/${den} cup into each dipping bowl. How many bowls can the chef fill? (${whole} ÷ 1/${den})`,
+          correctAnswer: ans,
+          options: prng.shuffle([ans, ...distractors]),
+          explanation: `Each whole cup has ${den} shares of 1/${den}. So ${whole} ÷ 1/${den} = ${whole} × ${den} = ${ans} bowls.`,
+          hint: `Multiply the whole number (${whole}) by the denominator (${den}).`,
+        };
+      } else {
+        // Unit fraction divided by whole number: (1/den) ÷ whole = 1 / (den * whole)
+        const ansDen = den * whole;
+        const ansStr = `1/${ansDen}`;
+        const candidates = [`${whole}/${den}`, `1/${den + whole}`, `${den}/${whole}`];
+        const options = generateDistinctStringOptions(ansStr, candidates, ['1/6', '1/8', '1/10', '1/12', '1/15', '1/20'], 4, prng);
+        return {
+          ...baseMeta,
+          prompt: `A relay team of ${whole} runners shares 1/${den} mile of a coastal trail equally. What fraction of a mile does each runner run? (1/${den} ÷ ${whole})`,
+          correctAnswer: ansStr,
+          options,
+          explanation: `Partitioning 1/${den} into ${whole} equal parts gives 1/(${den} × ${whole}) = ${ansStr} mile.`,
+          hint: `Dividing a unit fraction by ${whole} multiplies the denominator by ${whole}.`,
+        };
+      }
+    }
+
+    case '5.MD.A.1': {
+      const meters = prng.nextInt(2, 6);
+      const extraCm = prng.choice([25, 40, 50, 75]);
+      const totalCm = meters * 100 + extraCm;
+      const distractors = [meters * 10 + extraCm, totalCm + 100, (meters + extraCm) * 10];
+      const options = generateDistinctStringOptions(
+        `${totalCm} cm`,
+        distractors.map((d) => `${d} cm`),
+        ['250 cm', '325 cm', '450 cm', '575 cm'],
+        4,
+        prng
+      );
+      return {
+        ...baseMeta,
+        prompt: `Multi-Step Measurement Conversion: A sea lion rescue ramp is ${meters} meters and ${extraCm} centimeters long. What is the total length of the ramp in centimeters? (1 m = 100 cm)`,
+        correctAnswer: `${totalCm} cm`,
+        options,
+        explanation: `Convert ${meters} meters to centimeters: ${meters} × 100 = ${meters * 100} cm. Then add ${extraCm} cm: ${meters * 100} + ${extraCm} = ${totalCm} cm.`,
+        hint: `First multiply ${meters} × 100, then add ${extraCm}.`,
+      };
+    }
+
     case '5.MD.C.5': {
-      const l = prng.nextInt(4, 8);
-      const w = prng.nextInt(3, 6);
-      const h = prng.nextInt(2, 5);
+      const l = prng.nextInt(3, 6);
+      const w = prng.nextInt(2, 5);
+      const h = prng.nextInt(2, 4);
       const vol = l * w * h;
-      const candidates = [`${vol + 12} cu ft`, `${Math.max(20, vol - 10)} cu ft`, `${2 * (l * w + w * h + l * h)} cu ft`, `${vol + 20} cu ft`];
-      const fallbackPool = ['48 cu ft', '60 cu ft', '72 cu ft', '80 cu ft', '96 cu ft', '120 cu ft'];
+      const candidates = [`${vol + l * w} cu ft`, `${Math.max(12, vol - l * w)} cu ft`, `${2 * (l * w + w * h + l * h)} cu ft`, `${l + w + h} cu ft`];
+      const fallbackPool = ['24 cu ft', '36 cu ft', '48 cu ft', '60 cu ft', '72 cu ft', '96 cu ft'];
       const options = generateDistinctStringOptions(`${vol} cu ft`, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `A California marine science rescue tank is ${l} feet long, ${w} feet wide, and ${h} feet deep. What is the total volume of water it holds in cubic feet?`,
+        prompt: `A California marine science rescue tank is ${l} feet long, ${w} feet wide, and ${h} feet tall. What is its volume in cubic feet? (Explore the 3D layers below!)`,
         correctAnswer: `${vol} cu ft`,
         options,
-        explanation: `Volume = length × width × height = ${l} × ${w} × ${h} = ${vol} cubic feet.`,
-        hint: `Volume = length × width × height.`,
+        manipulative: { type: 'volume-prism', length: l, width: w, height: h, unit: 'ft' },
+        explanation: `Each horizontal layer has ${l} × ${w} = ${l * w} unit cubes. With ${h} layers, Volume = ${l} × ${w} × ${h} = ${vol} cubic feet.`,
+        hint: `Volume = length × width × height (${l} × ${w} × ${h}).`,
       };
     }
 
@@ -1029,12 +1642,12 @@ function synthesizeQuestion(standard, prng) {
       const options = generateDistinctStringOptions(coordStr, candidates, fallbackPool, 4, prng);
       return {
         ...baseMeta,
-        prompt: `Identify the coordinates (x, y) of the star plotted in Quadrant 1:`,
+        prompt: `Identify the ordered pair (x, y) of the star plotted in Quadrant 1 of the coordinate plane:`,
         correctAnswer: coordStr,
         options,
         manipulative: { type: 'coordinate', x, y, max: 10 },
         explanation: `Move horizontally along the x-axis to ${x}, then vertically up the y-axis to ${y}. Coordinates are (${x}, ${y}).`,
-        hint: `X comes first, then Y.`,
+        hint: `X-coordinate (horizontal) comes first, then Y-coordinate (vertical).`,
       };
     }
 
@@ -1063,7 +1676,7 @@ function createGuaranteedDynamicQuestion(standard, prng) {
     prompt = `What is ${a} + ${b}?`;
     options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 5, 20, prng));
     explanation = `${a} + ${b} = ${correctAnswer}.`;
-    hint = `Make a ten: start at ${a} and add ${b}.`;
+    hint = `Start at ${a} and add ${b}.`;
   } else if (g === '2') {
     const a = prng.nextInt(15, 60);
     const b = prng.nextInt(12, 38);
@@ -1089,7 +1702,6 @@ function createGuaranteedDynamicQuestion(standard, prng) {
     explanation = `${a} × ${b} = ${correctAnswer}.`;
     hint = `Use the distributive property: (${Math.floor(a / 10) * 10} × ${b}) + (${a % 10} × ${b}).`;
   } else {
-    // Grade 5
     const a = prng.nextInt(2, 6);
     const b = prng.nextInt(3, 8);
     const c = prng.nextInt(1, 5);
@@ -1143,7 +1755,7 @@ function generateDistinctStringOptions(correctStr, candidateWrongArray, fallback
 
   for (const item of candidateWrongArray) {
     if (result.length >= count) break;
-    if (item && !seen.has(norm(item))) {
+    if (item !== undefined && item !== null && !seen.has(norm(item))) {
       seen.add(norm(item));
       result.push(item);
     }
@@ -1151,7 +1763,7 @@ function generateDistinctStringOptions(correctStr, candidateWrongArray, fallback
 
   for (const item of fallbackPool) {
     if (result.length >= count) break;
-    if (item && !seen.has(norm(item))) {
+    if (item !== undefined && item !== null && !seen.has(norm(item))) {
       seen.add(norm(item));
       result.push(item);
     }
@@ -1159,7 +1771,7 @@ function generateDistinctStringOptions(correctStr, candidateWrongArray, fallback
 
   let fillIndex = 1;
   while (result.length < count) {
-    const filler = `${correctStr} [${fillIndex}]`;
+    const filler = typeof correctStr === 'number' ? correctStr + fillIndex : `${correctStr} (${fillIndex})`;
     if (!seen.has(norm(filler))) {
       seen.add(norm(filler));
       result.push(filler);

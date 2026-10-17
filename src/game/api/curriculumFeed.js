@@ -26,6 +26,7 @@ if (typeof window !== 'undefined') {
 export async function fetchEducationalQuestion({
   grade = '3',
   standardCode = null,
+  mode = 'grade-quest',
   seed = null,
   preferOnline = false,
   customApiUrl = null,
@@ -93,6 +94,7 @@ export async function fetchEducationalQuestion({
     question = generateVerifiedProblem({
       grade,
       standardCode,
+      mode,
       seed: dynamicSeed,
     });
 

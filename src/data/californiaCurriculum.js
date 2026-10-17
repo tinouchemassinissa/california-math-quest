@@ -89,52 +89,52 @@ export const MODULES = {
   'K-M6': { id: 'K-M6', grade: 'K', number: 6, title: 'Analyzing, Comparing & Composing Shapes', standards: ['K.G.A.2'] },
 
   // GRADE 1
-  '1-M1': { id: '1-M1', grade: '1', number: 1, title: 'Sums and Differences to 10', standards: ['1.OA.C.6'] },
+  '1-M1': { id: '1-M1', grade: '1', number: 1, title: 'Sums and Differences to 10', standards: ['1.OA.C.6', '1.OA.A.1'] },
   '1-M2': { id: '1-M2', grade: '1', number: 2, title: 'Introduction to Place Value (Add/Sub Within 20)', standards: ['1.OA.A.1', '1.OA.C.6', '1.OA.D.8'] },
-  '1-M3': { id: '1-M3', grade: '1', number: 3, title: 'Ordering and Comparing Length Measurements', standards: ['1.MD.B.3'] },
+  '1-M3': { id: '1-M3', grade: '1', number: 3, title: 'Ordering and Comparing Length Measurements', standards: ['1.MD.A.2', '1.MD.B.3'] },
   '1-M4': { id: '1-M4', grade: '1', number: 4, title: 'Place Value, Comparison & Addition to 40', standards: ['1.NBT.B.2', '1.NBT.B.3'] },
   '1-M5': { id: '1-M5', grade: '1', number: 5, title: 'Identifying, Composing & Partitioning Shapes & Clock', standards: ['1.MD.B.3', '1.G.A.3'] },
   '1-M6': { id: '1-M6', grade: '1', number: 6, title: 'Place Value, Addition & Subtraction to 100 & Coins', standards: ['1.NBT.C.5', '1.OA.C.6'] },
 
   // GRADE 2
-  '2-M1': { id: '2-M1', grade: '2', number: 1, title: 'Sums and Differences to 100', standards: ['2.OA.B.2'] },
-  '2-M2': { id: '2-M2', grade: '2', number: 2, title: 'Addition and Subtraction of Length Units', standards: ['2.NBT.B.7'] },
-  '2-M3': { id: '2-M3', grade: '2', number: 3, title: 'Place Value, Counting & Comparison to 1,000', standards: ['2.NBT.A.2', '2.NBT.B.7'] },
-  '2-M4': { id: '2-M4', grade: '2', number: 4, title: 'Addition and Subtraction Within 200', standards: ['2.NBT.B.7', '2.OA.B.2'] },
-  '2-M5': { id: '2-M5', grade: '2', number: 5, title: 'Addition and Subtraction Within 1,000', standards: ['2.NBT.B.7'] },
+  '2-M1': { id: '2-M1', grade: '2', number: 1, title: 'Sums and Differences to 100', standards: ['2.OA.A.1', '2.OA.B.2'] },
+  '2-M2': { id: '2-M2', grade: '2', number: 2, title: 'Addition and Subtraction of Length Units', standards: ['2.OA.A.1', '2.NBT.B.7'] },
+  '2-M3': { id: '2-M3', grade: '2', number: 3, title: 'Place Value, Counting & Comparison to 1,000', standards: ['2.NBT.A.1', '2.NBT.A.2', '2.NBT.B.7'] },
+  '2-M4': { id: '2-M4', grade: '2', number: 4, title: 'Addition and Subtraction Within 200', standards: ['2.NBT.B.7', '2.OA.A.1', '2.OA.B.2'] },
+  '2-M5': { id: '2-M5', grade: '2', number: 5, title: 'Addition and Subtraction Within 1,000', standards: ['2.NBT.B.7', '2.NBT.A.1'] },
   '2-M6': { id: '2-M6', grade: '2', number: 6, title: 'Foundations of Multiplication: Arrays & Odd/Even', standards: ['2.OA.C.3', '2.OA.C.4'] },
   '2-M7': { id: '2-M7', grade: '2', number: 7, title: 'Problem Solving with Money, Coins & Bills', standards: ['2.MD.C.8'] },
   '2-M8': { id: '2-M8', grade: '2', number: 8, title: 'Time to 5 Minutes, Shapes & Equal Shares', standards: ['2.MD.C.7', '2.G.A.1'] },
 
   // GRADE 3
-  '3-M1': { id: '3-M1', grade: '3', number: 1, title: 'Multiplication & Division with Units of 2–5 & 10', standards: ['3.OA.A.3', '3.OA.C.7'] },
-  '3-M2': { id: '3-M2', grade: '3', number: 2, title: 'Place Value, Rounding & Elapsed Time', standards: ['3.NBT.A.1', '3.MD.A.1'] },
-  '3-M3': { id: '3-M3', grade: '3', number: 3, title: 'Multiplication & Division with Units of 0, 1, 6–9 & Multiples of 10', standards: ['3.OA.C.7'] },
+  '3-M1': { id: '3-M1', grade: '3', number: 1, title: 'Multiplication & Division with Units of 2–5 & 10', standards: ['3.OA.A.3', '3.OA.A.4', '3.OA.C.7'] },
+  '3-M2': { id: '3-M2', grade: '3', number: 2, title: 'Place Value, Rounding & Elapsed Time', standards: ['3.NBT.A.1', '3.NBT.A.2', '3.MD.A.1'] },
+  '3-M3': { id: '3-M3', grade: '3', number: 3, title: 'Multiplication & Division with Units of 0, 1, 6–9 & Multiples of 10', standards: ['3.OA.C.7', '3.OA.D.8', '3.OA.A.4'] },
   '3-M4': { id: '3-M4', grade: '3', number: 4, title: 'Multiplication and Area (Square Units)', standards: ['3.MD.C.7'] },
-  '3-M5': { id: '3-M5', grade: '3', number: 5, title: 'Fractions as Numbers on the Number Line', standards: ['3.NF.A.1', '3.NF.A.2'] },
-  '3-M6': { id: '3-M6', grade: '3', number: 6, title: 'Collecting and Displaying Data', standards: ['3.MD.C.7'] },
+  '3-M5': { id: '3-M5', grade: '3', number: 5, title: 'Fractions as Numbers on the Number Line', standards: ['3.NF.A.1', '3.NF.A.2', '3.NF.A.3'] },
+  '3-M6': { id: '3-M6', grade: '3', number: 6, title: 'Collecting and Displaying Data', standards: ['3.MD.C.7', '3.OA.D.8'] },
   '3-M7': { id: '3-M7', grade: '3', number: 7, title: 'Geometry & Perimeter of Polygons', standards: ['3.MD.D.8', '3.G.A.1'] },
 
   // GRADE 4
-  '4-M1': { id: '4-M1', grade: '4', number: 1, title: 'Place Value, Rounding & Addition/Subtraction to 1,000,000', standards: ['4.NBT.A.3', '4.NBT.B.4'] },
+  '4-M1': { id: '4-M1', grade: '4', number: 1, title: 'Place Value, Rounding & Addition/Subtraction to 1,000,000', standards: ['4.NBT.A.2', '4.NBT.A.3', '4.NBT.B.4'] },
   '4-M2': { id: '4-M2', grade: '4', number: 2, title: 'Unit Conversions and Metric Measurement', standards: ['4.MD.A.1'] },
-  '4-M3': { id: '4-M3', grade: '4', number: 3, title: 'Multi-Digit Multiplication & Division with Remainders', standards: ['4.NBT.B.5', '4.OA.A.3', '4.OA.B.4'] },
+  '4-M3': { id: '4-M3', grade: '4', number: 3, title: 'Multi-Digit Multiplication & Division with Remainders', standards: ['4.NBT.B.5', '4.NBT.B.6', '4.OA.A.2', '4.OA.A.3', '4.OA.B.4', '4.MD.A.3'] },
   '4-M4': { id: '4-M4', grade: '4', number: 4, title: 'Angle Measure & Plane Figures (Protractor)', standards: ['4.MD.C.6', '4.G.A.1'] },
-  '4-M5': { id: '4-M5', grade: '4', number: 5, title: 'Fraction Equivalence, Ordering & Operations', standards: ['4.NF.A.1', '4.NF.B.3'] },
+  '4-M5': { id: '4-M5', grade: '4', number: 5, title: 'Fraction Equivalence, Ordering & Operations', standards: ['4.NF.A.1', '4.NF.B.3', '4.NF.B.4'] },
   '4-M6': { id: '4-M6', grade: '4', number: 6, title: 'Decimal Fractions (Tenths & Hundredths)', standards: ['4.NF.C.6'] },
-  '4-M7': { id: '4-M7', grade: '4', number: 7, title: 'Exploring Measurement with Multiplication Word Problems', standards: ['4.OA.A.3'] },
+  '4-M7': { id: '4-M7', grade: '4', number: 7, title: 'Exploring Measurement with Multiplication Word Problems', standards: ['4.OA.A.2', '4.OA.A.3', '4.MD.A.3'] },
 
   // GRADE 5
-  '5-M1': { id: '5-M1', grade: '5', number: 1, title: 'Place Value and Decimal Fractions', standards: ['5.NBT.A.2', '5.NBT.B.7'] },
-  '5-M2': { id: '5-M2', grade: '5', number: 2, title: 'Multi-Digit Whole Number & Decimal Operations (PEMDAS)', standards: ['5.OA.A.1', '5.NBT.B.7'] },
+  '5-M1': { id: '5-M1', grade: '5', number: 1, title: 'Place Value and Decimal Fractions', standards: ['5.NBT.A.2', '5.NBT.A.3', '5.NBT.B.7'] },
+  '5-M2': { id: '5-M2', grade: '5', number: 2, title: 'Multi-Digit Whole Number & Decimal Operations (PEMDAS)', standards: ['5.OA.A.1', '5.OA.A.2', '5.NBT.B.5', '5.NBT.B.6', '5.NBT.B.7', '5.MD.A.1'] },
   '5-M3': { id: '5-M3', grade: '5', number: 3, title: 'Addition and Subtraction of Unlike Fractions', standards: ['5.NF.A.1'] },
-  '5-M4': { id: '5-M4', grade: '5', number: 4, title: 'Multiplication and Division of Fractions & Decimals', standards: ['5.NF.B.4'] },
+  '5-M4': { id: '5-M4', grade: '5', number: 4, title: 'Multiplication and Division of Fractions & Decimals', standards: ['5.NF.B.4', '5.NF.B.7', '5.MD.A.1'] },
   '5-M5': { id: '5-M5', grade: '5', number: 5, title: 'Addition and Multiplication with Volume and Area', standards: ['5.MD.C.5'] },
   '5-M6': { id: '5-M6', grade: '5', number: 6, title: 'Problem Solving with the Coordinate Plane (Quadrant 1)', standards: ['5.G.A.1'] },
 };
 
 /**
- * CA CCSS-M Standards Dictionary
+ * Official CA CCSS-M Standards Dictionary (56 Core Standards across Grades K–5)
  */
 export const STANDARDS = {
   // KINDERGARTEN
@@ -171,8 +171,8 @@ export const STANDARDS = {
     domain: 'OA',
     module: 'K-M4',
     cluster: 'Understand addition and subtraction',
-    title: 'Addition & Subtraction within 10',
-    desc: 'Solve addition and subtraction word problems and equations within 10.',
+    title: 'Addition & Subtraction Word Problems within 10',
+    desc: 'Solve addition and subtraction word problems, and add and subtract within 10 using objects or drawings.',
   },
   'K.OA.A.4': {
     code: 'K.OA.A.4',
@@ -181,7 +181,7 @@ export const STANDARDS = {
     module: 'K-M4',
     cluster: 'Understand addition and subtraction',
     title: 'Partners to Make 10 (Friends of 10)',
-    desc: 'For any number from 1 to 9, find the number that makes 10 when added.',
+    desc: 'For any number from 1 to 9, find the number that makes 10 when added to the given number.',
   },
   'K.NBT.A.1': {
     code: 'K.NBT.A.1',
@@ -189,8 +189,8 @@ export const STANDARDS = {
     domain: 'NBT',
     module: 'K-M5',
     cluster: 'Work with numbers 11-19 to gain foundations for place value',
-    title: 'Decompose Teen Numbers (10 and More)',
-    desc: 'Compose and decompose numbers from 11 to 19 into ten ones and additional ones.',
+    title: 'Compose & Decompose Teen Numbers (11–19)',
+    desc: 'Compose and decompose numbers from 11 to 19 into ten ones and some further ones.',
   },
   'K.MD.A.2': {
     code: 'K.MD.A.2',
@@ -199,7 +199,7 @@ export const STANDARDS = {
     module: 'K-M3',
     cluster: 'Describe and compare measurable attributes',
     title: 'Compare Measurable Attributes',
-    desc: 'Directly compare two objects with a measurable attribute in common (longer, shorter, heavier).',
+    desc: 'Directly compare two objects with a measurable attribute in common (longer, shorter, taller, heavier).',
   },
   'K.G.A.2': {
     code: 'K.G.A.2',
@@ -208,7 +208,7 @@ export const STANDARDS = {
     module: 'K-M2',
     cluster: 'Identify and describe shapes',
     title: 'Name 2D & 3D Shapes & Attributes',
-    desc: 'Correctly name shapes (circle, triangle, rectangle, square, hexagon, cube) regardless of orientation.',
+    desc: 'Correctly name shapes (circle, triangle, rectangle, square, hexagon, cube) regardless of orientation or size.',
   },
 
   // 1ST GRADE
@@ -218,8 +218,8 @@ export const STANDARDS = {
     domain: 'OA',
     module: '1-M2',
     cluster: 'Represent and solve problems involving addition and subtraction',
-    title: 'Word Problems within 20',
-    desc: 'Use addition and subtraction within 20 to solve word problems involving situations of adding to and taking from.',
+    title: 'Addition & Subtraction Word Problems within 20',
+    desc: 'Use addition and subtraction within 20 to solve word problems involving adding to, taking from, and putting together.',
   },
   '1.OA.C.6': {
     code: '1.OA.C.6',
@@ -228,7 +228,7 @@ export const STANDARDS = {
     module: '1-M1',
     cluster: 'Add and subtract within 20',
     title: 'Addition & Subtraction Fluency within 20',
-    desc: 'Add and subtract within 20, demonstrating fluency for addition and subtraction within 10.',
+    desc: 'Add and subtract within 20, demonstrating fluency for addition and subtraction within 10 using strategies such as making ten.',
   },
   '1.OA.D.8': {
     code: '1.OA.D.8',
@@ -237,7 +237,7 @@ export const STANDARDS = {
     module: '1-M2',
     cluster: 'Work with addition and subtraction equations',
     title: 'Determine Unknown Number in Equations',
-    desc: 'Determine the unknown whole number in an addition or subtraction equation (e.g., 8 + ? = 14).',
+    desc: 'Determine the unknown whole number in an addition or subtraction equation relating three whole numbers.',
   },
   '1.NBT.B.2': {
     code: '1.NBT.B.2',
@@ -255,7 +255,7 @@ export const STANDARDS = {
     module: '1-M4',
     cluster: 'Understand place value',
     title: 'Compare Two 2-Digit Numbers',
-    desc: 'Compare two two-digit numbers based on meanings of the tens and ones digits, recording with >, =, <.',
+    desc: 'Compare two two-digit numbers based on meanings of the tens and ones digits, recording results with >, =, and <.',
   },
   '1.NBT.C.5': {
     code: '1.NBT.C.5',
@@ -264,7 +264,16 @@ export const STANDARDS = {
     module: '1-M6',
     cluster: 'Use place value understanding to add and subtract',
     title: '10 More and 10 Less Mentally',
-    desc: 'Given a two-digit number, mentally find 10 more or 10 less without having to count.',
+    desc: 'Given a two-digit number, mentally find 10 more or 10 less than the number, without having to count.',
+  },
+  '1.MD.A.2': {
+    code: '1.MD.A.2',
+    grade: '1',
+    domain: 'MD',
+    module: '1-M3',
+    cluster: 'Measure lengths indirectly and by iterating length units',
+    title: 'Measure Length with Unit Cubes & Centimeters',
+    desc: 'Express the length of an object as a whole number of length units, by laying multiple copies of a shorter object end to end.',
   },
   '1.MD.B.3': {
     code: '1.MD.B.3',
@@ -282,10 +291,19 @@ export const STANDARDS = {
     module: '1-M5',
     cluster: 'Reason with shapes and their attributes',
     title: 'Partition Halves and Fourths',
-    desc: 'Partition circles and rectangles into two and four equal shares; describe shares using halves, fourths, quarters.',
+    desc: 'Partition circles and rectangles into two and four equal shares; describe the shares using halves, fourths, and quarters.',
   },
 
   // 2ND GRADE
+  '2.OA.A.1': {
+    code: '2.OA.A.1',
+    grade: '2',
+    domain: 'OA',
+    module: '2-M1',
+    cluster: 'Represent and solve problems involving addition and subtraction',
+    title: 'One- & Two-Step Word Problems within 100',
+    desc: 'Use addition and subtraction within 100 to solve one- and two-step word problems involving adding to, taking from, and comparing.',
+  },
   '2.OA.B.2': {
     code: '2.OA.B.2',
     grade: '2',
@@ -293,7 +311,7 @@ export const STANDARDS = {
     module: '2-M1',
     cluster: 'Add and subtract within 20',
     title: 'Fluently Add & Subtract within 20',
-    desc: 'Fluently add and subtract within 20 using mental strategies. By end of Grade 2, know from memory all sums of two one-digit numbers.',
+    desc: 'Fluently add and subtract within 20 using mental strategies. Know from memory all sums of two one-digit numbers.',
   },
   '2.OA.C.3': {
     code: '2.OA.C.3',
@@ -302,7 +320,7 @@ export const STANDARDS = {
     module: '2-M6',
     cluster: 'Work with equal groups to gain foundations for multiplication',
     title: 'Odd and Even Numbers',
-    desc: 'Determine whether a group of objects (up to 20) has an odd or even number of members.',
+    desc: 'Determine whether a group of objects (up to 20) has an odd or even number of members, e.g., by pairing objects.',
   },
   '2.OA.C.4': {
     code: '2.OA.C.4',
@@ -311,7 +329,16 @@ export const STANDARDS = {
     module: '2-M6',
     cluster: 'Work with equal groups to gain foundations for multiplication',
     title: 'Rectangular Arrays & Repeated Addition',
-    desc: 'Use addition to find the total number of objects in rectangular arrays with up to 5 rows and 5 columns.',
+    desc: 'Use addition to find the total number of objects arranged in rectangular arrays with up to 5 rows and up to 5 columns.',
+  },
+  '2.NBT.A.1': {
+    code: '2.NBT.A.1',
+    grade: '2',
+    domain: 'NBT',
+    module: '2-M3',
+    cluster: 'Understand place value',
+    title: 'Three-Digit Place Value (Hundreds, Tens, Ones)',
+    desc: 'Understand that the three digits of a three-digit number represent amounts of hundreds, tens, and ones.',
   },
   '2.NBT.A.2': {
     code: '2.NBT.A.2',
@@ -329,7 +356,7 @@ export const STANDARDS = {
     module: '2-M4',
     cluster: 'Use place value understanding and properties of operations',
     title: 'Addition & Subtraction within 1,000',
-    desc: 'Add and subtract within 1000 using concrete models or drawings and strategies based on place value with regrouping.',
+    desc: 'Add and subtract within 1000, using concrete models or drawings and strategies based on place value with regrouping.',
   },
   '2.MD.C.7': {
     code: '2.MD.C.7',
@@ -347,7 +374,7 @@ export const STANDARDS = {
     module: '2-M7',
     cluster: 'Work with time and money',
     title: 'Money: Coins and Dollar Word Problems',
-    desc: 'Solve word problems involving dollar bills, quarters, dimes, nickels, and pennies.',
+    desc: 'Solve word problems involving dollar bills, quarters, dimes, nickels, and pennies, using $ and ¢ symbols appropriately.',
   },
   '2.G.A.1': {
     code: '2.G.A.1',
@@ -355,8 +382,8 @@ export const STANDARDS = {
     domain: 'G',
     module: '2-M8',
     cluster: 'Reason with shapes and their attributes',
-    title: 'Recognize Polygons & Faces',
-    desc: 'Recognize and draw shapes having specified attributes, such as a given number of angles or equal faces.',
+    title: 'Recognize Polygons, Angles & Faces',
+    desc: 'Identify triangles, quadrilaterals, pentagons, hexagons, and cubes based on specified numbers of angles or equal faces.',
   },
 
   // 3RD GRADE
@@ -369,6 +396,15 @@ export const STANDARDS = {
     title: 'Multiplication & Division Word Problems',
     desc: 'Use multiplication and division within 100 to solve word problems in situations involving equal groups, arrays, and measurement.',
   },
+  '3.OA.A.4': {
+    code: '3.OA.A.4',
+    grade: '3',
+    domain: 'OA',
+    module: '3-M1',
+    cluster: 'Represent and solve problems involving multiplication and division',
+    title: 'Unknown Factor & Quotient Equations',
+    desc: 'Determine the unknown whole number in a multiplication or division equation relating three whole numbers (e.g., 8 × ? = 48).',
+  },
   '3.OA.C.7': {
     code: '3.OA.C.7',
     grade: '3',
@@ -378,6 +414,15 @@ export const STANDARDS = {
     title: 'Multiplication & Division Fluency (0–12)',
     desc: 'Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division.',
   },
+  '3.OA.D.8': {
+    code: '3.OA.D.8',
+    grade: '3',
+    domain: 'OA',
+    module: '3-M3',
+    cluster: 'Solve problems involving the four operations',
+    title: 'Two-Step Word Problems (Four Operations)',
+    desc: 'Solve two-step word problems using the four operations. Represent these problems using equations with a letter for the unknown.',
+  },
   '3.NBT.A.1': {
     code: '3.NBT.A.1',
     grade: '3',
@@ -386,6 +431,15 @@ export const STANDARDS = {
     cluster: 'Use place value understanding and properties of operations',
     title: 'Rounding to Nearest 10 and 100',
     desc: 'Use place value understanding to round whole numbers to the nearest 10 or 100.',
+  },
+  '3.NBT.A.2': {
+    code: '3.NBT.A.2',
+    grade: '3',
+    domain: 'NBT',
+    module: '3-M2',
+    cluster: 'Use place value understanding and properties of operations',
+    title: 'Fluently Add & Subtract within 1,000',
+    desc: 'Fluently add and subtract within 1000 using strategies and algorithms based on place value and properties of operations.',
   },
   '3.NF.A.1': {
     code: '3.NF.A.1',
@@ -403,7 +457,16 @@ export const STANDARDS = {
     module: '3-M5',
     cluster: 'Develop understanding of fractions as numbers',
     title: 'Fractions on the Number Line',
-    desc: 'Represent a fraction 1/b and a/b on a number line diagram between 0 and 1.',
+    desc: 'Represent a fraction 1/b and a/b on a number line diagram by defining the interval from 0 to 1.',
+  },
+  '3.NF.A.3': {
+    code: '3.NF.A.3',
+    grade: '3',
+    domain: 'NF',
+    module: '3-M5',
+    cluster: 'Develop understanding of fractions as numbers',
+    title: 'Equivalent & Comparing Fractions',
+    desc: 'Explain equivalence of fractions and compare two fractions with the same numerator or the same denominator.',
   },
   '3.MD.A.1': {
     code: '3.MD.A.1',
@@ -412,7 +475,7 @@ export const STANDARDS = {
     module: '3-M2',
     cluster: 'Solve problems involving measurement and estimation',
     title: 'Telling Time to the Minute & Elapsed Time',
-    desc: 'Tell and write time to the nearest minute and measure elapsed time intervals in minutes.',
+    desc: 'Tell and write time to the nearest minute and measure time intervals in minutes. Solve word problems involving elapsed time.',
   },
   '3.MD.C.7': {
     code: '3.MD.C.7',
@@ -432,15 +495,33 @@ export const STANDARDS = {
     title: 'Perimeter of Polygons',
     desc: 'Solve real-world and mathematical problems involving perimeters of polygons, including finding an unknown side length.',
   },
+  '3.G.A.1': {
+    code: '3.G.A.1',
+    grade: '3',
+    domain: 'G',
+    module: '3-M7',
+    cluster: 'Reason with shapes and their attributes',
+    title: 'Classify Quadrilaterals & Polygon Attributes',
+    desc: 'Understand that shapes in different categories (rhombuses, rectangles, squares) may share attributes and belong to quadrilaterals.',
+  },
 
   // 4TH GRADE
+  '4.OA.A.2': {
+    code: '4.OA.A.2',
+    grade: '4',
+    domain: 'OA',
+    module: '4-M3',
+    cluster: 'Use the four operations with whole numbers to solve problems',
+    title: 'Multiplicative Comparison Word Problems',
+    desc: 'Multiply or divide to solve word problems involving multiplicative comparison (e.g., "times as many").',
+  },
   '4.OA.A.3': {
     code: '4.OA.A.3',
     grade: '4',
     domain: 'OA',
     module: '4-M3',
     cluster: 'Use the four operations with whole numbers to solve problems',
-    title: 'Multi-Step Word Problems with Remainders',
+    title: 'Multi-Step Word Problems & Remainders',
     desc: 'Solve multistep word problems posed with whole numbers and having whole-number answers using the four operations.',
   },
   '4.OA.B.4': {
@@ -450,7 +531,16 @@ export const STANDARDS = {
     module: '4-M3',
     cluster: 'Gain familiarity with factors and multiples',
     title: 'Factors, Multiples, Prime & Composite',
-    desc: 'Find all factor pairs for a whole number in the range 1–100; determine whether a number is prime or composite.',
+    desc: 'Find all factor pairs for a whole number in the range 1–100; determine whether a given whole number is prime or composite.',
+  },
+  '4.NBT.A.2': {
+    code: '4.NBT.A.2',
+    grade: '4',
+    domain: 'NBT',
+    module: '4-M1',
+    cluster: 'Generalize place value understanding for multi-digit whole numbers',
+    title: 'Read, Write & Compare Multi-Digit Numbers (Expanded Form)',
+    desc: 'Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form; compare using >, =, <.',
   },
   '4.NBT.A.3': {
     code: '4.NBT.A.3',
@@ -459,7 +549,16 @@ export const STANDARDS = {
     module: '4-M1',
     cluster: 'Generalize place value understanding for multi-digit whole numbers',
     title: 'Round Multi-Digit Numbers to Any Place',
-    desc: 'Use place value understanding to round multi-digit whole numbers to any place value up to 1,000,000.',
+    desc: 'Use place value understanding to round multi-digit whole numbers to any place up to 1,000,000.',
+  },
+  '4.NBT.B.4': {
+    code: '4.NBT.B.4',
+    grade: '4',
+    domain: 'NBT',
+    module: '4-M1',
+    cluster: 'Use place value understanding to perform multi-digit arithmetic',
+    title: 'Fluently Add & Subtract Multi-Digit Whole Numbers',
+    desc: 'Fluently add and subtract multi-digit whole numbers using the standard algorithm up to 1,000,000.',
   },
   '4.NBT.B.5': {
     code: '4.NBT.B.5',
@@ -467,8 +566,17 @@ export const STANDARDS = {
     domain: 'NBT',
     module: '4-M3',
     cluster: 'Use place value understanding to perform multi-digit arithmetic',
-    title: 'Multi-Digit Multiplication (Up to 4-Digit × 1-Digit and 2-Digit × 2-Digit)',
+    title: 'Multi-Digit Multiplication (Area Model & Partial Products)',
     desc: 'Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers.',
+  },
+  '4.NBT.B.6': {
+    code: '4.NBT.B.6',
+    grade: '4',
+    domain: 'NBT',
+    module: '4-M3',
+    cluster: 'Use place value understanding to perform multi-digit arithmetic',
+    title: 'Multi-Digit Division & Quotients',
+    desc: 'Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors.',
   },
   '4.NF.A.1': {
     code: '4.NF.A.1',
@@ -477,7 +585,7 @@ export const STANDARDS = {
     module: '4-M5',
     cluster: 'Extend understanding of fraction equivalence and ordering',
     title: 'Equivalent Fractions (Visual Models)',
-    desc: 'Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b) using visual fraction models.',
+    desc: 'Explain why a fraction a/b is equivalent to a fraction (n×a)/(n×b) by using visual fraction models.',
   },
   '4.NF.B.3': {
     code: '4.NF.B.3',
@@ -488,6 +596,15 @@ export const STANDARDS = {
     title: 'Add & Subtract Fractions with Like Denominators',
     desc: 'Understand addition and subtraction of fractions as joining and separating parts referring to the same whole.',
   },
+  '4.NF.B.4': {
+    code: '4.NF.B.4',
+    grade: '4',
+    domain: 'NF',
+    module: '4-M5',
+    cluster: 'Build fractions from unit fractions',
+    title: 'Multiply a Fraction by a Whole Number',
+    desc: 'Apply and extend previous understandings of multiplication to multiply a fraction by a whole number.',
+  },
   '4.NF.C.6': {
     code: '4.NF.C.6',
     grade: '4',
@@ -497,14 +614,41 @@ export const STANDARDS = {
     title: 'Decimals as Fractions (Tenths & Hundredths)',
     desc: 'Use decimal notation for fractions with denominators 10 or 100 (e.g., rewrite 0.62 as 62/100).',
   },
+  '4.MD.A.1': {
+    code: '4.MD.A.1',
+    grade: '4',
+    domain: 'MD',
+    module: '4-M2',
+    cluster: 'Solve problems involving measurement and conversion of measurements',
+    title: 'Metric & Customary Unit Conversions (km/m/cm, kg/g, L/mL)',
+    desc: 'Know relative sizes of measurement units within one system of units and express measurements in a larger unit in terms of a smaller unit.',
+  },
+  '4.MD.A.3': {
+    code: '4.MD.A.3',
+    grade: '4',
+    domain: 'MD',
+    module: '4-M3',
+    cluster: 'Solve problems involving measurement and conversion of measurements',
+    title: 'Area & Perimeter Formulas (Missing Side Lengths)',
+    desc: 'Apply the area and perimeter formulas for rectangles in real-world and mathematical problems, including finding an unknown dimension.',
+  },
   '4.MD.C.6': {
     code: '4.MD.C.6',
     grade: '4',
     domain: 'MD',
     module: '4-M4',
     cluster: 'Geometric measurement: understand concepts of angle',
-    title: 'Angle Measurement & Protractor Degrees',
-    desc: 'Measure angles in whole-number degrees using a protractor. Classify acute, right, and obtuse angles.',
+    title: 'Angle Measurement & Interactive Protractor',
+    desc: 'Measure angles in whole-number degrees using a protractor. Sketch and classify acute, right, and obtuse angles.',
+  },
+  '4.G.A.1': {
+    code: '4.G.A.1',
+    grade: '4',
+    domain: 'G',
+    module: '4-M4',
+    cluster: 'Draw and identify lines and angles',
+    title: 'Lines, Rays, Parallel/Perpendicular & Angle Classification',
+    desc: 'Draw points, lines, line segments, rays, angles (right, acute, obtuse), and perpendicular and parallel lines.',
   },
 
   // 5TH GRADE
@@ -517,14 +661,50 @@ export const STANDARDS = {
     title: 'Order of Operations & Parentheses (PEMDAS)',
     desc: 'Use parentheses, brackets, or braces in numerical expressions, and evaluate expressions with these symbols.',
   },
+  '5.OA.A.2': {
+    code: '5.OA.A.2',
+    grade: '5',
+    domain: 'OA',
+    module: '5-M2',
+    cluster: 'Write and interpret numerical expressions',
+    title: 'Write & Interpret Numerical Expressions',
+    desc: 'Write simple expressions that record calculations with numbers, and interpret numerical expressions without evaluating them.',
+  },
   '5.NBT.A.2': {
     code: '5.NBT.A.2',
     grade: '5',
     domain: 'NBT',
     module: '5-M1',
     cluster: 'Understand the place value system',
-    title: 'Powers of 10 and Decimal Patterns',
-    desc: 'Explain patterns in the number of zeros of the product when multiplying a number by powers of 10.',
+    title: 'Powers of 10 and Exponents',
+    desc: 'Explain patterns in the number of zeros of the product when multiplying a number by powers of 10, and use whole-number exponents.',
+  },
+  '5.NBT.A.3': {
+    code: '5.NBT.A.3',
+    grade: '5',
+    domain: 'NBT',
+    module: '5-M1',
+    cluster: 'Understand the place value system',
+    title: 'Read, Write & Compare Decimals to Thousandths',
+    desc: 'Read, write, and compare decimals to thousandths using base-ten numerals, number names, and expanded form.',
+  },
+  '5.NBT.B.5': {
+    code: '5.NBT.B.5',
+    grade: '5',
+    domain: 'NBT',
+    module: '5-M2',
+    cluster: 'Perform operations with multi-digit whole numbers and with decimals',
+    title: 'Fluently Multiply Multi-Digit Whole Numbers',
+    desc: 'Fluently multiply multi-digit whole numbers using the standard algorithm.',
+  },
+  '5.NBT.B.6': {
+    code: '5.NBT.B.6',
+    grade: '5',
+    domain: 'NBT',
+    module: '5-M2',
+    cluster: 'Perform operations with multi-digit whole numbers and with decimals',
+    title: 'Multi-Digit Division with Two-Digit Divisors',
+    desc: 'Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors.',
   },
   '5.NBT.B.7': {
     code: '5.NBT.B.7',
@@ -550,8 +730,26 @@ export const STANDARDS = {
     domain: 'NF',
     module: '5-M4',
     cluster: 'Apply and extend previous understandings of multiplication and division',
-    title: 'Multiply Fractions by Fractions',
+    title: 'Multiply Fractions & Area of Fractional Rectangles',
     desc: 'Apply and extend previous understandings of multiplication to multiply a fraction or whole number by a fraction.',
+  },
+  '5.NF.B.7': {
+    code: '5.NF.B.7',
+    grade: '5',
+    domain: 'NF',
+    module: '5-M4',
+    cluster: 'Apply and extend previous understandings of multiplication and division',
+    title: 'Divide Unit Fractions & Whole Numbers',
+    desc: 'Apply and extend previous understandings of division to divide unit fractions by whole numbers and whole numbers by unit fractions.',
+  },
+  '5.MD.A.1': {
+    code: '5.MD.A.1',
+    grade: '5',
+    domain: 'MD',
+    module: '5-M2',
+    cluster: 'Convert like measurement units within a given measurement system',
+    title: 'Multi-Step Measurement Unit Conversions',
+    desc: 'Convert among different-sized standard measurement units within a given measurement system and solve multi-step word problems.',
   },
   '5.MD.C.5': {
     code: '5.MD.C.5',
@@ -560,7 +758,7 @@ export const STANDARDS = {
     module: '5-M5',
     cluster: 'Geometric measurement: understand concepts of volume',
     title: 'Volume of Rectangular Prisms (V = l × w × h)',
-    desc: 'Relate volume to the operations of multiplication and addition and solve real world problems using V = l × w × h.',
+    desc: 'Relate volume to the operations of multiplication and addition and solve real-world problems using V = l × w × h.',
   },
   '5.G.A.1': {
     code: '5.G.A.1',
@@ -569,7 +767,7 @@ export const STANDARDS = {
     module: '5-M6',
     cluster: 'Graph points on the coordinate plane',
     title: 'Coordinate Plane: Plotting (x, y) in Quadrant 1',
-    desc: 'Use a pair of perpendicular number lines to define a coordinate system and locate points (x, y).',
+    desc: 'Use a pair of perpendicular number lines to define a coordinate system and locate points (x, y) in the first quadrant.',
   },
 };
 
@@ -1414,18 +1612,22 @@ export function generateQuestion(grade = '3', domain = null, seed = Math.random)
     }
 
     default: {
+      const a = Math.floor(seed() * 8) + 3;
+      const b = Math.floor(seed() * 8) + 3;
+      const isAdd = standard.grade === 'K' || standard.grade === '1' || standard.grade === '2';
+      const ans = isAdd ? a + b : a * b;
       return {
-        id: `q-def-${Date.now()}`,
-        grade,
-        standard: '3.OA.C.7',
-        domain: 'OA',
-        cluster: 'Multiply and divide within 100',
-        title: 'Multiplication Fluency',
-        module: '3-M3',
-        prompt: `What is 7 × 8?`,
-        correctAnswer: 56,
-        options: [48, 54, 56, 64],
-        hint: `7 × 8 = 56.`,
+        id: `q-dyn-${standard.code}-${Date.now()}-${Math.floor(seed() * 1000)}`,
+        grade: standard.grade,
+        standard: standard.code,
+        domain: standard.domain,
+        cluster: standard.cluster,
+        title: standard.title,
+        module: standard.module,
+        prompt: isAdd ? `Calculate: ${a} + ${b} = ❓` : `Calculate: ${a} × ${b} = ❓`,
+        correctAnswer: ans,
+        options: generateDistinctOptions(ans, 4, 2, isAdd ? 30 : 100, seed),
+        hint: isAdd ? `Add ${a} + ${b} = ${ans}.` : `Multiply ${a} × ${b} = ${ans}.`,
       };
     }
   }

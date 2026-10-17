@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
+import NumberPad from './NumberPad.jsx';
 
 export default function QuestionCard({
   question,
@@ -12,6 +13,19 @@ export default function QuestionCard({
   const [hintVisible, setHintVisible] = useState(false);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [manualInput, setManualInput] = useState('');
+  const [useKeypad, setUseKeypad] = useState(false);
+
+  useEffect(() => {
+    setHintVisible(false);
+    setExplanationVisible(false);
+    setManualInput('');
+  }, [question?.id, question?.prompt]);
+
+  useEffect(() => {
+    if (feedback?.status === 'incorrect') {
+      setExplanationVisible(true);
+    }
+  }, [feedback]);
 
   if (!question) {
     return <div className="card loading-card">Loading verified question...</div>;
@@ -26,6 +40,7 @@ export default function QuestionCard({
   };
 
   const timerPct = totalTime > 0 ? Math.max(0, (timeLeft / totalTime) * 100) : 100;
+  const hasMultipleChoice = Array.isArray(question.options) && question.options.length > 0;
 
   return (
     <div className={`question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
@@ -62,9 +77,9 @@ export default function QuestionCard({
         <VisualManipulative manipulative={question.manipulative} />
       )}
 
-      {/* Answer Options */}
+      {/* Answer Options or Free-Response Keypad */}
       <div className="answers-container">
-        {question.options && question.options.length > 0 ? (
+        {hasMultipleChoice && !useKeypad ? (
           <div className="options-grid">
             {question.options.map((opt, idx) => {
               const isSelectedFeedback =
@@ -95,28 +110,37 @@ export default function QuestionCard({
             })}
           </div>
         ) : (
-          <form className="manual-input-form" onSubmit={handleManualSubmit}>
-            <input
-              type="text"
-              className="text-input"
-              placeholder="Type your answer..."
-              value={manualInput}
+          <div>
+            <form className="manual-input-form" onSubmit={handleManualSubmit}>
+              <input
+                type="text"
+                className="text-input"
+                placeholder="Type or tap your answer..."
+                value={manualInput}
+                disabled={Boolean(feedback)}
+                onChange={(e) => setManualInput(e.target.value)}
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={Boolean(feedback) || !manualInput.trim()}
+              >
+                Submit
+              </button>
+            </form>
+            <NumberPad
               disabled={Boolean(feedback)}
-              onChange={(e) => setManualInput(e.target.value)}
-              autoFocus
+              onDigit={(d) => setManualInput((prev) => `${prev}${d}`)}
+              onBackspace={() => setManualInput((prev) => prev.slice(0, -1))}
+              onClear={() => setManualInput('')}
+              onSubmit={() => handleManualSubmit()}
             />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={Boolean(feedback) || !manualInput.trim()}
-            >
-              Submit
-            </button>
-          </form>
+          </div>
         )}
       </div>
 
-      {/* Step-by-Step Proof & Hint Row */}
+      {/* Step-by-Step Proof, Keypad Toggle & Hint Row */}
       <div className="card-footer-row">
         <div className="helper-buttons-row">
           {showHints && question.hint && (
@@ -136,6 +160,17 @@ export default function QuestionCard({
               onClick={() => setExplanationVisible((prev) => !prev)}
             >
               📐 {explanationVisible ? 'Hide Step-by-Step Proof' : 'View Step-by-Step Proof'}
+            </button>
+          )}
+
+          {hasMultipleChoice && (
+            <button
+              type="button"
+              className="step-proof-btn"
+              onClick={() => setUseKeypad((prev) => !prev)}
+              title="Switch between Multiple Choice and Touchscreen Keypad mode"
+            >
+              🔢 {useKeypad ? 'Multiple Choice Mode' : 'Keypad / Free Response'}
             </button>
           )}
         </div>
