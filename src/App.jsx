@@ -8,6 +8,7 @@ import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
 import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
 import AchievementsModal from './components/AchievementsModal.jsx';
+import MathTamagotchi from './components/MathTamagotchi.jsx';
 import { STANDARDS } from './data/californiaCurriculum.js';
 import {
   createInitialProfile,
@@ -313,11 +314,11 @@ export default function App() {
       setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
-      }, 1400);
+      }, 1500);
     } else if (isCorrect || mode === 'speed-sprint') {
       setTimeout(() => {
         nextQuestion(focusedStandard, false);
-      }, mode === 'speed-sprint' ? 600 : 1150);
+      }, mode === 'speed-sprint' ? 650 : 1650);
     }
     // Note: On incorrect answers in normal learning modes, we pause so the child can read/listen to the step-by-step explanation and click "Got It! Next Question ➔"
   };
@@ -366,6 +367,16 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Subtle Animated Floating Math Symbols in Background */}
+      <div className="ambient-math-bg" aria-hidden="true">
+        <span className="float-sym sym-1">＋</span>
+        <span className="float-sym sym-2">×</span>
+        <span className="float-sym sym-3">÷</span>
+        <span className="float-sym sym-4">⭐</span>
+        <span className="float-sym sym-5">½</span>
+        <span className="float-sym sym-6">△</span>
+      </div>
+
       <Header
         grade={grade}
         onGradeChange={(g) => {
@@ -423,7 +434,15 @@ export default function App() {
       )}
 
       <main className="main-game-layout">
+        <MathTamagotchi
+          feedback={feedback}
+          streak={streak}
+          correctCount={roundStats.correct}
+          grade={grade}
+        />
+
         <QuestionCard
+          key={currentQuestion?.id || currentQuestion?.prompt || 'q'}
           question={currentQuestion}
           onAnswer={handleAnswer}
           onSkip={() => nextQuestion(focusedStandard, false)}
