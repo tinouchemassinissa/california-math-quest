@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PROGRAM_INFO, GRADES } from '../data/californiaCurriculum.js';
 import { DIFFICULTY_PRESETS } from '../game/learningEngine.js';
 
@@ -19,6 +19,8 @@ export default function Header({
   onToggleMusic,
   theme,
   onToggleTheme,
+  timedPractice,
+  onToggleTimedPractice,
   onOpenClassroom,
   onOpenCurriculum,
   onOpenHelp,
@@ -26,186 +28,214 @@ export default function Header({
   onOpenAchievements,
   activeClassSession,
 }) {
-  const currentLeague = PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
+  const [teacherMenuOpen, setTeacherMenuOpen] = useState(false);
+
+  const currentLeague =
+    PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
+
+  const cycleLeague = () => {
+    const idx = PROGRAM_INFO.leagues.findIndex((l) => l.id === leagueId);
+    const next = PROGRAM_INFO.leagues[(idx + 1) % PROGRAM_INFO.leagues.length];
+    onLeagueChange(next.id);
+  };
 
   return (
-    <header className="app-header">
-      <div className="header-top">
+    <header className="app-header kid-header">
+      <div className="kid-header-main">
+        {/* Left: Bouncy Mascot + Title */}
         <div className="brand-group">
-          <div className="school-badge-icon" style={{ borderColor: currentLeague.color }}>
+          <button
+            type="button"
+            className="school-badge-icon mascot-bounce"
+            style={{ borderColor: currentLeague.color }}
+            onClick={cycleLeague}
+            title={`Click to change mascot! Current: ${currentLeague.name}`}
+          >
             {currentLeague.badge}
-          </div>
+          </button>
           <div className="brand-titles">
             <h1 className="district-title">California Math Quest</h1>
             <div className="district-sub">
-              <span>{currentLeague.name}</span> • <span>CA Common Core (CCSS-M)</span>
+              <span className="mascot-team-pill" onClick={cycleLeague} title="Tap to switch mascot">
+                {currentLeague.name} 🐾
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Global Controls */}
-        <div className="header-actions">
-          {activeClassSession && (
+        {/* Center: Big Kid-Friendly Grade Bubbles (K - 5) */}
+        <div className="kid-grade-picker" role="group" aria-label="Choose your grade">
+          <span className="grade-picker-label">Grade:</span>
+          {GRADES.map((g) => {
+            const isSelected = grade === g.id;
+            return (
+              <button
+                key={g.id}
+                type="button"
+                className={`grade-bubble-btn ${isSelected ? 'active' : ''}`}
+                onClick={() => onGradeChange(g.id)}
+                title={g.subtitle || g.label}
+              >
+                <span className="grade-bubble-icon">{g.icon}</span>
+                <span className="grade-bubble-text">
+                  {g.id === 'K' ? 'K' : `${g.id}`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right: Playful Animated HUD + Quick Actions */}
+        <div className="kid-hud-and-actions">
+          <div className="game-hud">
+            {lives !== null && (
+              <div className="lives-display" title={`${lives} hearts remaining`}>
+                {Array.from({ length: maxLives || 3 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`heart-icon ${i < lives ? 'active' : 'spent'}`}
+                  >
+                    ❤️
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className={`hud-pill streak-pill ${streak >= 3 ? 'on-fire' : ''}`} title="Current Streak">
+              <span className="hud-pill-emoji">{streak >= 3 ? '🔥' : '⚡'}</span>
+              <span className="hud-pill-num">{streak}</span>
+            </div>
+
+            <div className="hud-pill score-pill" title="Total Star Score">
+              <span className="hud-pill-emoji">⭐</span>
+              <span className="hud-pill-num">{score}</span>
+            </div>
+          </div>
+
+          <div className="header-actions">
             <button
               type="button"
-              className="badge-pill class-pill"
-              onClick={onOpenClassroom}
-              title="Study Group Active"
+              className="kid-trophy-btn"
+              onClick={onOpenAchievements}
+              title="My Badges & Trophies"
             >
-              👥 {activeClassSession.groupName} ({activeClassSession.activeStudent})
+              🏆 <span>Badges</span>
             </button>
-          )}
 
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={onToggleMusic}
-            title={musicEnabled ? 'Focus Ambient Music (Playing)' : 'Start Focus Ambient Music'}
-          >
-            {musicEnabled ? '🎵' : '🔇'}
-          </button>
+            <button
+              type="button"
+              className={`kid-teacher-toggle ${teacherMenuOpen ? 'active' : ''}`}
+              onClick={() => setTeacherMenuOpen((v) => !v)}
+              title="Open Standards Map, Teacher Tools & Difficulty Options"
+            >
+              👩‍🏫 <span>Tools</span>
+            </button>
 
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={onToggleSound}
-            title={soundEnabled ? 'Sound Effects Enabled' : 'Sound Effects Muted'}
-          >
-            {soundEnabled ? '🔔' : '🔕'}
-          </button>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={onToggleSound}
+              title={soundEnabled ? 'Sound Effects On' : 'Sound Effects Muted'}
+            >
+              {soundEnabled ? '🔊' : '🔇'}
+            </button>
 
-          <button
-            type="button"
-            className="icon-btn"
-            onClick={onToggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={onToggleMusic}
+              title={musicEnabled ? 'Background Music On' : 'Background Music Off'}
+            >
+              {musicEnabled ? '🎵' : '🎶'}
+            </button>
 
-          <button
-            type="button"
-            className="icon-btn help-btn"
-            onClick={onOpenHelp}
-            title="Help & Official California CCSS-M Guide"
-          >
-            ❓
-          </button>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={onToggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'Sunny Light' : 'Night Space'} Theme`}
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+
+            <button
+              type="button"
+              className="icon-btn help-btn"
+              onClick={onOpenHelp}
+              title="How to Play & Guide"
+            >
+              ❓
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="header-subbar">
-        {/* Selectors */}
-        <div className="selectors-group">
-          <div className="select-wrapper">
-            <label htmlFor="league-select">Scholar League:</label>
-            <select
-              id="league-select"
-              value={leagueId}
-              onChange={(e) => onLeagueChange(e.target.value)}
-              className="styled-select"
-            >
-              {PROGRAM_INFO.leagues.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.badge} {l.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-wrapper">
-            <label htmlFor="grade-select">Grade:</label>
-            <select
-              id="grade-select"
-              value={grade}
-              onChange={(e) => onGradeChange(e.target.value)}
-              className="styled-select"
-            >
-              {GRADES.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.icon} {g.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="select-wrapper">
-            <label htmlFor="diff-select">Difficulty:</label>
-            <select
-              id="diff-select"
-              value={difficulty}
-              onChange={(e) => onDifficultyChange(e.target.value)}
-              className="styled-select"
-            >
-              {Object.values(DIFFICULTY_PRESETS).map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.label} ({d.multiplier}x)
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="button"
-            className="text-link-btn"
-            onClick={onOpenCurriculum}
-          >
-            Standards Map
-          </button>
-
-          <button
-            type="button"
-            className="text-link-btn"
-            onClick={onOpenAchievements}
-            title="View California CCSS-M Mastery Progress & Badges"
-          >
-            🏆 Mastery & Badges
-          </button>
-
-          <button
-            type="button"
-            className="text-link-btn teacher-link"
-            onClick={onOpenClassroom}
-          >
-            Study Groups
-          </button>
-
-          <button
-            type="button"
-            className="text-link-btn vault-link"
-            onClick={onOpenVault}
-            title="Knowledge Vault: Inspect learned templates, sync APIs, and review AI learning"
-          >
-            🧠 AI Knowledge Vault
-          </button>
-        </div>
-
-        {/* Live Gameplay HUD */}
-        <div className="game-hud">
-          {lives !== null && (
-            <div className="lives-display" title={`${lives} lives remaining`}>
-              {Array.from({ length: maxLives || 3 }).map((_, i) => (
-                <span key={i} className={`heart-icon ${i < lives ? 'active' : 'spent'}`}>
-                  ❤️
-                </span>
-              ))}
+      {/* Collapsible Teacher / Parent & Curriculum Drawer */}
+      {teacherMenuOpen && (
+        <div className="teacher-drawer">
+          <div className="teacher-drawer-left">
+            <div className="select-wrapper">
+              <label htmlFor="diff-select">Difficulty:</label>
+              <select
+                id="diff-select"
+                value={difficulty}
+                onChange={(e) => onDifficultyChange(e.target.value)}
+                className="styled-select"
+              >
+                {Object.values(DIFFICULTY_PRESETS).map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.label} ({d.multiplier}x)
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          <div className="hud-metric">
-            <span className="hud-label">Streak</span>
-            <span className={`hud-val streak-val ${streak >= 3 ? 'on-fire' : ''}`}>
-              {streak >= 3 && '🔥 '}
-              {streak}
-            </span>
+            <button
+              type="button"
+              className={`drawer-tool-btn ${timedPractice ? 'active-timer' : ''}`}
+              onClick={onToggleTimedPractice}
+              title="Toggle question countdown timer for normal modes"
+            >
+              {timedPractice ? '⏱️ Timer: ON' : '🧘 Relaxed Mode (No Timer)'}
+            </button>
           </div>
 
-          <div className="hud-metric">
-            <span className="hud-label">Score</span>
-            <span className="hud-val score-val">{score}</span>
+          <div className="teacher-drawer-links">
+            <button
+              type="button"
+              className="drawer-tool-btn primary-tool"
+              onClick={() => {
+                setTeacherMenuOpen(false);
+                onOpenCurriculum();
+              }}
+            >
+              📘 CA Standards Map (82 Standards)
+            </button>
+
+            <button
+              type="button"
+              className="drawer-tool-btn"
+              onClick={() => {
+                setTeacherMenuOpen(false);
+                onOpenClassroom();
+              }}
+            >
+              👥 {activeClassSession ? `${activeClassSession.groupName} (${activeClassSession.activeStudent})` : 'Study Groups & Excel Export'}
+            </button>
+
+            <button
+              type="button"
+              className="drawer-tool-btn"
+              onClick={() => {
+                setTeacherMenuOpen(false);
+                onOpenVault();
+              }}
+            >
+              🧠 AI Knowledge Vault
+            </button>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 }

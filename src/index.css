@@ -1493,9 +1493,646 @@ button, input, select {
 /* Footer */
 .app-footer {
   margin-top: auto;
-  padding: 1.5rem 0;
+  padding: 1.1rem 0 0.5rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border-color);
 }
+
+/* =========================================================
+   KID-FRIENDLY SIMPLE & ANIMATED UI UPGRADE
+   ========================================================= */
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(4deg); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.92) translateY(6px); }
+  70% { transform: scale(1.02) translateY(-1px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulseFire {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes confettiFloat {
+  0% { opacity: 1; transform: translateY(0) scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: translateY(-38px) scale(1.25) rotate(18deg); }
+  100% { opacity: 0; transform: translateY(-75px) scale(0.9) rotate(-15deg); }
+}
+
+.kid-header {
+  padding: 0.75rem 1.1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 20px;
+}
+
+.kid-header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.mascot-bounce {
+  cursor: pointer;
+  animation: mascotFloat 3.2s ease-in-out infinite;
+  transition: transform 0.2s ease;
+}
+
+.mascot-bounce:hover {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+.mascot-team-pill {
+  cursor: pointer;
+  background: rgba(99, 102, 241, 0.14);
+  color: var(--color-primary);
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  transition: background 0.15s ease;
+}
+
+.mascot-team-pill:hover {
+  background: rgba(99, 102, 241, 0.26);
+}
+
+/* Big Kid Grade Bubbles (K - 5) */
+.kid-grade-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-primary);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.grade-picker-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-right: 0.2rem;
+}
+
+.grade-bubble-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.grade-bubble-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+}
+
+.grade-bubble-btn.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  border-color: #a5b4fc;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  transform: scale(1.07);
+}
+
+.grade-bubble-icon {
+  font-size: 1rem;
+}
+
+/* Right HUD & Quick Buttons */
+.kid-hud-and-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.streak-pill.on-fire {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  animation: pulseFire 1.4s ease-in-out infinite;
+}
+
+.score-pill {
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #818cf8;
+}
+
+.kid-trophy-btn,
+.kid-teacher-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: all 0.16s ease;
+}
+
+.kid-trophy-btn {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+[data-theme='light'] .kid-trophy-btn {
+  color: #d97706;
+}
+
+.kid-trophy-btn:hover,
+.kid-teacher-toggle:hover {
+  transform: translateY(-2px);
+}
+
+.kid-teacher-toggle.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: var(--color-primary);
+}
+
+/* Collapsible Teacher & Standards Drawer */
+.teacher-drawer {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  animation: popIn 0.22s ease-out;
+}
+
+.teacher-drawer-left,
+.teacher-drawer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.drawer-tool-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-tool-btn:hover {
+  border-color: var(--border-highlight);
+  transform: translateY(-1px);
+}
+
+.drawer-tool-btn.primary-tool {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #818cf8;
+}
+
+[data-theme='light'] .drawer-tool-btn.primary-tool {
+  color: #4f46e5;
+}
+
+.drawer-tool-btn.active-timer {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #f87171;
+}
+
+/* Compact 1-Row Kid Mode Pill Bar */
+.kid-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.kid-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.52rem 1rem;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.kid-mode-pill:hover {
+  transform: translateY(-3px);
+  color: var(--text-primary);
+  border-color: var(--mode-accent, #6366f1);
+}
+
+.kid-mode-pill.active {
+  background: var(--mode-accent, #6366f1);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 5px 14px rgba(99, 102, 241, 0.35);
+}
+
+.kid-mode-icon {
+  font-size: 1.15rem;
+}
+
+.kid-mistake-badge {
+  background: #ffffff;
+  color: #9333ea;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+}
+
+/* Focused Standard Filter Banner */
+.focused-standard-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(16, 185, 129, 0.14);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  margin-bottom: 0.85rem;
+  font-size: 0.9rem;
+}
+
+.clear-focus-btn {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Kid Question Card Upgrades */
+.kid-question-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.4rem 1.6rem;
+  border-radius: 24px;
+  border-width: 2px;
+  animation: popIn 0.25s ease-out;
+}
+
+.kid-card-top {
+  margin-bottom: 0.95rem;
+}
+
+.kid-skill-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.kid-skill-pill {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+[data-theme='light'] .kid-skill-pill {
+  color: #4f46e5;
+}
+
+.standard-info-chip {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.standard-info-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+}
+
+.kid-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.quest-stars-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  background: var(--bg-primary);
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+}
+
+.mini-quest-star {
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: transform 0.25s ease;
+}
+
+.mini-quest-star.earned {
+  color: #fbbf24;
+  transform: scale(1.15);
+}
+
+.kid-skip-pill {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.kid-skip-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+  transform: translateX(2px);
+}
+
+.educator-standard-drawer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  animation: popIn 0.2s ease-out;
+}
+
+/* Read-Aloud Prompt Row */
+.kid-prompt-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.read-aloud-btn {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  border: 2px solid #93c5fd;
+  color: #ffffff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #1d4ed8;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.read-aloud-btn:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.read-aloud-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #1d4ed8;
+}
+
+.mini-speak-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* Tactile 3D Answer Option Buttons */
+.kid-options-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .kid-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kid-option-btn {
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  border-width: 2px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kid-option-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28);
+}
+
+.kid-option-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.kid-option-btn.option-color-0 .option-label {
+  background: rgba(59, 130, 246, 0.22);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.45);
+}
+
+.kid-option-btn.option-color-1 .option-label {
+  background: rgba(168, 85, 247, 0.22);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+}
+
+.kid-option-btn.option-color-2 .option-label {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
+.kid-option-btn.option-color-3 .option-label {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+}
+
+/* Friendly Helper Pill Buttons */
+.kid-helpers-row {
+  margin-top: 0.25rem;
+}
+
+.kid-helper-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.kid-helper-pill:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--border-highlight);
+}
+
+.kid-helper-pill.hint-pill {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+[data-theme='light'] .kid-helper-pill.hint-pill {
+  color: #d97706;
+}
+
+.kid-helper-pill.proof-pill {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #818cf8;
+}
+
+[data-theme='light'] .kid-helper-pill.proof-pill {
+  color: #4f46e5;
+}
+
+.animated-pop {
+  animation: popIn 0.24s ease-out;
+}
+
+.feedback-row-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.kid-next-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: 2px solid #6ee7b7;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #047857;
+  transition: transform 0.15s ease;
+}
+
+.kid-next-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Celebration Confetti Burst */
+.celebration-burst {
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.confetti-piece {
+  font-size: 2rem;
+  animation: confettiFloat 1.1s ease-out forwards;
+}
+
+.confetti-0 { animation-delay: 0s; }
+.confetti-1 { animation-delay: 0.06s; }
+.confetti-2 { animation-delay: 0.12s; }
+.confetti-3 { animation-delay: 0.04s; }
+.confetti-4 { animation-delay: 0.15s; }
+.confetti-5 { animation-delay: 0.08s; }
+.confetti-6 { animation-delay: 0.1s; }
+.confetti-7 { animation-delay: 0.03s; }
+

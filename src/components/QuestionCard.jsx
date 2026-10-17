@@ -2,16 +2,56 @@ import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
 import NumberPad from './NumberPad.jsx';
 
+function speakMathText(rawText) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !rawText) return;
+  try {
+    window.speechSynthesis.cancel();
+    const spoken = String(rawText)
+      .replace(/×/g, ' times ')
+      .replace(/÷/g, ' divided by ')
+      .replace(/−|-/g, ' minus ')
+      .replace(/\+/g, ' plus ')
+      .replace(/=/g, ' equals ')
+      .replace(/\?/g, ' what number ')
+      .replace(/≥/g, ' is greater than or equal to ')
+      .replace(/≤/g, ' is less than or equal to ')
+      .replace(/>/g, ' is greater than ')
+      .replace(/</g, ' is less than ')
+      .replace(/sq ft/gi, 'square feet')
+      .replace(/sq m/gi, 'square meters')
+      .replace(/sq cm/gi, 'square centimeters')
+      .replace(/sq in/gi, 'square inches')
+      .replace(/cu ft/gi, 'cubic feet')
+      .replace(/cu m/gi, 'cubic meters')
+      .replace(/cu cm/gi, 'cubic centimeters')
+      .replace(/cu in/gi, 'cubic inches');
+
+    const utterance = new SpeechSynthesisUtterance(spoken);
+    utterance.rate = 0.94;
+    utterance.pitch = 1.08;
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    // Ignore speech synthesis errors on unsupported browsers
+  }
+}
+
+const CELEBRATION_EMOJIS = ['🌟', '✨', '🎉', '⭐', '🚀', '🏆', '💫', '🎊'];
+
 export default function QuestionCard({
   question,
   onAnswer,
+  onSkip,
+  onNextAfterIncorrect,
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
   showHints,
+  streak = 0,
+  correctCount = 0,
 }) {
   const [hintVisible, setHintVisible] = useState(false);
   const [explanationVisible, setExplanationVisible] = useState(false);
+  const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [useKeypad, setUseKeypad] = useState(false);
 
@@ -41,63 +81,109 @@ export default function QuestionCard({
 
   const timerPct = totalTime > 0 ? Math.max(0, (timeLeft / totalTime) * 100) : 100;
   const hasMultipleChoice = Array.isArray(question.options) && question.options.length > 0;
+  const questStarProgress = correctCount % 5;
 
   return (
-    <div className={`question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
-      {/* Top Bar: Standard tag, CAASPP Claim, Eureka Module, Verification Badge & Timer */}
-      <div className="card-top-row">
-        <div className="standard-tag" style={{ flexWrap: 'wrap', gap: '6px' }}>
-          <span className="code-pill" title="Official California Common Core State Standard for Mathematics">
-            CA CCSS-M {question.standard}
-          </span>
-          <span className="standard-name">{question.title}</span>
-          {question.module && (
-            <span
-              className="verified-proof-badge"
-              style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}
-              title="California Eureka Math (A Story of Units) Module Alignment"
+    <div className={`question-card kid-question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
+      {/* Animated Celebration Confetti Burst on Correct Answer */}
+      {feedback?.status === 'correct' && (
+        <div className="celebration-burst" aria-hidden="true">
+          {CELEBRATION_EMOJIS.map((emoji, idx) => (
+            <span key={idx} className={`confetti-piece confetti-${idx}`}>
+              {emoji}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Kid-Friendly Top Bar: Skill Title, 5-Star Quest Progress, Timer & Skip */}
+      <div className="card-top-row kid-card-top">
+        <div className="kid-skill-header">
+          <span className="kid-skill-pill">🌟 {question.title}</span>
+          <button
+            type="button"
+            className="standard-info-chip"
+            onClick={() => setStandardDetailsOpen((v) => !v)}
+            title="Click to view official California CCSS-M & CAASPP standard details"
+          >
+            ℹ️ {question.standard} {standardDetailsOpen ? '▲' : '▼'}
+          </button>
+        </div>
+
+        <div className="kid-top-right">
+          {/* 5-Star Mini Milestone Tracker */}
+          <div className="quest-stars-mini" title={`${questStarProgress} of 5 stars toward your next milestone!`}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span
+                key={i}
+                className={`mini-quest-star ${i < questStarProgress ? 'earned' : ''}`}
+              >
+                {i < questStarProgress ? '⭐' : '☆'}
+              </span>
+            ))}
+          </div>
+
+          {totalTime > 0 && (
+            <div className="timer-wrapper">
+              <div className={`timer-clock ${timeLeft <= 5 ? 'timer-urgent-text' : ''}`}>
+                ⏱️ {timeLeft}s
+              </div>
+              <div className="timer-bar-track">
+                <div
+                  className={`timer-bar-fill ${timeLeft <= 5 ? 'timer-urgent' : ''}`}
+                  style={{ width: `${timerPct}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {onSkip && !feedback && (
+            <button
+              type="button"
+              className="kid-skip-pill"
+              onClick={onSkip}
+              title="Try a different question"
             >
-              📘 {question.module.split(':')[0]}
+              Skip ➔
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Collapsible Official California Educator Metadata Drawer */}
+      {standardDetailsOpen && (
+        <div className="educator-standard-drawer">
+          <span className="code-pill">CA CCSS-M {question.standard}</span>
+          {question.module && (
+            <span className="verified-proof-badge" style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}>
+              📘 {question.module}
             </span>
           )}
           {question.caasppClaim && (
-            <span
-              className="verified-proof-badge"
-              style={{ background: 'rgba(59, 130, 246, 0.14)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.35)' }}
-              title={`Official California Assessment of Student Performance and Progress: ${question.caasppClaim}`}
-            >
-              🎯 {question.caasppClaim.split('—')[0].trim()}
+            <span className="verified-proof-badge" style={{ background: 'rgba(59, 130, 246, 0.14)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.35)' }}>
+              🎯 {question.caasppClaim}
             </span>
           )}
           {question.dokLevel && (
-            <span
-              className="verified-proof-badge"
-              style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.35)' }}
-              title="Smarter Balanced Depth of Knowledge (DOK) Rigor Level"
-            >
+            <span className="verified-proof-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.35)' }}>
               ⚡ {question.dokLevel}
             </span>
           )}
-          <span className="verified-proof-badge" title="Formally checked by Mathematical Invariant Verifier">
-            ✓ Formally Verified
-          </span>
+          <span className="verified-proof-badge">✓ Formally Verified</span>
         </div>
+      )}
 
-        {totalTime > 0 && (
-          <div className="timer-wrapper">
-            <div className="timer-clock">⏱️ {timeLeft}s</div>
-            <div className="timer-bar-track">
-              <div
-                className={`timer-bar-fill ${timeLeft <= 5 ? 'timer-urgent' : ''}`}
-                style={{ width: `${timerPct}%` }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Question Text */}
-      <div className="question-prompt-box">
+      {/* Main Question Prompt + Read-Aloud Speaker Button */}
+      <div className="question-prompt-box kid-prompt-row">
+        <button
+          type="button"
+          className="read-aloud-btn"
+          onClick={() => speakMathText(question.prompt)}
+          title="Read this math question out loud!"
+          aria-label="Read question aloud"
+        >
+          🔊
+        </button>
         <h2 className="question-prompt">{question.prompt}</h2>
       </div>
 
@@ -106,17 +192,17 @@ export default function QuestionCard({
         <VisualManipulative manipulative={question.manipulative} />
       )}
 
-      {/* Answer Options or Free-Response Keypad */}
+      {/* Big Tactile Answer Options or Free-Response Keypad */}
       <div className="answers-container">
         {hasMultipleChoice && !useKeypad ? (
-          <div className="options-grid">
+          <div className="options-grid kid-options-grid">
             {question.options.map((opt, idx) => {
               const isSelectedFeedback =
                 feedback && String(feedback.answer) === String(opt);
               const isCorrectFeedback =
                 feedback && String(question.correctAnswer) === String(opt);
 
-              let btnClass = 'option-btn';
+              let btnClass = `option-btn kid-option-btn option-color-${idx % 4}`;
               if (feedback) {
                 if (isCorrectFeedback) btnClass += ' correct-reveal';
                 else if (isSelectedFeedback && feedback.status === 'incorrect') {
@@ -155,7 +241,7 @@ export default function QuestionCard({
                 className="btn btn-primary"
                 disabled={Boolean(feedback) || !manualInput.trim()}
               >
-                Submit
+                Check Answer! 🚀
               </button>
             </form>
             <NumberPad
@@ -169,14 +255,18 @@ export default function QuestionCard({
         )}
       </div>
 
-      {/* Step-by-Step Proof, Keypad Toggle & Hint Row */}
+      {/* Friendly Kid Helper Pills (Hint, Step-by-Step Proof, Keypad Toggle) */}
       <div className="card-footer-row">
-        <div className="helper-buttons-row">
+        <div className="helper-buttons-row kid-helpers-row">
           {showHints && question.hint && (
             <button
               type="button"
-              className="hint-toggle-btn"
-              onClick={() => setHintVisible((prev) => !prev)}
+              className={`kid-helper-pill hint-pill ${hintVisible ? 'active' : ''}`}
+              onClick={() => {
+                const next = !hintVisible;
+                setHintVisible(next);
+                if (next) speakMathText(question.hint);
+              }}
             >
               💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
             </button>
@@ -185,49 +275,83 @@ export default function QuestionCard({
           {question.explanation && (
             <button
               type="button"
-              className="step-proof-btn"
+              className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
               onClick={() => setExplanationVisible((prev) => !prev)}
             >
-              📐 {explanationVisible ? 'Hide Step-by-Step Proof' : 'View Step-by-Step Proof'}
+              📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
             </button>
           )}
 
           {hasMultipleChoice && (
             <button
               type="button"
-              className="step-proof-btn"
+              className="kid-helper-pill keypad-pill"
               onClick={() => setUseKeypad((prev) => !prev)}
-              title="Switch between Multiple Choice and Touchscreen Keypad mode"
+              title="Switch between Multiple Choice and Number Pad"
             >
-              🔢 {useKeypad ? 'Multiple Choice Mode' : 'Keypad / Free Response'}
+              🔢 {useKeypad ? '4 Choices (A-D)' : 'Type Answer'}
             </button>
           )}
         </div>
 
         {hintVisible && question.hint && (
-          <div className="hint-callout">
-            <span className="hint-icon">💡</span> <strong>Hint:</strong> {question.hint}
+          <div className="hint-callout animated-pop">
+            <span className="hint-icon">💡</span>
+            <div style={{ flex: 1 }}>
+              <strong>Helpful Hint:</strong> {question.hint}
+            </div>
+            <button
+              type="button"
+              className="mini-speak-btn"
+              onClick={() => speakMathText(question.hint)}
+              title="Read hint aloud"
+            >
+              🔊
+            </button>
           </div>
         )}
 
         {explanationVisible && question.explanation && (
-          <div className="explanation-callout">
+          <div className="explanation-callout animated-pop">
             <span className="proof-icon">📐</span>
-            <div>
-              <strong>Step-by-Step Mathematical Proof:</strong>
+            <div style={{ flex: 1 }}>
+              <strong>How It Works (Step-by-Step):</strong>
               <p>{question.explanation}</p>
             </div>
+            <button
+              type="button"
+              className="mini-speak-btn"
+              onClick={() => speakMathText(question.explanation)}
+              title="Read explanation aloud"
+            >
+              🔊
+            </button>
           </div>
         )}
 
         {feedback && (
-          <div className={`feedback-alert ${feedback.status}`}>
+          <div className={`feedback-alert animated-pop ${feedback.status}`}>
             {feedback.status === 'correct' ? (
-              <span>🌟 Excellent! 100% Correct!</span>
+              <div className="feedback-row-content">
+                <span>
+                  🌟 <strong>Awesome Job!</strong> {streak >= 2 ? `${streak} in a row! 🔥` : 'You nailed it!'}
+                </span>
+              </div>
             ) : (
-              <span>
-                ❌ Nice try! The mathematically verified answer is <strong>{String(question.correctAnswer)}</strong>.
-              </span>
+              <div className="feedback-row-content">
+                <span>
+                  🌱 <strong>Good try!</strong> The correct answer is <strong>{String(question.correctAnswer)}</strong>. Check the steps above!
+                </span>
+                {onNextAfterIncorrect && (
+                  <button
+                    type="button"
+                    className="kid-next-btn"
+                    onClick={onNextAfterIncorrect}
+                  >
+                    Got It! Next Question ➔
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}

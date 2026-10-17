@@ -72,6 +72,7 @@ export default function App() {
   const [leagueId, setLeagueId] = useState('golden-bears');
   const [difficulty, setDifficulty] = useState('intermediate');
   const [mode, setMode] = useState('grade-quest');
+  const [timedPractice, setTimedPractice] = useState(false);
 
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [engineSource, setEngineSource] = useState('local-verified-engine');
@@ -211,8 +212,10 @@ export default function App() {
     nextQuestion(focusedStandard, mode === 'speed-sprint');
   }, [grade, focusedStandard, mode, difficulty]);
 
+  const isTimerActive = mode === 'speed-sprint' || timedPractice;
+
   useEffect(() => {
-    if (feedback || summaryOpen || !currentQuestion) return;
+    if (feedback || summaryOpen || !currentQuestion || !isTimerActive) return;
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -231,7 +234,7 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [currentQuestion, feedback, summaryOpen, mode, soundEnabled]);
+  }, [currentQuestion, feedback, summaryOpen, mode, soundEnabled, isTimerActive]);
 
   const handleTimeOut = () => {
     handleAnswer('TIMEOUT_EXPIRED');
@@ -306,14 +309,17 @@ export default function App() {
       );
     }
 
-    setTimeout(() => {
-      if (isGameOver) {
+    if (isGameOver) {
+      setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
-      } else {
-        nextQuestion(null, false);
-      }
-    }, mode === 'speed-sprint' ? 650 : 1200);
+      }, 1400);
+    } else if (isCorrect || mode === 'speed-sprint') {
+      setTimeout(() => {
+        nextQuestion(focusedStandard, false);
+      }, mode === 'speed-sprint' ? 600 : 1150);
+    }
+    // Note: On incorrect answers in normal learning modes, we pause so the child can read/listen to the step-by-step explanation and click "Got It! Next Question ➔"
   };
 
   useEffect(() => {
@@ -353,7 +359,7 @@ export default function App() {
     setStreak(0);
     setRoundStats({ correct: 0, total: 0 });
     setSummaryOpen(false);
-    nextQuestion(null, mode === 'speed-sprint');
+    nextQuestion(focusedStandard, mode === 'speed-sprint');
   };
 
   const mistakeStandards = getMistakeReviewStandards(learnerProfile, grade);
@@ -383,6 +389,8 @@ export default function App() {
         onToggleMusic={() => setMusicEnabled((v) => !v)}
         theme={theme}
         onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+        timedPractice={timedPractice}
+        onToggleTimedPractice={() => setTimedPractice((v) => !v)}
         onOpenClassroom={() => setClassroomOpen(true)}
         onOpenCurriculum={() => setCurriculumOpen(true)}
         onOpenHelp={() => setHelpOpen(true)}
@@ -390,43 +398,6 @@ export default function App() {
         onOpenAchievements={() => setAchievementsOpen(true)}
         activeClassSession={classSession}
       />
-
-      <div className="engine-status-strip">
-        <div className="status-badge-container" style={{ flexWrap: 'wrap' }}>
-          <span className={`status-dot ${isNetworkOnline ? 'online' : 'offline'}`} />
-          <span className="status-text">
-            ⚡ Official CA CCSS-M & CAASPP Engine Active (82 Standards • 40 Eureka Math Modules • 100% Verified)
-          </span>
-          {focusedStandard && (
-            <button
-              type="button"
-              className="skip-btn"
-              onClick={() => setFocusedStandard(null)}
-              title="Click to clear standard filter and practice all standards in this grade"
-              style={{ background: 'rgba(16, 185, 129, 0.16)', color: '#10b981', borderColor: '#10b981' }}
-            >
-              🎯 Focused: {focusedStandard} (× Show All Grade {grade})
-            </button>
-          )}
-          <button
-            type="button"
-            className="skip-btn vault-quick-btn"
-            onClick={() => setVaultOpen(true)}
-            title="Inspect learned templates and sync online curriculum APIs"
-            style={{ background: '#e8f0fe', color: '#1a73e8', borderColor: '#1a73e8' }}
-          >
-            🧠 AI Knowledge Vault
-          </button>
-          <button
-            type="button"
-            className="skip-btn"
-            onClick={() => nextQuestion(focusedStandard, false)}
-            title="Skip to another fresh question"
-          >
-            Skip ➔
-          </button>
-        </div>
-      </div>
 
       <ModeSelector
         currentMode={mode}
@@ -436,14 +407,33 @@ export default function App() {
         mistakeCount={mistakeStandards.length}
       />
 
+      {focusedStandard && (
+        <div className="focused-standard-banner">
+          <span>
+            🎯 Practicing Standard <strong>{focusedStandard}</strong> ({STANDARDS[focusedStandard]?.title})
+          </span>
+          <button
+            type="button"
+            className="clear-focus-btn"
+            onClick={() => setFocusedStandard(null)}
+          >
+            × Show All Grade {grade} Topics
+          </button>
+        </div>
+      )}
+
       <main className="main-game-layout">
         <QuestionCard
           question={currentQuestion}
           onAnswer={handleAnswer}
+          onSkip={() => nextQuestion(focusedStandard, false)}
+          onNextAfterIncorrect={() => nextQuestion(focusedStandard, false)}
           timeLeft={timeLeft}
-          totalTime={mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds}
+          totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
           feedback={feedback}
           showHints={diffInfo.showHints}
+          streak={streak}
+          correctCount={roundStats.correct}
         />
       </main>
 
