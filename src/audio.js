@@ -196,3 +196,47 @@ export const setFocusMusicVolume = (volume) => {
     focusSynthGain.gain.setValueAtTime(currentFocusVolume, audioCtx.currentTime);
   }
 };
+
+export const playTamagotchiChomp = () => {
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    // Playful 3-bite crunch followed by a happy chirp
+    softTone(260, now + 0.1, 0.08, 0.12, ctx.destination, 'triangle');
+    softTone(310, now + 0.22, 0.08, 0.12, ctx.destination, 'triangle');
+    softTone(587.33, now + 0.36, 0.12, 0.14, ctx.destination, 'sine');
+    softTone(880.0, now + 0.46, 0.2, 0.15, ctx.destination, 'sine');
+  } catch {
+    // ignore
+  }
+};
+
+export const playTamagotchiGiggle = () => {
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const freqs = [659.25, 783.99, 987.77, 880, 1046.5];
+    freqs.forEach((f, idx) => {
+      softTone(f, now + idx * 0.055, 0.1, 0.11, ctx.destination, 'sine');
+    });
+  } catch {
+    // ignore
+  }
+};
+
+export const playTamagotchiDance = () => {
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const groove = [392.0, 523.25, 659.25, 587.33, 659.25, 783.99];
+    groove.forEach((f, idx) => {
+      softTone(f, now + idx * 0.08, 0.14, 0.12, ctx.destination, 'triangle');
+    });
+  } catch {
+    // ignore
+  }
+};
+

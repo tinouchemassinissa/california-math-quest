@@ -439,6 +439,7 @@ export default function App() {
           streak={streak}
           correctCount={roundStats.correct}
           grade={grade}
+          soundEnabled={soundEnabled}
         />
 
         <QuestionCard
