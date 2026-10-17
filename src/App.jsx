@@ -8,6 +8,7 @@ import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
 import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
 import AchievementsModal from './components/AchievementsModal.jsx';
+import { STANDARDS } from './data/californiaCurriculum.js';
 import {
   createInitialProfile,
   updateLearnerProfile,
@@ -67,6 +68,7 @@ export default function App() {
   });
 
   const [grade, setGrade] = useState('3');
+  const [focusedStandard, setFocusedStandard] = useState(null);
   const [leagueId, setLeagueId] = useState('golden-bears');
   const [difficulty, setDifficulty] = useState('intermediate');
   const [mode, setMode] = useState('grade-quest');
@@ -163,7 +165,7 @@ export default function App() {
   const nextQuestion = useCallback(
     async (customStandard = null, resetSprintClock = false) => {
       setFeedback(null);
-      let targetStandard = customStandard;
+      let targetStandard = customStandard || focusedStandard;
 
       if (!targetStandard) {
         if (mode === 'mistake-review') {
@@ -179,8 +181,10 @@ export default function App() {
         }
       }
 
+      const activeGrade = targetStandard && STANDARDS[targetStandard] ? STANDARDS[targetStandard].grade : grade;
+
       const res = await fetchEducationalQuestion({
-        grade,
+        grade: activeGrade,
         standardCode: targetStandard,
         mode,
         preferOnline: false,
@@ -197,15 +201,15 @@ export default function App() {
         setTimeLeft(diffInfo.timerSeconds || 25);
       }
     },
-    [grade, mode, diffInfo, learnerProfile]
+    [grade, focusedStandard, mode, diffInfo, learnerProfile]
   );
 
   useEffect(() => {
     if (mode === 'speed-sprint') {
       setTimeLeft(60);
     }
-    nextQuestion(null, mode === 'speed-sprint');
-  }, [grade, mode, difficulty]);
+    nextQuestion(focusedStandard, mode === 'speed-sprint');
+  }, [grade, focusedStandard, mode, difficulty]);
 
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion) return;
@@ -358,7 +362,10 @@ export default function App() {
     <div className="app-container">
       <Header
         grade={grade}
-        onGradeChange={setGrade}
+        onGradeChange={(g) => {
+          setGrade(g);
+          setFocusedStandard(null);
+        }}
         leagueId={leagueId}
         onLeagueChange={setLeagueId}
         difficulty={difficulty}
@@ -385,11 +392,22 @@ export default function App() {
       />
 
       <div className="engine-status-strip">
-        <div className="status-badge-container">
+        <div className="status-badge-container" style={{ flexWrap: 'wrap' }}>
           <span className={`status-dot ${isNetworkOnline ? 'online' : 'offline'}`} />
           <span className="status-text">
-            ⚡ Formal Mathematical Invariant Engine Active (69 CA CCSS-M Standards • Error-Free Seeded Generation)
+            ⚡ Official CA CCSS-M & CAASPP Engine Active (82 Standards • 40 Eureka Math Modules • 100% Verified)
           </span>
+          {focusedStandard && (
+            <button
+              type="button"
+              className="skip-btn"
+              onClick={() => setFocusedStandard(null)}
+              title="Click to clear standard filter and practice all standards in this grade"
+              style={{ background: 'rgba(16, 185, 129, 0.16)', color: '#10b981', borderColor: '#10b981' }}
+            >
+              🎯 Focused: {focusedStandard} (× Show All Grade {grade})
+            </button>
+          )}
           <button
             type="button"
             className="skip-btn vault-quick-btn"
@@ -402,7 +420,7 @@ export default function App() {
           <button
             type="button"
             className="skip-btn"
-            onClick={() => nextQuestion(null, false)}
+            onClick={() => nextQuestion(focusedStandard, false)}
             title="Skip to another fresh question"
           >
             Skip ➔
@@ -431,10 +449,10 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>California Elementary Math Quest</strong> • California Common Core State Standards (CA CCSSM)
+          <strong>California Elementary Math Quest</strong> • Official California Common Core State Standards (CA CCSS-M) & CAASPP Claims 1–4
         </p>
         <p>
-          Formally Verified Mathematical Constraint Engine (Grades K–5 • 40 Eureka Modules • 69 Standards)
+          Formally Verified Mathematical Constraint Engine (Grades K–5 • 40 Eureka Math Modules • 82 Official Standards)
         </p>
       </footer>
 
@@ -450,7 +468,13 @@ export default function App() {
         isOpen={curriculumOpen}
         onClose={() => setCurriculumOpen(false)}
         learnerProfile={learnerProfile}
-        onPracticeStandard={(code) => nextQuestion(code, false)}
+        onPracticeStandard={(code) => {
+          if (STANDARDS[code]) {
+            setGrade(STANDARDS[code].grade);
+          }
+          setFocusedStandard(code);
+          nextQuestion(code, false);
+        }}
       />
 
       <AchievementsModal

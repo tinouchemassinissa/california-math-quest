@@ -284,6 +284,114 @@ export default function VisualManipulative({ manipulative }) {
       );
     }
 
+    case 'tape-diagram': {
+      const { parts = [12, 8], total = 20, unknownPartIndex = -1, unknownTotal = false, unit = '' } = manipulative;
+      const sumParts = parts.reduce((a, b) => a + b, 0) || 1;
+      return (
+        <div className="manipulative-container" style={{ padding: '12px' }}>
+          <div className="manipulative-label">Eureka Math Tape Diagram (Part–Part–Whole Model)</div>
+          <div style={{ maxWidth: '420px', margin: '8px auto' }}>
+            {/* Total Brace */}
+            <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '13px', marginBottom: '4px', color: '#4f46e5' }}>
+              Total Whole: {unknownTotal ? '❓' : `${total}${unit ? ' ' + unit : ''}`}
+            </div>
+            <div style={{ display: 'flex', width: '100%', height: '42px', border: '2px solid #4f46e5', borderRadius: '6px', overflow: 'hidden' }}>
+              {parts.map((p, idx) => {
+                const widthPct = Math.max(18, Math.round((p / sumParts) * 100));
+                const isUnknown = idx === unknownPartIndex;
+                const colors = ['rgba(99, 102, 241, 0.18)', 'rgba(16, 185, 129, 0.18)', 'rgba(245, 158, 11, 0.18)', 'rgba(14, 165, 233, 0.18)'];
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      width: `${widthPct}%`,
+                      background: colors[idx % colors.length],
+                      borderRight: idx < parts.length - 1 ? '2px solid #4f46e5' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: '14px',
+                    }}
+                  >
+                    {isUnknown ? '❓' : `${p}${unit ? ' ' + unit : ''}`}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    case 'place-value': {
+      const { hundreds = 0, tens = 0, ones = 0 } = manipulative;
+      return (
+        <div className="manipulative-container" style={{ padding: '12px' }}>
+          <div className="manipulative-label">California Place Value Disks Chart</div>
+          <div style={{ display: 'grid', gridTemplateColumns: hundreds > 0 ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: '8px', maxWidth: '420px', margin: '8px auto' }}>
+            {hundreds > 0 && (
+              <div style={{ border: '1px solid rgba(99, 102, 241, 0.35)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, marginBottom: '6px', color: '#4f46e5' }}>HUNDREDS (100)</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
+                  {Array.from({ length: hundreds }).map((_, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '50%', background: '#4f46e5', color: '#fff', fontSize: '10px', fontWeight: 700 }}>
+                      100
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div style={{ border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, marginBottom: '6px', color: '#10b981' }}>TENS (10)</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
+                {Array.from({ length: tens }).map((_, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', background: '#10b981', color: '#fff', fontSize: '10px', fontWeight: 700 }}>
+                    10
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div style={{ border: '1px solid rgba(245, 158, 11, 0.35)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, marginBottom: '6px', color: '#f59e0b' }}>ONES (1)</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
+                {Array.from({ length: ones }).map((_, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', borderRadius: '50%', background: '#f59e0b', color: '#fff', fontSize: '10px', fontWeight: 700 }}>
+                    1
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    case 'bar-graph': {
+      const { categories = [], maxVal = 15 } = manipulative;
+      return (
+        <div className="manipulative-container" style={{ padding: '12px' }}>
+          <div className="manipulative-label">California Data Bar Graph</div>
+          <div style={{ maxWidth: '380px', margin: '8px auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {categories.map((cat, idx) => {
+              const pct = Math.min(100, Math.round((cat.value / maxVal) * 100));
+              const colors = ['#4f46e5', '#10b981', '#f59e0b', '#0284c7'];
+              return (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                  <div style={{ width: '95px', textAlign: 'right', fontWeight: 600 }}>{cat.label}:</div>
+                  <div style={{ flex: 1, background: 'rgba(150,150,150,0.15)', height: '20px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: colors[idx % colors.length], display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '6px', color: '#fff', fontSize: '11px', fontWeight: 700 }}>
+                      {cat.value}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
     case 'interactive-geometry':
     case 'geometry':
     case 'protractor':

@@ -44,11 +44,40 @@ export default function QuestionCard({
 
   return (
     <div className={`question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
-      {/* Top Bar: Standard tag, Verification Badge & Timer */}
+      {/* Top Bar: Standard tag, CAASPP Claim, Eureka Module, Verification Badge & Timer */}
       <div className="card-top-row">
-        <div className="standard-tag">
-          <span className="code-pill">{question.standard}</span>
+        <div className="standard-tag" style={{ flexWrap: 'wrap', gap: '6px' }}>
+          <span className="code-pill" title="Official California Common Core State Standard for Mathematics">
+            CA CCSS-M {question.standard}
+          </span>
           <span className="standard-name">{question.title}</span>
+          {question.module && (
+            <span
+              className="verified-proof-badge"
+              style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}
+              title="California Eureka Math (A Story of Units) Module Alignment"
+            >
+              📘 {question.module.split(':')[0]}
+            </span>
+          )}
+          {question.caasppClaim && (
+            <span
+              className="verified-proof-badge"
+              style={{ background: 'rgba(59, 130, 246, 0.14)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.35)' }}
+              title={`Official California Assessment of Student Performance and Progress: ${question.caasppClaim}`}
+            >
+              🎯 {question.caasppClaim.split('—')[0].trim()}
+            </span>
+          )}
+          {question.dokLevel && (
+            <span
+              className="verified-proof-badge"
+              style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.35)' }}
+              title="Smarter Balanced Depth of Knowledge (DOK) Rigor Level"
+            >
+              ⚡ {question.dokLevel}
+            </span>
+          )}
           <span className="verified-proof-badge" title="Formally checked by Mathematical Invariant Verifier">
             ✓ Formally Verified
           </span>
