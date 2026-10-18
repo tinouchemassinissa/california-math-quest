@@ -45,7 +45,6 @@ function speakMathText(rawText) {
 function renderHighlightedPrompt(promptText) {
   if (!promptText) return null;
   const text = String(promptText);
-  // Match equations/expressions, fractions, currency/numbers, or standalone '?' unknown boxes
   const tokenRegex = /(\b\d+\s*[+−\-×÷=]\s*\d+(?:\s*[+−\-×÷=]\s*(?:\d+|\?))?|\[\s*\?\s*\]|\b\d+\/\d+\b|\$\d+(?:\.\d+)?|\b\d+(?:,\d{3})*(?:\.\d+)?(?:¢|°)?\b)/g;
   const parts = text.split(tokenRegex);
 
@@ -90,14 +89,17 @@ export default function QuestionCard({
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
-  const [bipPeekOpen, setBipPeekOpen] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [useKeypad, setUseKeypad] = useState(false);
+  const [hoveredOption, setHoveredOption] = useState(null);
+  const [eliminatedOption, setEliminatedOption] = useState(null);
 
   useEffect(() => {
     setHintVisible(false);
     setExplanationVisible(false);
     setManualInput('');
+    setHoveredOption(null);
+    setEliminatedOption(null);
 
     // Auto-read aloud for Kindergarten & 1st Grade early readers when sound is explicitly enabled
     if (
@@ -127,11 +129,23 @@ export default function QuestionCard({
     }
   };
 
+  // Let Bip laser-zap 1 wrong multiple-choice distractor so Bip directly helps with the answers!
+  const handleBipEliminateOption = () => {
+    if (eliminatedOption || !Array.isArray(question.options)) return;
+    const wrongChoices = question.options.filter(
+      (opt) => String(opt).trim().toLowerCase() !== String(question.correctAnswer).trim().toLowerCase()
+    );
+    if (wrongChoices.length > 0) {
+      const picked = wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
+      setEliminatedOption(picked);
+    }
+  };
+
   const timerPct = totalTime > 0 ? Math.max(0, (timeLeft / totalTime) * 100) : 100;
   const hasMultipleChoice = Array.isArray(question.options) && question.options.length > 0;
   const questStarProgress = correctCount % 5;
 
-  // Map game state to Bip's official event states (idle, thinking, correct, tryAgain, rest, saving)
+  // Map game state to Bip's live interactive states
   let bipEvent = 'idle';
   if (isSaving) {
     bipEvent = 'saving';
@@ -139,7 +153,7 @@ export default function QuestionCard({
     bipEvent = 'correct';
   } else if (feedback?.status === 'incorrect') {
     bipEvent = 'tryAgain';
-  } else if (hintVisible || explanationVisible || scratchpadOpen) {
+  } else if (hintVisible || explanationVisible || scratchpadOpen || hoveredOption !== null) {
     bipEvent = 'thinking';
   }
 
@@ -258,7 +272,7 @@ export default function QuestionCard({
         <ScratchpadCanvas questionId={question.id || question.prompt} />
       )}
 
-      {/* Big Beautiful Answer Tiles */}
+      {/* Big Beautiful Answer Tiles (Interactive with Bip Hover & 50/50 Laser Zap!) */}
       <div className="answers-container">
         {hasMultipleChoice && !useKeypad ? (
           <div className="options-grid kid-options-grid">
@@ -267,8 +281,15 @@ export default function QuestionCard({
                 feedback && String(feedback.answer) === String(opt);
               const isCorrectFeedback =
                 feedback && String(question.correctAnswer) === String(opt);
+              const isZappedByBip =
+                !feedback &&
+                eliminatedOption !== null &&
+                String(eliminatedOption) === String(opt);
 
               let btnClass = `option-btn kid-option-btn option-color-${idx % 4}`;
+              if (isZappedByBip) {
+                btnClass += ' bip-zapped-option';
+              }
               if (feedback) {
                 if (isCorrectFeedback) btnClass += ' correct-reveal';
                 else if (isSelectedFeedback && feedback.status === 'incorrect') {
@@ -281,11 +302,17 @@ export default function QuestionCard({
                   key={idx}
                   type="button"
                   className={btnClass}
-                  disabled={Boolean(feedback)}
+                  disabled={Boolean(feedback) || isZappedByBip}
+                  onMouseEnter={() => !feedback && !isZappedByBip && setHoveredOption(opt)}
+                  onMouseLeave={() => setHoveredOption(null)}
+                  onFocus={() => !feedback && !isZappedByBip && setHoveredOption(opt)}
+                  onBlur={() => setHoveredOption(null)}
                   onClick={() => onAnswer(opt)}
                 >
                   <span className="option-label">{String.fromCharCode(65 + idx)}</span>
-                  <span className="option-value">{String(opt)}</span>
+                  <span className="option-value">
+                    {isZappedByBip ? `⚡ ${String(opt)} (Ruled Out)` : String(opt)}
+                  </span>
                 </button>
               );
             })}
@@ -321,16 +348,29 @@ export default function QuestionCard({
         )}
       </div>
 
-      {/* Bip Robot Companion: Appears automatically after answering (or when toggled via helper pill) */}
-      {(feedback || bipPeekOpen || isSaving) && (
-        <BipCompanion
-          event={bipEvent}
-          eventKey={eventKey}
-          studentName={studentName}
-          streak={streak}
-          showControls
-        />
-      )}
+      {/* Always-Active Interactive Bip Companion: Coaches on the question, scans hovered options, zaps 1 wrong choice, & celebrates answers! */}
+      <BipCompanion
+        event={bipEvent}
+        eventKey={eventKey}
+        studentName={studentName}
+        streak={streak}
+        correctCount={correctCount}
+        question={question}
+        feedback={feedback}
+        hoveredOption={hoveredOption}
+        eliminatedOption={eliminatedOption}
+        soundEnabled={soundEnabled}
+        onAskHint={() => {
+          setHintVisible(true);
+          if (question.hint) speakMathText(question.hint);
+        }}
+        onEliminateOption={handleBipEliminateOption}
+        onSpeakExplanation={() => {
+          setExplanationVisible(true);
+          if (question.explanation) speakMathText(question.explanation);
+        }}
+        showControls
+      />
 
       {/* Friendly Kid Helper Pills & Feedback Banner */}
       <div className="card-footer-row">
@@ -379,15 +419,6 @@ export default function QuestionCard({
                 🔢 {useKeypad ? '4 Choices (A-D)' : 'Type Answer'}
               </button>
             )}
-
-            <button
-              type="button"
-              className={`kid-helper-pill bip-pill ${bipPeekOpen ? 'active' : ''}`}
-              onClick={() => setBipPeekOpen((prev) => !prev)}
-              title="Show or hide Bip while working on a question"
-            >
-              🤖 {bipPeekOpen ? 'Hide Bip' : 'Bip Companion'}
-            </button>
           </div>
         )}
 
