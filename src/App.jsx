@@ -388,6 +388,8 @@ export default function App() {
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
+          leagueId={leagueId}
+          onSelectLeague={setLeagueId}
           grade={grade}
           onSelectGrade={(g) => {
             setGrade(g);
@@ -484,10 +486,7 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>California Elementary Math Quest</strong> • Official California Common Core State Standards (CA CCSS-M) & CAASPP Claims 1–4
-        </p>
-        <p>
-          Formally Verified Mathematical Constraint Engine (Grades K–5 • 40 Eureka Math Modules • 82 Official Standards)
+          <strong>California Elementary Math Quest</strong> • Official California CCSS-M, Cambrian School District (San Jose, CA) K–5 Eureka Math & CAASPP Claims 1–4
         </p>
       </footer>
 

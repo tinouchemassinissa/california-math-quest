@@ -95,7 +95,7 @@ export const WORD_PROBLEM_STANDARDS = new Set([
 function inferCaasppMetadata(standard, prompt = '') {
   const isWord =
     prompt.length > 68 ||
-    /California|Sierra|Redwood|Monterey|Yosemite|San Diego|Sacramento|Fresno|student|teacher|ranger|chef|market|library|solar|train|aquarium/i.test(
+    /California|Cambrian|Bagby|Fammatre|Farnham|Sartorette|Steindorf|San Jose|Sierra|Redwood|Monterey|Yosemite|San Diego|Sacramento|Fresno|student|teacher|ranger|chef|market|library|solar|train|aquarium/i.test(
       prompt
     );
   if (isWord) {
@@ -296,9 +296,9 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const sum = a + b;
         const distractors = generateDistinctOptions(sum, 4, 1, 10, prng).filter((x) => x !== sum).slice(0, 3);
         const stories = [
+          `In the Bagby Elementary garden, ${a} ladybugs are on a leaf and ${b} more fly over. How many ladybugs are there in all?`,
           `Monterey Bay rangers spotted ${a} sea otters floating in the kelp forest, and ${b} more swam over. How many sea otters are there in all?`,
           `Maya picked ${a} California golden poppies in the meadow and ${b} more by the trail. How many poppies did she pick altogether?`,
-          `There are ${a} red ladybugs on a leaf in Muir Woods and ${b} yellow ladybugs join them. How many ladybugs in all?`,
         ];
         return {
           ...baseMeta,
@@ -314,7 +314,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const diff = total - a;
         const distractors = generateDistinctOptions(diff, 4, 0, 10, prng).filter((x) => x !== diff).slice(0, 3);
         const subStories = [
-          `There were ${total} sweet Valencias oranges in a basket. Students ate ${a} of them at snack time. How many oranges are left?`,
+          `There were ${total} sweet oranges in the Sartorette Elementary snack basket. Students ate ${a} of them. How many oranges are left?`,
           `${total} quail were foraging on a Sierra Foothills trail. Then ${a} flew into the bushes. How many quail remain on the trail?`,
         ];
         return {
@@ -651,7 +651,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const options = generateDistinctStringOptions(left, distractors, [14, 18, 22, 26, 31], 4, prng);
         return {
           ...baseMeta,
-          prompt: `Two-Step Word Problem: A Sacramento school garden harvested ${start} heirloom tomatoes. Students gave ${givenA} tomatoes to the cafeteria and ${givenB} tomatoes to a neighborhood food pantry. How many tomatoes are left?`,
+          prompt: `Two-Step Word Problem: The Fammatre Elementary school garden in San Jose harvested ${start} cherry tomatoes. Students gave ${givenA} tomatoes to the cafeteria and ${givenB} tomatoes to a neighborhood pantry. How many tomatoes are left?`,
           correctAnswer: left,
           options,
           manipulative: { type: 'tape-diagram', parts: [givenA, givenB, left], total: start, unknownPartIndex: 2 },
@@ -943,7 +943,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const distractors = generateDistinctOptions(total, 4, 12, 90, prng).filter((x) => x !== total).slice(0, 3);
         return {
           ...baseMeta,
-          prompt: `Equal Groups Multiplication: A California elementary library organized ${groups} shelves with ${perGroup} books on each shelf. How many books are there in total?`,
+          prompt: `Equal Groups Multiplication: The Farnham Elementary library in Cambrian organized ${groups} shelves with ${perGroup} books on each shelf. How many books are there in total?`,
           correctAnswer: total,
           options: prng.shuffle([total, ...distractors]),
           manipulative: { type: 'array', rows: groups, cols: perGroup },
@@ -1046,8 +1046,8 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       return {
         ...baseMeta,
         prompt: isAdd
-          ? `Two-Step Word Problem: A San Diego robotics teacher bought ${packs} packs of gears with ${perPack} gears in each pack, plus ${extra} extra gears. How many gears did the teacher buy in all?`
-          : `Two-Step Word Problem: A Central Valley orchard packed ${packs} crates with ${perPack} melons in each crate. They sold ${extra} melons at the farm stand. How many melons are left?`,
+          ? `Two-Step Word Problem: The Steindorf STEAM robotics club bought ${packs} packs of gears with ${perPack} gears in each pack, plus ${extra} extra gears. How many gears did they buy in all?`
+          : `Two-Step Word Problem: A Santa Clara Valley orchard packed ${packs} crates with ${perPack} melons in each crate. They sold ${extra} melons at the farm stand. How many melons are left?`,
         correctAnswer: total,
         options: prng.shuffle([total, ...distractors]),
         manipulative: { type: 'tape-diagram', parts: isAdd ? [packs * perPack, extra] : [total, extra], total: isAdd ? total : packs * perPack, unknownTotal: isAdd, unknownPartIndex: isAdd ? -1 : 0 },

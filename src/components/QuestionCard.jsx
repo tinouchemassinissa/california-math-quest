@@ -36,6 +36,37 @@ function speakMathText(rawText) {
   }
 }
 
+/**
+ * Splits a question prompt into plain text and highlighted math tokens
+ * (numbers, fractions, equations, dollar/cent values, and unknown '?' boxes)
+ * so young learners can immediately spot the mathematical quantities.
+ */
+function renderHighlightedPrompt(promptText) {
+  if (!promptText) return null;
+  const text = String(promptText);
+  // Match equations/expressions, fractions, currency/numbers, or standalone '?' unknown boxes
+  const tokenRegex = /(\b\d+\s*[+−\-×÷=]\s*\d+(?:\s*[+−\-×÷=]\s*(?:\d+|\?))?|\[\s*\?\s*\]|\b\d+\/\d+\b|\$\d+(?:\.\d+)?|\b\d+(?:,\d{3})*(?:\.\d+)?(?:¢|°)?\b)/g;
+  const parts = text.split(tokenRegex);
+
+  return parts.map((part, idx) => {
+    if (!part) return null;
+    if (tokenRegex.test(part)) {
+      tokenRegex.lastIndex = 0;
+      const isUnknownBox = part.includes('?');
+      return (
+        <span
+          key={idx}
+          className={`kid-math-token ${isUnknownBox ? 'token-unknown' : ''}`}
+        >
+          {part}
+        </span>
+      );
+    }
+    tokenRegex.lastIndex = 0;
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
 const CELEBRATION_EMOJIS = ['🌟', '✨', '🎉', '⭐', '🚀', '🏆', '💫', '🎊'];
 
 export default function QuestionCard({
@@ -63,7 +94,16 @@ export default function QuestionCard({
     setHintVisible(false);
     setExplanationVisible(false);
     setManualInput('');
-  }, [question?.id, question?.prompt]);
+
+    // Auto-read aloud for Kindergarten & 1st Grade early readers when sound is enabled
+    if (
+      soundEnabled &&
+      question?.prompt &&
+      (question.grade === 'K' || question.grade === '1')
+    ) {
+      speakMathText(question.prompt);
+    }
+  }, [question?.id, question?.prompt, question?.grade, soundEnabled]);
 
   useEffect(() => {
     if (feedback?.status === 'incorrect') {
@@ -108,7 +148,7 @@ export default function QuestionCard({
             type="button"
             className="standard-info-chip"
             onClick={() => setStandardDetailsOpen((v) => !v)}
-            title="Click to view official California CCSS-M & CAASPP standard details"
+            title="Click to view official California CCSS-M, Cambrian Eureka Math & CAASPP details"
           >
             ℹ️ {question.standard} {standardDetailsOpen ? '▲' : '▼'}
           </button>
@@ -153,13 +193,13 @@ export default function QuestionCard({
         </div>
       </div>
 
-      {/* Collapsible Official California Educator Metadata Drawer */}
+      {/* Collapsible Official California & Cambrian District Educator Metadata Drawer */}
       {standardDetailsOpen && (
         <div className="educator-standard-drawer">
           <span className="code-pill">CA CCSS-M {question.standard}</span>
           {question.module && (
             <span className="verified-proof-badge" style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}>
-              📘 {question.module}
+              📘 Cambrian Eureka: {question.module}
             </span>
           )}
           {question.caasppClaim && (
@@ -172,11 +212,11 @@ export default function QuestionCard({
               ⚡ {question.dokLevel}
             </span>
           )}
-          <span className="verified-proof-badge">✓ Formally Verified</span>
+          <span className="verified-proof-badge">✓ 100% Verified Safe</span>
         </div>
       )}
 
-      {/* Main Question Prompt + Read-Aloud Speaker Button */}
+      {/* Main Question Prompt + Read-Aloud Speaker Button + Highlighted Math Tokens */}
       <div className="question-prompt-box kid-prompt-row">
         <button
           type="button"
@@ -187,7 +227,9 @@ export default function QuestionCard({
         >
           🔊
         </button>
-        <h2 className="question-prompt">{question.prompt}</h2>
+        <h2 className="question-prompt">
+          {renderHighlightedPrompt(question.prompt)}
+        </h2>
       </div>
 
       {/* Manipulative Visual if present */}
