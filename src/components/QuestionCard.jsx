@@ -1,3 +1,4 @@
+import { buildLessonGuide } from '../game/coachGuide.js';
 import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
 import NumberPad from './NumberPad.jsx';
@@ -86,6 +87,7 @@ export default function QuestionCard({
   studentName = '',
 }) {
   const [hintVisible, setHintVisible] = useState(false);
+  const guide = buildLessonGuide(question);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
@@ -111,14 +113,10 @@ export default function QuestionCard({
     }
   }, [question?.id, question?.prompt, question?.grade, soundEnabled]);
 
-  useEffect(() => {
-    if (feedback?.status === 'incorrect') {
-      setExplanationVisible(true);
-    }
-  }, [feedback]);
+
 
   if (!question) {
-    return <div className="card loading-card">Loading verified question...</div>;
+    return <div className="card loading-card">Preparing a checked question...</div>;
   }
 
   const handleManualSubmit = (e) => {
@@ -229,7 +227,7 @@ export default function QuestionCard({
           <span className="code-pill">CA CCSS-M {question.standard}</span>
           {question.module && (
             <span className="verified-proof-badge" style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}>
-              📘 Cambrian Eureka: {question.module}
+              📘 Practice unit: {question.module}
             </span>
           )}
           {question.caasppClaim && (
@@ -242,7 +240,7 @@ export default function QuestionCard({
               ⚡ {question.dokLevel}
             </span>
           )}
-          <span className="verified-proof-badge">✓ 100% Verified Safe</span>
+          <span className="verified-proof-badge">✓ Built-in checks passed • Not a certification</span>
         </div>
       )}
 
@@ -355,14 +353,14 @@ export default function QuestionCard({
         studentName={studentName}
         streak={streak}
         correctCount={correctCount}
-        question={question}
+        question={{ ...question, hint: guide.firstHint }}
         feedback={feedback}
         hoveredOption={hoveredOption}
         eliminatedOption={eliminatedOption}
         soundEnabled={soundEnabled}
         onAskHint={() => {
           setHintVisible(true);
-          if (question.hint) speakMathText(question.hint);
+          if (question.hint) speakMathText(guide.firstHint);
         }}
         onEliminateOption={handleBipEliminateOption}
         onSpeakExplanation={() => {
@@ -392,7 +390,7 @@ export default function QuestionCard({
                 onClick={() => {
                   const next = !hintVisible;
                   setHintVisible(next);
-                  if (next) speakMathText(question.hint);
+                  if (next) speakMathText(guide.firstHint);
                 }}
               >
                 💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
@@ -426,12 +424,12 @@ export default function QuestionCard({
           <div className="hint-callout animated-pop">
             <span className="hint-icon">💡</span>
             <div style={{ flex: 1 }}>
-              <strong>Helpful Hint:</strong> {question.hint}
+              <strong>Helpful Hint:</strong> {guide.firstHint}
             </div>
             <button
               type="button"
               className="mini-speak-btn"
-              onClick={() => speakMathText(question.hint)}
+              onClick={() => speakMathText(guide.firstHint)}
               title="Read hint aloud"
             >
               🔊

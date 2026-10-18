@@ -186,7 +186,7 @@ export default function Header({
                 onOpenCurriculum();
               }}
             >
-              📘 CA Standards Map (82 Standards)
+              📘 CA Standards Practice Map
             </button>
 
             <button

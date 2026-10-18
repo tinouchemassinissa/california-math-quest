@@ -87,7 +87,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
       if (res.success) {
         setSyncMessage({
           type: 'success',
-          text: `✓ Connected to Open Trivia DB Math API: Ingested ${res.ingested} verified questions and synthesized ${res.templatesLearned} templates!`,
+          text: `✓ Connected to Open Trivia DB Math API: Ingested ${res.ingested} candidate questions and extracted ${res.templatesLearned} templates!`,
         });
       } else {
         setSyncMessage({ type: 'error', text: res.error || 'Failed to query Open Trivia DB API.' });
@@ -202,7 +202,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           <div style={{ background: '#fafafa', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>📡 Sync with California CCSS-M OER Feed</h4>
             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 10px 0' }}>
-              Download and verify benchmark problems from the California Elementary Math repository. All items are verified before storage.
+              Download and inspect example problems from the California Elementary Math repository. Items pass limited automated checks before storage. Imported drafts are excluded from normal practice until reviewed.
             </p>
             <button
               className="btn btn-primary"
@@ -218,7 +218,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           <div style={{ background: '#fafafa', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>🔗 Ingest Custom API / JSON Feed</h4>
             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0' }}>
-              Connect to any classroom JSON feed or educational API. The engine will inspect and learn from valid problems.
+              Connect to any classroom JSON feed or educational API. The engine can extract draft patterns. This does not certify mathematics or California alignment.
             </p>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input

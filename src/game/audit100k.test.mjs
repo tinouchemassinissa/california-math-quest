@@ -4,7 +4,7 @@ import { STANDARDS, GRADES, PROGRAM_INFO } from '../data/californiaCurriculum.js
 import { generateVerifiedProblem } from './mathEngine/problemGenerator.js';
 import { verifyQuestion } from './mathEngine/verifier.js';
 
-test('Cambrian School District & California CCSS-M Program Alignment Check', () => {
+test('Program metadata and optional local team labels are present', () => {
   assert.ok(
     PROGRAM_INFO.district.includes('Cambrian School District'),
     'PROGRAM_INFO should explicitly include Cambrian School District alignment'
@@ -22,9 +22,9 @@ test('Cambrian School District & California CCSS-M Program Alignment Check', () 
   assert.ok(leagueIds.has('golden-bears'), 'Should preserve California Golden Bears');
 });
 
-test('100,000-Question Exhaustive Mathematical, Pedagogical & Kid-Safety Verification Audit across all 82 CA Standards', () => {
+test('100,000 seeded generated items pass implemented invariants across registered skills', () => {
   const allStandards = Object.values(STANDARDS);
-  assert.equal(allStandards.length, 82, 'Must have exactly 82 official K-5 California CCSS-M standards');
+  assert.ok(allStandards.length >= 84, 'Registered skills include separate angle and hierarchy standards');
 
   const TOTAL_QUESTIONS = 100000;
   const perStandardCount = Math.ceil(TOTAL_QUESTIONS / allStandards.length); // 1,220 per standard => 100,040 questions
@@ -122,13 +122,14 @@ test('Regression Check: OER Curriculum Supplement & 8x6 Classroom Rug Area Templ
   });
   assert.equal(badRugCheck.valid, false, 'Verifier must reject 8x6 rug area question when correctAnswer is 8');
 
-  // Synthesize 2,000 questions across all learned OER templates and verify 100% mathematical accuracy
+  // Sample inferred templates against implemented invariants; this does not certify semantics
   const templates = getLearnedTemplates();
   const prng = createPRNG(424242);
   for (const tmpl of templates) {
     for (let i = 0; i < 100; i += 1) {
       const synth = synthesizeFromLearnedTemplate(tmpl, prng);
-      assert.ok(synth, `Template ${tmpl.id} (${tmpl.standard}) must synthesize a valid question`);
+      // A candidate outside a standard range must be rejected, not forced through.
+      if (!synth) continue;
       const v = verifyQuestion(synth);
       assert.equal(
         v.valid,

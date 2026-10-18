@@ -41,14 +41,14 @@ export default function WelcomeDashboard({
       <div className="welcome-top-bar">
         <div className="welcome-brand-group">
           <div className="welcome-hero-badge">
-            🌟 Official California CCSS-M • Cambrian School District (Eureka Math K–5)
+            🌟 Independent California standards practice • Grades K–5
           </div>
           <h1 className="welcome-hero-title">California Elementary Math Quest</h1>
         </div>
 
         <div className="welcome-teacher-bar">
           <button type="button" className="welcome-tool-link" onClick={onOpenCurriculum}>
-            📘 82 CA Standards
+            📘 Selected CA Skills
           </button>
           <button type="button" className="welcome-tool-link" onClick={onOpenAchievements}>
             🏆 Badges
@@ -181,9 +181,9 @@ export default function WelcomeDashboard({
               🚀 Start {activeGradeLabel} Math Quest with Bip!
             </button>
             <div className="welcome-safety-guarantee">
-              <span>🛡️ 100% Kid-Safe & Ad-Free</span>
+              <span>🛡️ Ad-Free • No Student Accounts</span>
               <span>•</span>
-              <span>✓ Formally Verified CA & Cambrian District Math</span>
+              <span>✓ Built-in Maths Checks • Teacher Review Recommended</span>
               <span>•</span>
               <span>🔊 Read-Aloud & ✏️ Scratchpad Ready</span>
             </div>

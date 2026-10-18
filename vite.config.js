@@ -12,9 +12,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       manifest: {
-        name: 'California Elementary Math Quest',
-        short_name: 'CAMathQuest',
-        description: 'California Elementary Mathematics Learning Platform aligned with CA CCSSM (Grades K-5)',
+        name: 'Bip’s Math Adventure',
+        short_name: 'Bip Math',
+        description: 'Independent practice for selected California K–5 mathematics skills',
         theme_color: '#4f46e5',
         background_color: '#0f172a',
         display: 'standalone',

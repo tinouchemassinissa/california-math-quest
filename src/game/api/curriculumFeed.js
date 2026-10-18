@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * Educational Problem Content Service:
- * - Algorithmic Formal Engine provides infinite, verified, mathematically rigorous problems with zero repetition.
+ * - Algorithmic Formal Engine provides built-in questions with bounded structural and numeric checks.
  * - Open Educational Resources (OER) feed allows ingesting real California curriculum questions.
  * - Machine-Assisted Template Learner ingests online questions and teaches the procedural engine new problem types.
  * - Formal Verification Gate prevents invalid math from entering the app.
@@ -29,13 +29,14 @@ export async function fetchEducationalQuestion({
   mode = 'grade-quest',
   seed = null,
   preferOnline = false,
+  allowImportedContent = false,
   customApiUrl = null,
   timeoutMs = 1500,
 } = {}) {
   const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
   // If online OER feed is requested and user is online, pull verified items and learn from them
-  if (isOnline && preferOnline) {
+  if (isOnline && preferOnline && allowImportedContent) {
     try {
       const endpoint = customApiUrl || '/curriculum_supplement.json';
       const controller = new AbortController();
@@ -95,7 +96,7 @@ export async function fetchEducationalQuestion({
       grade,
       standardCode,
       mode,
-      seed: dynamicSeed,
+      seed: seed === null ? dynamicSeed : seed + attempts - 1,
     });
 
     if (!recentPrompts.includes(question.prompt)) {
@@ -138,19 +139,8 @@ export async function syncAndLearnFromFeed(customUrl = null) {
       rawItems = data;
     } else if (Array.isArray(data.items)) {
       rawItems = data.items;
-    } else if (Array.isArray(data.results)) {
-      // Support Open Trivia DB math category transformation
-      rawItems = data.results.map((r, idx) => ({
-        id: `opentdb-${idx}-${Date.now()}`,
-        grade: '5',
-        standard: '5.OA.A.1',
-        title: 'General Math Challenge',
-        prompt: decodeHTMLEntities(r.question),
-        correctAnswer: decodeHTMLEntities(r.correct_answer),
-        options: [decodeHTMLEntities(r.correct_answer), ...r.incorrect_answers.map(decodeHTMLEntities)].sort(),
-        explanation: 'Standard mathematical problem from public quiz bank.',
-        hint: 'Analyze the numbers carefully.',
-      }));
+    } else {
+      return { success: false, error: 'Use a curriculum feed with explicit grade and standard metadata; general trivia is not a standards-aligned lesson bank.' };
     }
 
     const learnResult = learnFromFeed(rawItems);

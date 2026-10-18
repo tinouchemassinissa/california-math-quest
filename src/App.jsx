@@ -1,3 +1,4 @@
+import { isAnswerEquivalent } from './game/mathEngine/answerMath.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header.jsx';
 import { GAME_MODES } from './components/ModeSelector.jsx';
@@ -43,22 +44,6 @@ const STORAGE_KEYS = {
   PET_ID: 'california_math_pet_id_v3',
 };
 
-function isAnswerEquivalent(given, correct) {
-  const gNorm = String(given ?? '').trim().toLowerCase();
-  const cNorm = String(correct ?? '').trim().toLowerCase();
-  if (gNorm === cNorm) return true;
-
-  // Allow free-response numeric entry when correct answer has units or commas (e.g., "24" for "24 sq m" or "3000" for "3,000")
-  const stripCommas = (s) => s.replace(/,/g, '');
-  if (stripCommas(gNorm) === stripCommas(cNorm)) return true;
-
-  const numericOnlyC = stripCommas(cNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
-  const numericOnlyG = stripCommas(gNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
-  if (numericOnlyG && numericOnlyG === numericOnlyC) return true;
-
-  return false;
-}
-
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEYS.THEME) || 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => {
@@ -88,6 +73,7 @@ export default function App() {
   const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
   const [lives, setLives] = useState(diffInfo.lives);
   const [feedback, setFeedback] = useState(null);
+  const [questionError, setQuestionError] = useState('');
   const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
@@ -204,12 +190,18 @@ export default function App() {
 
       const activeGrade = targetStandard && STANDARDS[targetStandard] ? STANDARDS[targetStandard].grade : grade;
 
-      const res = await fetchEducationalQuestion({
+      setQuestionError('');
+      let res;
+      try { res = await fetchEducationalQuestion({
         grade: activeGrade,
         standardCode: targetStandard,
         mode,
         preferOnline: false,
-      });
+      }); } catch {
+        setCurrentQuestion(null);
+        setQuestionError('This question could not pass our checks. Please choose another skill or retry.');
+        return;
+      }
 
       setCurrentQuestion(res.question);
       setEngineSource(res.source);
@@ -464,6 +456,7 @@ export default function App() {
           )}
 
           <main className="main-game-layout">
+            {questionError && <div role="alert" className="hint-callout">{questionError} <button onClick={() => nextQuestion()}>Retry</button></div>}
             <QuestionCard
               key={currentQuestion?.id || currentQuestion?.prompt || 'q'}
               question={currentQuestion}
@@ -486,7 +479,7 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>California Elementary Math Quest</strong> • Official California CCSS-M, Cambrian School District (San Jose, CA) K–5 Eureka Math & CAASPP Claims 1–4
+          <strong>California Elementary Math Quest</strong> • Independent practice mapped to selected California K–5 standards • Not school- or state-endorsed
         </p>
       </footer>
 

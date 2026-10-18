@@ -1,3 +1,5 @@
+import { STANDARDS } from '../../data/californiaCurriculum.js';
+import { semanticErrors } from './semanticChecks.js';
 /**
  * Formal Mathematical, Pedagogical, Semantic & Kid-Safety Invariant Verifier
  * Validates that every generated or ingested question satisfies strict constraints:
@@ -41,6 +43,12 @@ export function verifyQuestion(question) {
       return { valid: false, error: msg, errors: [msg] };
     }
   }
+
+  if (!STANDARDS[question.standard] || STANDARDS[question.standard].grade !== question.grade) {
+    return { valid: false, error: 'Unknown standard or grade mismatch', errors: ['Unknown standard or grade mismatch'] };
+  }
+  const independentErrors = semanticErrors(question);
+  if (independentErrors.length) return { valid: false, error: independentErrors[0], errors: independentErrors };
 
   // 2. Text corruption & XSS safety check on prompt, title, explanation, hint
   if (hasCorruptedText(question.prompt) || hasCorruptedText(question.title)) {

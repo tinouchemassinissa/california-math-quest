@@ -1,4 +1,5 @@
-import { STANDARDS, generateQuestion } from '../data/californiaCurriculum.js';
+import { generateVerifiedProblem } from './mathEngine/problemGenerator.js';
+import { STANDARDS } from '../data/californiaCurriculum.js';
 
 export const EMPTY_STANDARD_STATS = {
   attempts: 0,
@@ -94,7 +95,7 @@ export function getMistakeReviewStandards(profile, grade = null) {
 export function selectAdaptiveQuestion(grade, profile, random = Math.random, now = Date.now()) {
   const standardsForGrade = Object.keys(STANDARDS).filter((c) => STANDARDS[c].grade === grade);
   if (!standardsForGrade.length) {
-    return generateQuestion(grade, null, random);
+    return generateVerifiedProblem({ grade, seed: Math.floor(random() * 2 ** 32) });
   }
 
   const due = new Set(getDueStandards(profile, grade, now));
@@ -120,8 +121,7 @@ export function selectAdaptiveQuestion(grade, profile, random = Math.random, now
     }
   }
 
-  const standardObj = STANDARDS[selectedCode];
-  return generateQuestion(grade, standardObj?.domain, random);
+  return generateVerifiedProblem({ grade, standardCode: selectedCode, seed: Math.floor(random() * 2 ** 32) });
 }
 
 export const DIFFICULTY_PRESETS = {

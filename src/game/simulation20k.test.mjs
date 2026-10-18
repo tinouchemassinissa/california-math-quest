@@ -1,3 +1,4 @@
+import { STANDARDS } from '../data/californiaCurriculum.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { run20kSimulation } from './simulation20k.mjs';
@@ -24,7 +25,7 @@ test('20,000-CYCLE E2E STRESS TEST: Complete Game Loop, Invariant Verification, 
   // Gameplay Simulation
   assert.equal(result.totalAttempts, 20000);
   assert.equal(result.totalCorrect, 12000);
-  assert.equal(result.standardsPracticedCount, 82);
+  assert.equal(result.standardsPracticedCount, Object.keys(STANDARDS).length);
   assert.equal(result.classroomWorksheetsValid, true);
   assert.ok(result.livesCycles.gameOversTriggered > 0);
   assert.equal(result.livesCycles.gameOversTriggered, result.livesCycles.totalResets);

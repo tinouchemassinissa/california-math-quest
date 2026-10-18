@@ -1,3 +1,4 @@
+import { canonicalAnswer } from './answerMath.js';
 import { STANDARDS } from '../../data/californiaCurriculum.js';
 import { createPRNG } from './prng.js';
 import { Rational } from './rational.js';
@@ -90,7 +91,7 @@ export const WORD_PROBLEM_STANDARDS = new Set([
 ]);
 
 /**
- * Assign official CAASPP (Smarter Balanced) Assessment Claim & Depth of Knowledge (DOK)
+ * Heuristic teaching metadata only; not an official CAASPP/DOK classification
  */
 function inferCaasppMetadata(standard, prompt = '') {
   const isWord =
@@ -100,25 +101,26 @@ function inferCaasppMetadata(standard, prompt = '') {
     );
   if (isWord) {
     return {
-      caasppClaim: 'Claim 2: Problem Solving & Modeling',
-      dokLevel: standard.grade >= '3' ? 'DOK 2: Conceptual Application' : 'DOK 2: Skill & Concept',
+      caasppClaim: 'Suggested claim 2: Problem Solving & Modeling',
+      dokLevel: standard.grade >= '3' ? 'Suggested DOK 2: Conceptual Application' : 'Suggested DOK 2: Skill & Concept',
     };
   }
   if (/why|explain|classify|true|always|equivalent|compare|expression|pattern|hierarchy/i.test(prompt)) {
     return {
-      caasppClaim: 'Claim 3: Communicating Reasoning',
-      dokLevel: 'DOK 2: Conceptual Reasoning',
+      caasppClaim: 'Suggested claim 3: Communicating Reasoning',
+      dokLevel: 'Suggested DOK 2: Conceptual Reasoning',
     };
   }
   return {
-    caasppClaim: 'Claim 1: Concepts & Procedures',
-    dokLevel: 'DOK 1: Procedural Fluency',
+    caasppClaim: 'Suggested claim 1: Concepts & Procedures',
+    dokLevel: 'Suggested DOK 1: Procedural Fluency',
   };
 }
 
 /**
  * Robust, Verified Mathematical Problem Generator
- * Every single standard in CA CCSS-M Grades K through 5 (82 standards) has a dedicated, verified generator
+ * Registered K–5 skills have dedicated generators; this is a selected practice bank, not complete state coverage.
+ * Each item is checked against implemented invariants
  * with multiple authentic California sub-templates.
  */
 export function generateVerifiedProblem({
@@ -127,6 +129,7 @@ export function generateVerifiedProblem({
   mode = 'grade-quest',
   seed = null,
   maxVerificationAttempts = 15,
+  allowLearnedTemplates = false,
 } = {}) {
   const actualSeed =
     seed ??
@@ -138,7 +141,11 @@ export function generateVerifiedProblem({
   const prng = createPRNG(actualSeed);
 
   let candidateStandards = Object.values(STANDARDS).filter((s) => s.grade === grade);
-  if (standardCode && STANDARDS[standardCode]) {
+  if (!candidateStandards.length) throw new RangeError('Unsupported grade');
+  if (standardCode && (!STANDARDS[standardCode] || STANDARDS[standardCode].grade !== grade)) {
+    throw new RangeError('Standard must exist and match the requested grade');
+  }
+  if (standardCode) {
     candidateStandards = [STANDARDS[standardCode]];
   } else if (mode === 'manipulatives') {
     const manipFiltered = candidateStandards.filter((s) => MANIPULATIVE_STANDARDS.has(s.code));
@@ -150,7 +157,8 @@ export function generateVerifiedProblem({
 
   const standard = prng.choice(candidateStandards) || candidateStandards[0];
 
-  if (mode !== 'manipulatives') {
+  // Imported/inferred templates are not part of the reviewed built-in lesson bank.
+  if (allowLearnedTemplates && mode !== 'manipulatives') {
     try {
       const learned = getLearnedTemplates(grade, standard.code);
       if (learned && learned.length > 0 && prng.next() < 0.35) {
@@ -158,13 +166,14 @@ export function generateVerifiedProblem({
         const synthesized = synthesizeFromLearnedTemplate(chosenTemplate, prng);
         if (synthesized) {
           const check = verifyQuestion(synthesized);
-          if (check.valid) {
+          if (check.valid && synthesized.standard === standard.code && synthesized.grade === grade) {
             const meta = inferCaasppMetadata(standard, synthesized.prompt);
             return {
               ...meta,
               ...synthesized,
               seed: actualSeed,
               verified: true,
+              verificationScope: 'implemented-invariants-only',
               verificationTimestamp: new Date().toISOString(),
             };
           }
@@ -188,13 +197,14 @@ export function generateVerifiedProblem({
         ...rawQuestion,
         seed: actualSeed,
         verified: true,
+        verificationScope: 'implemented-invariants-only',
         verificationTimestamp: new Date().toISOString(),
       };
     }
     prng.next();
   }
 
-  return createGuaranteedDynamicQuestion(standard, prng);
+  throw new Error(`No valid built-in question for ${standard.code}; refusing a mislabeled fallback`);
 }
 
 function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
@@ -373,42 +383,28 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     }
 
     case 'K.MD.A.2': {
-      const attributes = [
-        { objA: 'Coastal Redwood Tree', objB: 'California Poppy', compare: 'TALLER', answer: 'Coastal Redwood Tree' },
-        { objA: 'Hummingbird Feather', objB: 'Sierra Granite Boulder', compare: 'HEAVIER', answer: 'Sierra Granite Boulder' },
-        { objA: 'Golden Gate Bridge', objB: 'Park Bench', compare: 'LONGER', answer: 'Golden Gate Bridge' },
-        { objA: 'Pacific Gray Whale', objB: 'Sea Star', compare: 'LIGHTER', answer: 'Sea Star' },
-        { objA: 'Swimming Pool', objB: 'Teacup', compare: 'HOLDS MORE WATER (Greater Capacity)', answer: 'Swimming Pool' },
-      ];
-      const pick = prng.choice(attributes);
-      const options = prng.shuffle([pick.objA, pick.objB, 'Both are equal', 'Cannot be compared']);
-      return {
-        ...baseMeta,
-        prompt: `Measurable Attributes: Which object is ${pick.compare} — a ${pick.objA} or a ${pick.objB}?`,
-        correctAnswer: pick.answer,
-        options,
-        explanation: `Directly comparing measurable attributes (length, weight, or capacity): A ${pick.answer} is ${pick.compare.toLowerCase()}.`,
-        hint: `Picture both objects in the real world and compare their size or weight.`,
+      const a = prng.nextInt(3, 7); const b = a + prng.nextInt(2, 4);
+      const longer = prng.next() < 0.5;
+      return { ...baseMeta,
+        prompt: `Both ribbons start at the same line. Which ribbon is ${longer ? 'LONGER' : 'SHORTER'}?`,
+        correctAnswer: longer ? 'Ribbon B' : 'Ribbon A',
+        options: prng.shuffle(['Ribbon A', 'Ribbon B', 'They are equal', 'The picture does not show both ribbons']),
+        manipulative: { type: 'length-comparison', a, b },
+        explanation: `Ribbon B extends farther from the shared starting line, so B is longer and A is shorter.`,
+        hint: 'Compare where the ribbons end after lining up their starting edges.',
       };
     }
 
     case 'K.G.A.2': {
-      const shapes = [
-        { name: 'Triangle', sides: 3 },
-        { name: 'Rectangle', sides: 4 },
-        { name: 'Square', sides: 4 },
-        { name: 'Hexagon', sides: 6 },
-      ];
-      const pick = prng.choice(shapes);
-      const distractors = generateDistinctOptions(pick.sides, 4, 0, 8, prng).filter((x) => x !== pick.sides).slice(0, 3);
+      const pick = prng.choice(['Triangle', 'Square', 'Circle', 'Hexagon']);
       return {
         ...baseMeta,
-        prompt: `How many straight sides and corners (vertices) does a ${pick.name.toLowerCase()} have? (Tap the corners on the shape below to count!)`,
-        correctAnswer: pick.sides,
-        options: prng.shuffle([pick.sides, ...distractors]),
-        manipulative: { type: 'polygon-inspector', sides: pick.sides, shapeName: pick.name },
-        explanation: `A ${pick.name.toLowerCase()} is a closed 2D shape with exactly ${pick.sides} straight sides and ${pick.sides} corners (vertices).`,
-        hint: `Tap each orange corner on the ${pick.name.toLowerCase()} to count them.`,
+        prompt: 'What is the name of the shape shown below? A shape keeps its name when it is turned.',
+        correctAnswer: pick,
+        options: prng.shuffle(['Triangle', 'Square', 'Circle', 'Hexagon']),
+        manipulative: { type: 'shape-outline', kind: pick, rotation: prng.choice([0, 20, 45, 70]) },
+        explanation: ({ Triangle: 'A triangle has 3 straight sides and 3 corners.', Square: 'A square has 4 equal straight sides and 4 right angles, even when turned.', Circle: 'A circle is round: all points on its boundary are equally far from its center.', Hexagon: 'A hexagon has 6 straight sides and 6 corners.' })[pick],
+        hint: 'Look for straight or curved edges, then count any straight sides. Turning a shape does not change its name.',
       };
     }
 
@@ -588,18 +584,14 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     }
 
     case '1.MD.A.2': {
-      const lenA = prng.nextInt(5, 10);
-      const lenB = prng.nextInt(3, 7);
-      const total = lenA + lenB;
-      const distractors = generateDistinctOptions(total, 4, 5, 19, prng).filter((x) => x !== total).slice(0, 3);
-      return {
-        ...baseMeta,
-        prompt: `Iterating Centimeter Cubes: A California newt model is ${lenA} centimeter cubes long and a tree frog model is ${lenB} centimeter cubes long. Placed end-to-end with no gaps, how many centimeter cubes long are they together?`,
-        correctAnswer: `${total} cm cubes`,
-        options: prng.shuffle([`${total} cm cubes`, ...distractors.map((d) => `${d} cm cubes`)]),
-        manipulative: { type: 'number-line', min: 0, max: 18, start: lenA, hop: lenB, target: total },
-        explanation: `When measured end-to-end with no gaps or overlaps, the total length is ${lenA} + ${lenB} = ${total} cm cubes.`,
-        hint: `Add the two lengths: ${lenA} + ${lenB}.`,
+      const count = prng.nextInt(3, 12);
+      return { ...baseMeta,
+        prompt: 'Each small block is 1 centimeter long. The blocks line up end-to-end with no gaps or overlaps. How long is the ribbon above them?',
+        correctAnswer: `${count} cm`,
+        options: prng.shuffle(generateDistinctOptions(count, 4, 1, 15, prng).map(n => `${n} cm`)),
+        manipulative: { type: 'unit-length', count },
+        explanation: `There are ${count} equal 1-centimeter units from one end to the other. The length is ${count} centimeters.`,
+        hint: 'Count each equal unit once, starting at one end of the ribbon.',
       };
     }
 
@@ -677,7 +669,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
 
     case '2.OA.B.2': {
       const a = prng.nextInt(7, 14);
-      const b = prng.nextInt(6, 9);
+      const b = prng.nextInt(6, Math.min(9, 20 - a));
       const isAdd = prng.next() < 0.5;
       if (isAdd) {
         const sum = a + b;
@@ -687,7 +679,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           prompt: `Mental Fluency within 20: What is ${a} + ${b}?`,
           correctAnswer: sum,
           options: prng.shuffle([sum, ...distractors]),
-          explanation: `${a} + ${b} = ${sum}.`,
+          explanation: `Start with ${a} and count on ${b} more, or make a ten. Combining the two parts gives ${a} + ${b} = ${sum}.`,
           hint: `Use doubles or make-a-ten to add mentally.`,
         };
       } else {
@@ -1012,8 +1004,8 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     }
 
     case '3.OA.C.7': {
-      const a = prng.nextInt(3, 10);
-      const b = prng.nextInt(4, 10);
+      const a = prng.nextInt(1, 9);
+      const b = prng.nextInt(0, 9);
       const prod = a * b;
       if (prng.next() < 0.55) {
         const distractors = generateDistinctOptions(prod, 4, 12, 100, prng).filter((x) => x !== prod).slice(0, 3);
@@ -1024,10 +1016,10 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           options: prng.shuffle([prod, ...distractors]),
           manipulative: { type: 'array', rows: a, cols: b },
           explanation: `${a} equal groups of ${b} is ${prod}.`,
-          hint: `Decompose ${b} into 5 + ${b - 5} if helpful, or use your ${a}s facts.`,
+          hint: `Use equal groups or a multiplication fact you already know. Try splitting one factor into smaller parts.`,
         };
       } else {
-        const distractors = generateDistinctOptions(b, 4, 2, 12, prng).filter((x) => x !== b).slice(0, 3);
+        const distractors = generateDistinctOptions(b, 4, 0, 9, prng).filter((x) => x !== b).slice(0, 3);
         return {
           ...baseMeta,
           prompt: `Division Fluency within 100: What is ${prod} ÷ ${a}?`,
@@ -1075,13 +1067,13 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt: `Place Value Rounding: Round ${val} to the nearest ${roundTo}.`,
         correctAnswer: rounded,
         options,
-        explanation: `To round ${val} to the nearest ${roundTo}, look at the ${roundTo === 10 ? 'ones' : 'tens'} digit. Halfway (5) or more rounds up to ${rounded}.`,
+        explanation: `The neighboring multiples of ${roundTo} are ${Math.floor(val / roundTo) * roundTo} and ${(Math.floor(val / roundTo) + 1) * roundTo}. Choose the nearer one; at the midpoint choose the larger: ${rounded}.`,
         hint: `Find which multiple of ${roundTo} is closest to ${val} on a number line.`,
       };
     }
 
     case '3.NBT.A.2': {
-      const a = prng.nextInt(345, 680);
+      const a = prng.nextInt(345, 670);
       const b = prng.nextInt(158, 329);
       const isAdd = prng.next() < 0.5;
       const ans = isAdd ? a + b : a - b;
@@ -1125,7 +1117,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt: `Fractions on a Number Line: The interval from 0 to 1 is partitioned into ${den} equal lengths. What fraction is located ${num} intervals to the right of 0?`,
         correctAnswer: fracStr,
         options,
-        manipulative: { type: 'fraction', numerator: num, denominator: den },
+        manipulative: { type: 'fraction-number-line', numerator: num, denominator: den },
         explanation: `Each interval has length 1/${den}. Moving ${num} intervals from 0 reaches ${fracStr}.`,
         hint: `Count ${num} hops of size 1/${den} starting at 0.`,
       };
@@ -1160,7 +1152,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           prompt: `Whole Numbers as Fractions: What whole number is equivalent to the fraction ${fracStr}?`,
           correctAnswer: whole,
           options: prng.shuffle([whole, ...distractors]),
-          explanation: `Every ${den} fourths/thirds/halves make 1 whole. Since ${num} ÷ ${den} = ${whole}, ${fracStr} = ${whole}.`,
+          explanation: `Each whole contains ${den} equal parts of size 1/${den}. So ${num} such parts make ${num} ÷ ${den} = ${whole} wholes.`,
           hint: `Divide the numerator (${num}) by the denominator (${den}).`,
         };
       } else {
@@ -1205,7 +1197,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt: `Metric Mass Word Problem: A wildlife rehabilitator in Lake Tahoe has ${bags} bags of acorns, each with a mass of ${kgPerBag} kilograms (kg). What is the total mass of all the bags in kilograms?`,
         correctAnswer: `${totalKg} kg`,
         options: prng.shuffle([`${totalKg} kg`, ...distractors.map((d) => `${d} kg`)]),
-        manipulative: { type: 'tape-diagram', parts: Array.from({ length: Math.min(bags, 5) }, () => kgPerBag), total: totalKg, unknownTotal: true, unit: 'kg' },
+        manipulative: { type: 'tape-diagram', parts: Array.from({ length: bags }, () => kgPerBag), total: totalKg, unknownTotal: true, unit: 'kg' },
         explanation: `Multiply the number of bags by the mass per bag: ${bags} × ${kgPerBag} kg = ${totalKg} kg.`,
         hint: `Multiply ${bags} × ${kgPerBag}.`,
       };
@@ -1313,7 +1305,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
             4,
             prng
           ),
-          manipulative: { type: 'tape-diagram', parts: Array.from({ length: Math.min(times, 5) }, () => small), total: large, unknownTotal: true, unit: 'ft' },
+          manipulative: { type: 'tape-diagram', parts: Array.from({ length: times }, () => small), total: large, unknownTotal: true, unit: 'ft' },
           explanation: `"${times} times as tall as ${small}" is ${times} × ${small} = ${large} feet (not ${small} + ${times}).`,
           hint: `"Times as many" means multiply (${times} × ${small}), not add!`,
         };
@@ -1346,7 +1338,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           prompt: `CAASPP Remainder Interpretation: ${totalStudents} fourth-grade students are taking shuttle vans to Griffith Observatory. Each shuttle van holds at most ${perVan} students. What is the MINIMUM number of vans needed so that EVERY student has a seat?`,
           correctAnswer: vansNeeded,
           options,
-          explanation: `Divide ${totalStudents} ÷ ${perVan} = ${fullVans} with a remainder of ${rem} students. Since those ${rem} remaining students cannot be left behind, 1 additional van is required: ${fullVans} + 1 = ${vansNeeded} vans.`,
+          explanation: `The division has quotient ${fullVans} and remainder ${rem}, because ${totalStudents} = ${perVan} × ${fullVans} + ${rem}. Since those ${rem} remaining students cannot be left behind, 1 additional van is required: ${fullVans} + 1 = ${vansNeeded} vans.`,
           hint: `Divide ${totalStudents} by ${perVan}. If there is a remainder, round UP by 1 van so no student is left behind!`,
         };
       } else if (storyType === 'bus') {
@@ -1754,8 +1746,9 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       };
     }
 
-    case '4.MD.C.6': {
-      if (prng.next() < 0.6) {
+    case '4.MD.C.6':
+    case '4.MD.C.7': {
+      if (standard.code === '4.MD.C.6') {
         const angle = prng.choice([30, 45, 60, 90, 120, 135, 150]);
         const distractors = buildProtractorDistractors(angle);
         const kind = angle < 90 ? 'acute' : angle === 90 ? 'right' : 'obtuse';
@@ -1823,7 +1816,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt: pick.prompt,
         correctAnswer: pick.ans,
         options: prng.shuffle(pick.options),
-        manipulative: { type: 'protractor', angle: pick.angle },
+        ...(pick.ans.endsWith('angle') ? { manipulative: { type: 'protractor', angle: pick.angle } } : {}),
         explanation: pick.exp,
         hint: `Inspect the angle on the interactive protractor model.`,
       };
@@ -2298,7 +2291,8 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       };
     }
 
-    case '5.G.B.3': {
+    case '5.G.B.3':
+    case '5.G.B.4': {
       const hierarchyQuestions = [
         {
           prompt: 'Hierarchy of 2D Figures (5.G.B.3): Because every square has 4 right angles and 2 pairs of parallel opposite sides, which statement is ALWAYS true?',
@@ -2327,96 +2321,22 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           exp: 'A parallelogram is any quadrilateral with two pairs of parallel sides (rectangles, rhombuses, and squares are all special parallelograms).',
         },
       ];
-      const pick = prng.choice(hierarchyQuestions);
+      const pick = prng.choice(standard.code === '5.G.B.3' ? hierarchyQuestions.slice(0, 1) : hierarchyQuestions.slice(1));
       return {
         ...baseMeta,
         prompt: pick.prompt,
         correctAnswer: pick.ans,
         options: prng.shuffle(pick.options),
-        manipulative: { type: 'polygon-inspector', sides: pick.sides, shapeName: pick.ans },
+        // Text hierarchy tasks do not have a misleading regular-polygon illustration.
         explanation: pick.exp,
         hint: `Think about how subcategories inherit all properties of their parent category.`,
       };
     }
 
     default: {
-      return createGuaranteedDynamicQuestion(standard, prng);
+      throw new Error(`No built-in template for ${standard.code}`);
     }
   }
-}
-
-function createGuaranteedDynamicQuestion(standard, prng) {
-  const g = standard.grade;
-  let prompt, correctAnswer, options, explanation, hint;
-
-  if (g === 'K') {
-    const a = prng.nextInt(1, 5);
-    const b = prng.nextInt(1, 5);
-    correctAnswer = a + b;
-    prompt = `Count the total objects: ${a} + ${b} = ❓`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 1, 10, prng));
-    explanation = `${a} + ${b} = ${correctAnswer}.`;
-    hint = `Count forward from ${a}.`;
-  } else if (g === '1') {
-    const a = prng.nextInt(4, 12);
-    const b = prng.nextInt(3, 8);
-    correctAnswer = a + b;
-    prompt = `What is ${a} + ${b}?`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 5, 20, prng));
-    explanation = `${a} + ${b} = ${correctAnswer}.`;
-    hint = `Start at ${a} and add ${b}.`;
-  } else if (g === '2') {
-    const a = prng.nextInt(15, 60);
-    const b = prng.nextInt(12, 38);
-    correctAnswer = a + b;
-    prompt = `Calculate: ${a} + ${b}`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 20, 100, prng));
-    explanation = `${a} + ${b} = ${correctAnswer}.`;
-    hint = `Add ones first, then tens.`;
-  } else if (g === '3') {
-    const a = prng.nextInt(3, 9);
-    const b = prng.nextInt(3, 9);
-    correctAnswer = a * b;
-    prompt = `What is ${a} × ${b}?`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 9, 81, prng));
-    explanation = `${a} groups of ${b} equals ${correctAnswer}.`;
-    hint = `Recall your multiplication facts.`;
-  } else if (g === '4') {
-    const a = prng.nextInt(12, 35);
-    const b = prng.nextInt(4, 9);
-    correctAnswer = a * b;
-    prompt = `Multiply: ${a} × ${b}`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 40, 350, prng));
-    explanation = `${a} × ${b} = ${correctAnswer}.`;
-    hint = `Use the distributive property: (${Math.floor(a / 10) * 10} × ${b}) + (${a % 10} × ${b}).`;
-  } else {
-    const a = prng.nextInt(2, 6);
-    const b = prng.nextInt(3, 8);
-    const c = prng.nextInt(1, 5);
-    correctAnswer = a * b - c;
-    prompt = `Evaluate using order of operations: (${a} × ${b}) - ${c}`;
-    options = prng.shuffle(generateDistinctOptions(correctAnswer, 4, 1, 60, prng));
-    explanation = `Multiply inside parentheses first: ${a} × ${b} = ${a * b}. Then subtract ${c} = ${correctAnswer}.`;
-    hint = `Perform operations inside parentheses first (PEMDAS).`;
-  }
-
-  return {
-    id: `q-dyn-${standard.code}-${Date.now()}-${prng.nextInt(100, 999)}`,
-    grade: standard.grade,
-    standard: standard.code,
-    domain: standard.domain,
-    cluster: standard.cluster,
-    title: standard.title,
-    module: standard.module,
-    caasppClaim: 'Claim 1: Concepts & Procedures',
-    dokLevel: 'DOK 1: Procedural Fluency',
-    prompt,
-    correctAnswer,
-    options,
-    explanation,
-    hint,
-    verified: true,
-  };
 }
 
 function generateDistinctOptions(correct, count = 4, min = 0, max = 100, prng) {
@@ -2439,7 +2359,7 @@ function generateDistinctOptions(correct, count = 4, min = 0, max = 100, prng) {
 }
 
 function generateDistinctStringOptions(correctStr, candidateWrongArray, fallbackPool, count = 4, prng) {
-  const norm = (s) => String(s).trim().toLowerCase();
+  const norm = canonicalAnswer;
   const seen = new Set([norm(correctStr)]);
   const result = [correctStr];
 

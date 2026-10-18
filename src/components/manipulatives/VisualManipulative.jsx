@@ -5,6 +5,47 @@ export default function VisualManipulative({ manipulative }) {
   if (!manipulative) return null;
 
   switch (manipulative.type) {
+    case 'shape-outline': {
+      const { kind, rotation = 0 } = manipulative;
+      const sides = { Triangle: 3, Square: 4, Hexagon: 6 }[kind];
+      const points = sides ? Array.from({ length: sides }, (_, i) => {
+        const a = (i * 360 / sides - 90) * Math.PI / 180;
+        return `${100 + 65 * Math.cos(a)},${100 + 65 * Math.sin(a)}`;
+      }).join(' ') : '';
+      return <div className="manipulative-container"><div className="manipulative-label">Name this shape</div>
+        <svg viewBox="0 0 200 200" role="img" aria-label="Shape to identify" style={{ width: 'min(220px, 100%)' }}>
+          <g transform={`rotate(${rotation},100,100)`} fill="#60a5fa" stroke="#1d4ed8" strokeWidth="4">
+            {kind === 'Circle' ? <circle cx="100" cy="100" r="65" /> : <polygon points={points} />}
+          </g>
+        </svg><p>Turning a shape keeps its name.</p></div>;
+    }
+    case 'length-comparison': {
+      const { a, b } = manipulative;
+      return <div className="manipulative-container"><div className="manipulative-label">Compare the ribbon lengths</div>
+        <svg viewBox="0 0 340 115" role="img" aria-label={`Ribbon A spans ${a} equal units; ribbon B spans ${b} equal units`} style={{ width: '100%', maxWidth: 440 }}>
+          <line x1="75" y1="10" x2="75" y2="100" stroke="currentColor" />
+          <text x="0" y="38" fill="currentColor">Ribbon A</text><rect x="75" y="18" width={a*20} height="28" fill="#60a5fa" />
+          <text x="0" y="83" fill="currentColor">Ribbon B</text><rect x="75" y="63" width={b*20} height="28" fill="#a78bfa" />
+        </svg></div>;
+    }
+    case 'unit-length': {
+      const { count } = manipulative;
+      return <div className="manipulative-container"><div className="manipulative-label">Measure using equal units</div>
+        <svg viewBox={`0 0 ${count*30+10} 85`} role="img" aria-label={`Ribbon aligned with ${count} adjacent equal one-centimeter blocks`} style={{ width:'100%', maxWidth: 480 }}>
+          <rect x="5" y="5" width={count*30} height="20" fill="#a78bfa" />
+          {Array.from({length:count}, (_, i) => <g key={i}><rect x={5+i*30} y="35" width="30" height="26" fill="#60a5fa" stroke="#1e3a8a" /><text x={20+i*30} y="51" textAnchor="middle" fontSize="9">1 cm</text></g>)}
+        </svg><p>Equal units, no gaps, no overlaps.</p></div>;
+    }
+    case 'fraction-number-line': {
+      const { numerator, denominator } = manipulative;
+      return <div className="manipulative-container"><div className="manipulative-label">Fraction number line</div>
+        <svg viewBox="0 0 440 100" role="img" aria-label={`Line from zero to one with ${denominator} equal intervals; marked point is ${numerator} intervals from zero`} style={{ width:'100%', maxWidth:520 }}>
+          <line x1="30" y1="45" x2="410" y2="45" stroke="currentColor" strokeWidth="3" />
+          {Array.from({length:denominator+1},(_,i)=><line key={i} x1={30+380*i/denominator} x2={30+380*i/denominator} y1="37" y2="53" stroke="currentColor" />)}
+          <circle cx={30+380*numerator/denominator} cy="45" r="7" fill="#f59e0b" />
+          <text x="30" y="79" fill="currentColor" textAnchor="middle">0</text><text x="410" y="79" fill="currentColor" textAnchor="middle">1</text>
+        </svg></div>;
+    }
     case 'ten-frame': {
       const { count = 0, groups = null, removeCount = 0 } = manipulative;
       const dots = Array.from({ length: 10 }, (_, i) => i < count);
@@ -297,7 +338,7 @@ export default function VisualManipulative({ manipulative }) {
             </div>
             <div style={{ display: 'flex', width: '100%', height: '42px', border: '2px solid #4f46e5', borderRadius: '6px', overflow: 'hidden' }}>
               {parts.map((p, idx) => {
-                const widthPct = Math.max(18, Math.round((p / sumParts) * 100));
+                const widthPct = (p / sumParts) * 100;
                 const isUnknown = idx === unknownPartIndex;
                 const colors = ['rgba(99, 102, 241, 0.18)', 'rgba(16, 185, 129, 0.18)', 'rgba(245, 158, 11, 0.18)', 'rgba(14, 165, 233, 0.18)'];
                 return (
@@ -305,6 +346,8 @@ export default function VisualManipulative({ manipulative }) {
                     key={idx}
                     style={{
                       width: `${widthPct}%`,
+                      flexShrink: 0,
+                      boxSizing: 'border-box',
                       background: colors[idx % colors.length],
                       borderRight: idx < parts.length - 1 ? '2px solid #4f46e5' : 'none',
                       display: 'flex',
