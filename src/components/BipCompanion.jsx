@@ -32,6 +32,7 @@ export default function BipCompanion({
       : false
   );
   const [manualEvent, setManualEvent] = useState(null);
+  const [manualTrigger, setManualTrigger] = useState(0);
   const [settled, setSettled] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -48,35 +49,57 @@ export default function BipCompanion({
 
   const activeKey = manualEvent || (settled ? 'idle' : BIP_CLIPS[event] ? event : 'idle');
   const [path, loop, defaultLabel] = BIP_CLIPS[activeKey] || BIP_CLIPS.idle;
+  const fullSrc = `${baseUrl}/${path}`;
 
   useEffect(() => {
     const element = videoRef.current;
     if (!element) return;
+
+    // Safely restart or play the clip
     try {
-      element.currentTime = 0;
-      if (paused) {
-        element.pause();
-      } else {
-        const playPromise = element.play();
-        if (playPromise && typeof playPromise.catch === 'function') {
-          playPromise.catch(() => {});
-        }
+      if (element.readyState >= 1) {
+        element.currentTime = 0;
       }
     } catch {
-      // Ignore playback errors in headless/test environments
+      // Ignore if metadata is still loading; video starts at 0 by default
     }
-  }, [path, eventKey, paused, manualEvent]);
+
+    if (paused) {
+      element.pause();
+    } else {
+      const playPromise = element.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+  }, [fullSrc, eventKey, paused, manualTrigger]);
+
+  const handleVideoLoadedData = () => {
+    const element = videoRef.current;
+    if (!element) return;
+    setFailed(false);
+    if (paused) {
+      element.pause();
+    } else {
+      const playPromise = element.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+  };
 
   const namePrefix = studentName?.trim() ? `${studentName.trim()}, ` : '';
   let statusText = customMessage || defaultLabel;
 
-  if (!customMessage && !manualEvent) {
-    if (activeKey === 'correct') {
+  if (!customMessage) {
+    if (manualEvent === 'correct') {
+      statusText = `Hi ${studentName?.trim() || 'friend'}! Let’s have fun with math today!`;
+    } else if (!manualEvent && activeKey === 'correct') {
       statusText =
         streak >= 3
           ? `Well done, ${studentName?.trim() || 'math explorer'}! ${streak} in a row!`
           : `Well done${studentName?.trim() ? `, ${studentName.trim()}` : ''}! You solved it!`;
-    } else if (activeKey === 'tryAgain') {
+    } else if (!manualEvent && activeKey === 'tryAgain') {
       statusText = `Gentle retry: ${namePrefix}let’s look at the steps together—you can do this!`;
     }
   }
@@ -89,14 +112,15 @@ export default function BipCompanion({
       <div className="bip-video-frame">
         <video
           ref={videoRef}
-          src={`${baseUrl}/${path}`}
-          poster={`${baseUrl}/poster.jpg`}
+          src={fullSrc}
           muted
           playsInline
+          autoPlay={!paused}
           loop={loop}
-          preload="metadata"
+          preload="auto"
           aria-hidden="true"
           className="bip-video-element"
+          onLoadedData={handleVideoLoadedData}
           onError={() => setFailed(true)}
           onEnded={() => {
             if (!loop) {
@@ -107,14 +131,15 @@ export default function BipCompanion({
           }}
         />
         <span className="bip-status-badge">
-          🤖 Bip • {activeKey === 'correct' ? 'Celebrating' : activeKey === 'tryAgain' ? 'Encouraging' : activeKey === 'thinking' ? 'Thinking' : activeKey === 'rest' ? 'Resting' : activeKey === 'saving' ? 'Saving' : 'Ready'}
+          🤖 Bip • {activeKey === 'correct' ? (manualEvent ? 'Waving' : 'Celebrating') : activeKey === 'tryAgain' ? 'Encouraging' : activeKey === 'thinking' ? 'Thinking' : activeKey === 'rest' ? 'Resting' : activeKey === 'saving' ? 'Saving' : 'Ready'}
         </span>
       </div>
 
       <div className="bip-companion-body">
         <div className="bip-message-area">
           <div className="bip-companion-title">
-            <strong>Bip</strong> <span className="bip-sub-badge">Ivory & Brass Math Companion</span>
+            <strong>Bip</strong>
+            <span className="bip-sub-badge">Ivory & Brass Companion</span>
           </div>
           <p role="status" aria-live="polite" className="bip-status-text">
             {failed ? 'Bip is taking a quick break. You can keep playing!' : statusText}
@@ -128,7 +153,7 @@ export default function BipCompanion({
               className="bip-ctrl-btn"
               onClick={() => setPaused((v) => !v)}
             >
-              {paused ? '▶️ Play animation' : '⏸️ Pause animation'}
+              {paused ? '▶️ Play' : '⏸️ Pause'}
             </button>
 
             <button
@@ -138,10 +163,25 @@ export default function BipCompanion({
                 setPaused(false);
                 setSettled(false);
                 setManualEvent('correct');
+                setManualTrigger((c) => c + 1);
               }}
               title="Ask Bip to wave hello"
             >
               👋 Wave Hello
+            </button>
+
+            <button
+              type="button"
+              className={`bip-ctrl-btn ${manualEvent === 'thinking' ? 'active' : ''}`}
+              onClick={() => {
+                setPaused(false);
+                setSettled(false);
+                setManualEvent((prev) => (prev === 'thinking' ? null : 'thinking'));
+                setManualTrigger((c) => c + 1);
+              }}
+              title="See Bip thinking"
+            >
+              🤔 Think
             </button>
 
             <button
@@ -151,10 +191,11 @@ export default function BipCompanion({
                 setPaused(false);
                 setSettled(false);
                 setManualEvent((prev) => (prev === 'rest' ? null : 'rest'));
+                setManualTrigger((c) => c + 1);
               }}
               title="Let Bip rest"
             >
-              😴 {manualEvent === 'rest' ? 'Wake Bip' : 'Rest'}
+              😴 {manualEvent === 'rest' ? 'Wake' : 'Rest'}
             </button>
           </div>
         )}

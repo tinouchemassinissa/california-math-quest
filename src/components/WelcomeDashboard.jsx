@@ -64,51 +64,51 @@ export default function WelcomeDashboard({
 
       {/* Zero-Scroll 2-Column Bento Setup Card */}
       <form className="welcome-bento-grid" onSubmit={handleFormSubmit}>
-        {/* Left Bento Panel: Name + School + Bip Robot Companion + Grade Tiles */}
+        {/* Left Bento Panel: Name & School Row + Full-Width Bip Companion Bar + Grade Tiles */}
         <div className="welcome-bento-panel">
-          <div className="welcome-profile-split">
-            <div className="welcome-step-block">
-              <label htmlFor="kid-name-input" className="welcome-step-title">
-                <span className="step-num-circle">1</span> Scholar Name & School
-              </label>
-              <div className="kid-name-school-stack">
-                <input
-                  id="kid-name-input"
-                  type="text"
-                  className="kid-name-input"
-                  placeholder="Type your name (e.g., Leo, Maya)..."
-                  value={studentName}
-                  onChange={(e) => onStudentNameChange(e.target.value)}
-                  maxLength={24}
-                />
-                {onSelectLeague && (
-                  <select
-                    aria-label="Choose your Cambrian School or California Team"
-                    className="kid-school-select"
-                    value={leagueId}
-                    onChange={(e) => onSelectLeague(e.target.value)}
-                  >
-                    {PROGRAM_INFO.leagues.map((l) => (
-                      <option key={l.id} value={l.id}>
-                        {l.badge} {l.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </div>
-
-            <div className="welcome-step-block">
-              <div className="welcome-step-title">
-                <span className="step-num-circle">2</span> Meet Bip, Your Companion
-              </div>
-              <BipCompanion
-                event="idle"
-                studentName={studentName}
-                compact
-                showControls
+          {/* Step 1: Compact Side-by-Side Name & School Row */}
+          <div className="welcome-step-block">
+            <label htmlFor="kid-name-input" className="welcome-step-title">
+              <span className="step-num-circle">1</span> Scholar Name & School
+            </label>
+            <div className="kid-name-school-row">
+              <input
+                id="kid-name-input"
+                type="text"
+                className="kid-name-input"
+                placeholder="Type your name (e.g., Leo, Maya)..."
+                value={studentName}
+                onChange={(e) => onStudentNameChange(e.target.value)}
+                maxLength={24}
               />
+              {onSelectLeague && (
+                <select
+                  aria-label="Choose your Cambrian School or California Team"
+                  className="kid-school-select"
+                  value={leagueId}
+                  onChange={(e) => onSelectLeague(e.target.value)}
+                >
+                  {PROGRAM_INFO.leagues.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.badge} {l.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
+          </div>
+
+          {/* Step 2: Full-Width Horizontal Bip Companion Card */}
+          <div className="welcome-step-block">
+            <div className="welcome-step-title">
+              <span className="step-num-circle">2</span> Meet Bip, Your Companion
+            </div>
+            <BipCompanion
+              event="idle"
+              studentName={studentName}
+              compact
+              showControls
+            />
           </div>
 
           {/* Step 3: 6 Big Animated Grade Tiles (K - 5) */}
