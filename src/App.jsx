@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header.jsx';
-import ModeSelector, { GAME_MODES } from './components/ModeSelector.jsx';
+import { GAME_MODES } from './components/ModeSelector.jsx';
+import WelcomeDashboard from './components/WelcomeDashboard.jsx';
 import QuestionCard from './components/QuestionCard.jsx';
 import ClassroomModal from './components/ClassroomModal.jsx';
 import CurriculumBrowser from './components/CurriculumBrowser.jsx';
@@ -8,7 +9,6 @@ import HelpGuide from './components/HelpGuide.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
 import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
 import AchievementsModal from './components/AchievementsModal.jsx';
-import MathTamagotchi from './components/MathTamagotchi.jsx';
 import { STANDARDS } from './data/californiaCurriculum.js';
 import {
   createInitialProfile,
@@ -39,6 +39,8 @@ const STORAGE_KEYS = {
   MUSIC: 'california_math_music_v3',
   SESSION: 'california_math_session_v3',
   RECORDS: 'california_math_records_v3',
+  STUDENT_NAME: 'california_math_student_name_v3',
+  PET_ID: 'california_math_pet_id_v3',
 };
 
 function isAnswerEquivalent(given, correct) {
@@ -68,6 +70,9 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [studentName, setStudentName] = useState(() => localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || '');
+  const [petId, setPetId] = useState(() => localStorage.getItem(STORAGE_KEYS.PET_ID) || 'server-bot');
   const [grade, setGrade] = useState('3');
   const [focusedStandard, setFocusedStandard] = useState(null);
   const [leagueId, setLeagueId] = useState('golden-bears');
@@ -86,6 +91,7 @@ export default function App() {
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
   const timerRef = useRef(null);
+  const autoNextTimerRef = useRef(null);
 
   const [classroomOpen, setClassroomOpen] = useState(false);
   const [curriculumOpen, setCurriculumOpen] = useState(false);
@@ -156,6 +162,14 @@ export default function App() {
   }, [soundEnabled]);
 
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.STUDENT_NAME, studentName);
+  }, [studentName]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.PET_ID, petId);
+  }, [petId]);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.MUSIC, String(musicEnabled));
     if (musicEnabled) {
       startFocusMusic(0.2);
@@ -166,6 +180,10 @@ export default function App() {
 
   const nextQuestion = useCallback(
     async (customStandard = null, resetSprintClock = false) => {
+      if (autoNextTimerRef.current) {
+        clearTimeout(autoNextTimerRef.current);
+        autoNextTimerRef.current = null;
+      }
       setFeedback(null);
       let targetStandard = customStandard || focusedStandard;
 
@@ -213,7 +231,7 @@ export default function App() {
     nextQuestion(focusedStandard, mode === 'speed-sprint');
   }, [grade, focusedStandard, mode, difficulty]);
 
-  const isTimerActive = mode === 'speed-sprint' || timedPractice;
+  const isTimerActive = !showWelcome && (mode === 'speed-sprint' || timedPractice);
 
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion || !isTimerActive) return;
@@ -297,7 +315,7 @@ export default function App() {
     if (classSession) {
       setClassSession((prev) =>
         recordClassroomAttempt(prev, {
-          studentName: prev.activeStudent,
+          studentName: studentName.trim() || prev.activeStudent,
           grade,
           standard: currentQuestion.standard,
           prompt: currentQuestion.prompt,
@@ -311,21 +329,20 @@ export default function App() {
     }
 
     if (isGameOver) {
-      setTimeout(() => {
+      autoNextTimerRef.current = setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
-      }, 1500);
+      }, 1800);
     } else if (isCorrect || mode === 'speed-sprint') {
-      setTimeout(() => {
+      autoNextTimerRef.current = setTimeout(() => {
         nextQuestion(focusedStandard, false);
-      }, mode === 'speed-sprint' ? 650 : 1650);
+      }, mode === 'speed-sprint' ? 750 : 2400);
     }
-    // Note: On incorrect answers in normal learning modes, we pause so the child can read/listen to the step-by-step explanation and click "Got It! Next Question ➔"
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (feedback || !currentQuestion?.options || summaryOpen) return;
+      if (showWelcome || feedback || !currentQuestion?.options || summaryOpen) return;
       if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
       const key = e.key;
       if (['1', '2', '3', '4'].includes(key)) {
@@ -337,7 +354,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentQuestion, feedback, summaryOpen]);
+  }, [showWelcome, currentQuestion, feedback, summaryOpen]);
 
   const handleStartClassSession = ({ leaderName, groupName, leagueId }) => {
     const newSession = createClassSession({
@@ -367,95 +384,103 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Subtle Animated Floating Math Symbols in Background */}
-      <div className="ambient-math-bg" aria-hidden="true">
-        <span className="float-sym sym-1">＋</span>
-        <span className="float-sym sym-2">×</span>
-        <span className="float-sym sym-3">÷</span>
-        <span className="float-sym sym-4">⭐</span>
-        <span className="float-sym sym-5">½</span>
-        <span className="float-sym sym-6">△</span>
-      </div>
-
-      <Header
-        grade={grade}
-        onGradeChange={(g) => {
-          setGrade(g);
-          setFocusedStandard(null);
-        }}
-        leagueId={leagueId}
-        onLeagueChange={setLeagueId}
-        difficulty={difficulty}
-        onDifficultyChange={(d) => {
-          setDifficulty(d);
-          setLives(DIFFICULTY_PRESETS[d]?.lives || 3);
-        }}
-        score={score}
-        streak={streak}
-        lives={lives}
-        maxLives={diffInfo.lives}
-        soundEnabled={soundEnabled}
-        onToggleSound={() => setSoundEnabled((v) => !v)}
-        musicEnabled={musicEnabled}
-        onToggleMusic={() => setMusicEnabled((v) => !v)}
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
-        timedPractice={timedPractice}
-        onToggleTimedPractice={() => setTimedPractice((v) => !v)}
-        onOpenClassroom={() => setClassroomOpen(true)}
-        onOpenCurriculum={() => setCurriculumOpen(true)}
-        onOpenHelp={() => setHelpOpen(true)}
-        onOpenVault={() => setVaultOpen(true)}
-        onOpenAchievements={() => setAchievementsOpen(true)}
-        activeClassSession={classSession}
-      />
-
-      <ModeSelector
-        currentMode={mode}
-        onSelectMode={(m) => {
-          setMode(m);
-        }}
-        mistakeCount={mistakeStandards.length}
-      />
-
-      {focusedStandard && (
-        <div className="focused-standard-banner">
-          <span>
-            🎯 Practicing Standard <strong>{focusedStandard}</strong> ({STANDARDS[focusedStandard]?.title})
-          </span>
-          <button
-            type="button"
-            className="clear-focus-btn"
-            onClick={() => setFocusedStandard(null)}
-          >
-            × Show All Grade {grade} Topics
-          </button>
-        </div>
-      )}
-
-      <main className="main-game-layout">
-        <MathTamagotchi
-          feedback={feedback}
-          streak={streak}
-          correctCount={roundStats.correct}
+      {showWelcome ? (
+        <WelcomeDashboard
+          studentName={studentName}
+          onStudentNameChange={setStudentName}
           grade={grade}
-          soundEnabled={soundEnabled}
+          onSelectGrade={(g) => {
+            setGrade(g);
+            setFocusedStandard(null);
+          }}
+          mode={mode}
+          onSelectMode={setMode}
+          petId={petId}
+          onSelectPet={setPetId}
+          mistakeCount={mistakeStandards.length}
+          onStartGame={() => {
+            setShowWelcome(false);
+            if (mode === 'speed-sprint') {
+              setTimeLeft(60);
+            }
+            nextQuestion(focusedStandard, mode === 'speed-sprint');
+          }}
+          onOpenCurriculum={() => setCurriculumOpen(true)}
+          onOpenAchievements={() => setAchievementsOpen(true)}
+          onOpenClassroom={() => setClassroomOpen(true)}
+          onOpenVault={() => setVaultOpen(true)}
         />
+      ) : (
+        <>
+          <Header
+            studentName={studentName}
+            grade={grade}
+            mode={mode}
+            onGoHome={() => {
+              if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
+              setFeedback(null);
+              setShowWelcome(true);
+            }}
+            difficulty={difficulty}
+            onDifficultyChange={(d) => {
+              setDifficulty(d);
+              setLives(DIFFICULTY_PRESETS[d]?.lives || 3);
+            }}
+            score={score}
+            streak={streak}
+            lives={lives}
+            maxLives={diffInfo.lives}
+            soundEnabled={soundEnabled}
+            onToggleSound={() => setSoundEnabled((v) => !v)}
+            musicEnabled={musicEnabled}
+            onToggleMusic={() => setMusicEnabled((v) => !v)}
+            theme={theme}
+            onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+            timedPractice={timedPractice}
+            onToggleTimedPractice={() => setTimedPractice((v) => !v)}
+            onOpenClassroom={() => setClassroomOpen(true)}
+            onOpenCurriculum={() => setCurriculumOpen(true)}
+            onOpenHelp={() => setHelpOpen(true)}
+            onOpenVault={() => setVaultOpen(true)}
+            onOpenAchievements={() => setAchievementsOpen(true)}
+            activeClassSession={classSession}
+          />
 
-        <QuestionCard
-          key={currentQuestion?.id || currentQuestion?.prompt || 'q'}
-          question={currentQuestion}
-          onAnswer={handleAnswer}
-          onSkip={() => nextQuestion(focusedStandard, false)}
-          onNextAfterIncorrect={() => nextQuestion(focusedStandard, false)}
-          timeLeft={timeLeft}
-          totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
-          feedback={feedback}
-          showHints={diffInfo.showHints}
-          streak={streak}
-          correctCount={roundStats.correct}
-        />
-      </main>
+          {focusedStandard && (
+            <div className="focused-standard-banner">
+              <span>
+                🎯 Practicing Standard <strong>{focusedStandard}</strong> ({STANDARDS[focusedStandard]?.title})
+              </span>
+              <button
+                type="button"
+                className="clear-focus-btn"
+                onClick={() => setFocusedStandard(null)}
+              >
+                × Show All Grade {grade} Topics
+              </button>
+            </div>
+          )}
+
+          <main className="main-game-layout">
+            <QuestionCard
+              key={currentQuestion?.id || currentQuestion?.prompt || 'q'}
+              question={currentQuestion}
+              onAnswer={handleAnswer}
+              onSkip={() => nextQuestion(focusedStandard, false)}
+              onNextAfterAnswer={() => nextQuestion(focusedStandard, false)}
+              timeLeft={timeLeft}
+              totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
+              feedback={feedback}
+              showHints={diffInfo.showHints}
+              streak={streak}
+              correctCount={roundStats.correct}
+              soundEnabled={soundEnabled}
+              petId={petId}
+              studentName={studentName}
+            />
+          </main>
+        </>
+      )}
 
       <footer className="app-footer">
         <p>
@@ -483,6 +508,7 @@ export default function App() {
             setGrade(STANDARDS[code].grade);
           }
           setFocusedStandard(code);
+          setShowWelcome(false);
           nextQuestion(code, false);
         }}
       />

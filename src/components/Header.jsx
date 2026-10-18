@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { PROGRAM_INFO, GRADES } from '../data/californiaCurriculum.js';
+import { GRADES } from '../data/californiaCurriculum.js';
+import { GAME_MODES } from './ModeSelector.jsx';
 import { DIFFICULTY_PRESETS } from '../game/learningEngine.js';
 
 export default function Header({
+  studentName,
   grade,
-  onGradeChange,
-  leagueId,
-  onLeagueChange,
+  mode,
+  onGoHome,
   difficulty,
   onDifficultyChange,
   score,
@@ -30,62 +31,39 @@ export default function Header({
 }) {
   const [teacherMenuOpen, setTeacherMenuOpen] = useState(false);
 
-  const currentLeague =
-    PROGRAM_INFO.leagues.find((l) => l.id === leagueId) || PROGRAM_INFO.leagues[0];
-
-  const cycleLeague = () => {
-    const idx = PROGRAM_INFO.leagues.findIndex((l) => l.id === leagueId);
-    const next = PROGRAM_INFO.leagues[(idx + 1) % PROGRAM_INFO.leagues.length];
-    onLeagueChange(next.id);
-  };
+  const gradeInfo = GRADES.find((g) => g.id === grade) || GRADES[3];
+  const modeInfo = GAME_MODES.find((m) => m.id === mode) || GAME_MODES[0];
 
   return (
-    <header className="app-header kid-header">
-      <div className="kid-header-main">
-        {/* Left: Bouncy Mascot + Title */}
-        <div className="brand-group">
+    <header className="app-header slim-play-header">
+      <div className="slim-header-row">
+        {/* Left: Home / Welcome Dashboard Button + Active Player & Grade Pill */}
+        <div className="slim-left-group">
           <button
             type="button"
-            className="school-badge-icon mascot-bounce"
-            style={{ borderColor: currentLeague.color }}
-            onClick={cycleLeague}
-            title={`Click to change mascot! Current: ${currentLeague.name}`}
+            className="home-dashboard-btn"
+            onClick={onGoHome}
+            title="Return to Welcome Dashboard to change Name, Grade, Pet, or Mode"
           >
-            {currentLeague.badge}
+            🏠 <span>Change Grade / Mode</span>
           </button>
-          <div className="brand-titles">
-            <h1 className="district-title">California Math Quest</h1>
-            <div className="district-sub">
-              <span className="mascot-team-pill" onClick={cycleLeague} title="Tap to switch mascot">
-                {currentLeague.name} 🐾
-              </span>
-            </div>
+
+          <div className="player-active-chip">
+            <span className="player-chip-name">
+              👋 {studentName?.trim() || 'Explorer'}
+            </span>
+            <span className="player-chip-sep">•</span>
+            <span className="player-chip-grade">
+              {gradeInfo.icon} {gradeInfo.label}
+            </span>
+            <span className="player-chip-sep">•</span>
+            <span className="player-chip-mode">
+              {modeInfo.icon} {modeInfo.shortTitle || modeInfo.title}
+            </span>
           </div>
         </div>
 
-        {/* Center: Big Kid-Friendly Grade Bubbles (K - 5) */}
-        <div className="kid-grade-picker" role="group" aria-label="Choose your grade">
-          <span className="grade-picker-label">Grade:</span>
-          {GRADES.map((g) => {
-            const isSelected = grade === g.id;
-            return (
-              <button
-                key={g.id}
-                type="button"
-                className={`grade-bubble-btn ${isSelected ? 'active' : ''}`}
-                onClick={() => onGradeChange(g.id)}
-                title={g.subtitle || g.label}
-              >
-                <span className="grade-bubble-icon">{g.icon}</span>
-                <span className="grade-bubble-text">
-                  {g.id === 'K' ? 'K' : `${g.id}`}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right: Playful Animated HUD + Quick Actions */}
+        {/* Right: Clean Live HUD (Hearts, Streak, Stars) + Minimal Icons */}
         <div className="kid-hud-and-actions">
           <div className="game-hud">
             {lives !== null && (
@@ -119,16 +97,16 @@ export default function Header({
               onClick={onOpenAchievements}
               title="My Badges & Trophies"
             >
-              🏆 <span>Badges</span>
+              🏆
             </button>
 
             <button
               type="button"
               className={`kid-teacher-toggle ${teacherMenuOpen ? 'active' : ''}`}
               onClick={() => setTeacherMenuOpen((v) => !v)}
-              title="Open Standards Map, Teacher Tools & Difficulty Options"
+              title="Teacher & Standards Tools"
             >
-              👩‍🏫 <span>Tools</span>
+              👩‍🏫
             </button>
 
             <button
@@ -194,7 +172,6 @@ export default function Header({
               type="button"
               className={`drawer-tool-btn ${timedPractice ? 'active-timer' : ''}`}
               onClick={onToggleTimedPractice}
-              title="Toggle question countdown timer for normal modes"
             >
               {timedPractice ? '⏱️ Timer: ON' : '🧘 Relaxed Mode (No Timer)'}
             </button>
@@ -220,7 +197,7 @@ export default function Header({
                 onOpenClassroom();
               }}
             >
-              👥 {activeClassSession ? `${activeClassSession.groupName} (${activeClassSession.activeStudent})` : 'Study Groups & Excel Export'}
+              👥 {activeClassSession ? `${activeClassSession.groupName} (${activeClassSession.activeStudent})` : 'Study Groups & Excel'}
             </button>
 
             <button

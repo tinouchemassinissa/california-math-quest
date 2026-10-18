@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
 import NumberPad from './NumberPad.jsx';
+import MathTamagotchi from './MathTamagotchi.jsx';
 
 function speakMathText(rawText) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window) || !rawText) return;
@@ -41,13 +42,16 @@ export default function QuestionCard({
   question,
   onAnswer,
   onSkip,
-  onNextAfterIncorrect,
+  onNextAfterAnswer,
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
   showHints,
   streak = 0,
   correctCount = 0,
+  soundEnabled = true,
+  petId = 'server-bot',
+  studentName = '',
 }) {
   const [hintVisible, setHintVisible] = useState(false);
   const [explanationVisible, setExplanationVisible] = useState(false);
@@ -85,7 +89,7 @@ export default function QuestionCard({
 
   return (
     <div className={`question-card kid-question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
-      {/* Animated Celebration Confetti Burst on Correct Answer */}
+      {/* Animated Celebration Confetti Burst ONLY after a Correct Answer */}
       {feedback?.status === 'correct' && (
         <div className="celebration-burst" aria-hidden="true">
           {CELEBRATION_EMOJIS.map((emoji, idx) => (
@@ -96,7 +100,7 @@ export default function QuestionCard({
         </div>
       )}
 
-      {/* Kid-Friendly Top Bar: Skill Title, 5-Star Quest Progress, Timer & Skip */}
+      {/* Clean Top Bar: Skill Title, 5-Star Quest Progress, Timer & Skip */}
       <div className="card-top-row kid-card-top">
         <div className="kid-skill-header">
           <span className="kid-skill-pill">🌟 {question.title}</span>
@@ -111,7 +115,6 @@ export default function QuestionCard({
         </div>
 
         <div className="kid-top-right">
-          {/* 5-Star Mini Milestone Tracker */}
           <div className="quest-stars-mini" title={`${questStarProgress} of 5 stars toward your next milestone!`}>
             {[0, 1, 2, 3, 4].map((i) => (
               <span
@@ -192,7 +195,7 @@ export default function QuestionCard({
         <VisualManipulative manipulative={question.manipulative} />
       )}
 
-      {/* Big Tactile Answer Options or Free-Response Keypad */}
+      {/* Big Beautiful Answer Tiles */}
       <div className="answers-container">
         {hasMultipleChoice && !useKeypad ? (
           <div className="options-grid kid-options-grid">
@@ -255,44 +258,58 @@ export default function QuestionCard({
         )}
       </div>
 
-      {/* Friendly Kid Helper Pills (Hint, Step-by-Step Proof, Keypad Toggle) */}
+      {/* ONLY AFTER ANSWERING: Pop Up the Animated Tamagotchi Celebration Stage! */}
+      {feedback && (
+        <MathTamagotchi
+          feedback={feedback}
+          streak={streak}
+          correctCount={correctCount}
+          soundEnabled={soundEnabled}
+          speciesId={petId}
+          studentName={studentName}
+        />
+      )}
+
+      {/* Friendly Kid Helper Pills & Feedback Banner */}
       <div className="card-footer-row">
-        <div className="helper-buttons-row kid-helpers-row">
-          {showHints && question.hint && (
-            <button
-              type="button"
-              className={`kid-helper-pill hint-pill ${hintVisible ? 'active' : ''}`}
-              onClick={() => {
-                const next = !hintVisible;
-                setHintVisible(next);
-                if (next) speakMathText(question.hint);
-              }}
-            >
-              💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
-            </button>
-          )}
+        {!feedback && (
+          <div className="helper-buttons-row kid-helpers-row">
+            {showHints && question.hint && (
+              <button
+                type="button"
+                className={`kid-helper-pill hint-pill ${hintVisible ? 'active' : ''}`}
+                onClick={() => {
+                  const next = !hintVisible;
+                  setHintVisible(next);
+                  if (next) speakMathText(question.hint);
+                }}
+              >
+                💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
+              </button>
+            )}
 
-          {question.explanation && (
-            <button
-              type="button"
-              className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
-              onClick={() => setExplanationVisible((prev) => !prev)}
-            >
-              📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
-            </button>
-          )}
+            {question.explanation && (
+              <button
+                type="button"
+                className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
+                onClick={() => setExplanationVisible((prev) => !prev)}
+              >
+                📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
+              </button>
+            )}
 
-          {hasMultipleChoice && (
-            <button
-              type="button"
-              className="kid-helper-pill keypad-pill"
-              onClick={() => setUseKeypad((prev) => !prev)}
-              title="Switch between Multiple Choice and Number Pad"
-            >
-              🔢 {useKeypad ? '4 Choices (A-D)' : 'Type Answer'}
-            </button>
-          )}
-        </div>
+            {hasMultipleChoice && (
+              <button
+                type="button"
+                className="kid-helper-pill keypad-pill"
+                onClick={() => setUseKeypad((prev) => !prev)}
+                title="Switch between Multiple Choice and Number Pad"
+              >
+                🔢 {useKeypad ? '4 Choices (A-D)' : 'Type Answer'}
+              </button>
+            )}
+          </div>
+        )}
 
         {hintVisible && question.hint && (
           <div className="hint-callout animated-pop">
@@ -331,28 +348,28 @@ export default function QuestionCard({
 
         {feedback && (
           <div className={`feedback-alert animated-pop ${feedback.status}`}>
-            {feedback.status === 'correct' ? (
-              <div className="feedback-row-content">
+            <div className="feedback-row-content">
+              {feedback.status === 'correct' ? (
                 <span>
-                  🌟 <strong>Awesome Job!</strong> {streak >= 2 ? `${streak} in a row! 🔥` : 'You nailed it!'}
+                  🌟 <strong>Awesome Job{studentName ? `, ${studentName}` : ''}!</strong>{' '}
+                  {streak >= 2 ? `${streak} in a row! 🔥` : '100% Correct!'}
                 </span>
-              </div>
-            ) : (
-              <div className="feedback-row-content">
+              ) : (
                 <span>
-                  🌱 <strong>Good try!</strong> The correct answer is <strong>{String(question.correctAnswer)}</strong>. Check the steps above!
+                  🌱 <strong>Good try{studentName ? `, ${studentName}` : ''}!</strong> The correct answer is{' '}
+                  <strong>{String(question.correctAnswer)}</strong>.
                 </span>
-                {onNextAfterIncorrect && (
-                  <button
-                    type="button"
-                    className="kid-next-btn"
-                    onClick={onNextAfterIncorrect}
-                  >
-                    Got It! Next Question ➔
-                  </button>
-                )}
-              </div>
-            )}
+              )}
+              {onNextAfterAnswer && (
+                <button
+                  type="button"
+                  className="kid-next-btn"
+                  onClick={onNextAfterAnswer}
+                >
+                  Next Question ➔
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
