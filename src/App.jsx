@@ -63,7 +63,7 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEYS.THEME) || 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.SOUND);
-    return saved !== null ? saved === 'true' : true;
+    return saved !== null ? saved === 'true' : false;
   });
   const [musicEnabled, setMusicEnabled] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MUSIC);
@@ -72,7 +72,7 @@ export default function App() {
 
   const [showWelcome, setShowWelcome] = useState(true);
   const [studentName, setStudentName] = useState(() => localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || '');
-  const [petId, setPetId] = useState(() => localStorage.getItem(STORAGE_KEYS.PET_ID) || 'server-bot');
+  const [petId, setPetId] = useState(() => localStorage.getItem(STORAGE_KEYS.PET_ID) || 'bip');
   const [grade, setGrade] = useState('3');
   const [focusedStandard, setFocusedStandard] = useState(null);
   const [leagueId, setLeagueId] = useState('golden-bears');
@@ -88,6 +88,7 @@ export default function App() {
   const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
   const [lives, setLives] = useState(diffInfo.lives);
   const [feedback, setFeedback] = useState(null);
+  const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
   const timerRef = useRef(null);
@@ -279,6 +280,7 @@ export default function App() {
       }
     }
 
+    setAttemptKey((k) => k + 1);
     setFeedback({
       status: isCorrect ? 'correct' : 'incorrect',
       answer: givenAnswer,
@@ -332,11 +334,11 @@ export default function App() {
       autoNextTimerRef.current = setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
-      }, 1800);
+      }, 2200);
     } else if (isCorrect || mode === 'speed-sprint') {
       autoNextTimerRef.current = setTimeout(() => {
         nextQuestion(focusedStandard, false);
-      }, mode === 'speed-sprint' ? 750 : 2400);
+      }, mode === 'speed-sprint' ? 750 : 6200);
     }
   };
 
@@ -397,8 +399,6 @@ export default function App() {
           }}
           mode={mode}
           onSelectMode={setMode}
-          petId={petId}
-          onSelectPet={setPetId}
           mistakeCount={mistakeStandards.length}
           onStartGame={() => {
             setShowWelcome(false);
@@ -473,11 +473,11 @@ export default function App() {
               timeLeft={timeLeft}
               totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
               feedback={feedback}
+              eventKey={attemptKey}
               showHints={diffInfo.showHints}
               streak={streak}
               correctCount={roundStats.correct}
               soundEnabled={soundEnabled}
-              petId={petId}
               studentName={studentName}
             />
           </main>

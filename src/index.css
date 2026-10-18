@@ -3353,6 +3353,292 @@ button, input, select {
   }
 }
 
+/* =========================================================
+   BIP — IVORY & BRASS ROBOT MATH COMPANION (4K60 STUDIO MP4)
+   ========================================================= */
 
+.bip-companion-card {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  align-items: center;
+  gap: 1rem;
+  background: #0a1524;
+  color: #ffffff;
+  border: 2px solid rgba(212, 175, 55, 0.45);
+  border-radius: 22px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 8px 24px rgba(10, 21, 36, 0.45);
+  animation: popIn 0.25s ease-out;
+}
 
+.bip-companion-card.state-correct {
+  border-color: #10b981;
+  box-shadow: 0 8px 26px rgba(16, 185, 129, 0.28);
+}
+
+.bip-companion-card.state-tryAgain {
+  border-color: #fbbf24;
+  box-shadow: 0 8px 24px rgba(251, 191, 36, 0.22);
+}
+
+.bip-companion-card.bip-compact {
+  margin-top: 0;
+  grid-template-columns: 150px 1fr;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 18px;
+}
+
+@media (max-width: 680px) {
+  .bip-companion-card,
+  .bip-companion-card.bip-compact {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bip-video-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #050b14;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+}
+
+.bip-video-element {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.bip-status-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  background: rgba(10, 21, 36, 0.82);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  color: #fde68a;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.48rem;
+  border-radius: 999px;
+}
+
+.bip-companion-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+
+.bip-companion-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: #fef3c7;
+}
+
+.bip-sub-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.bip-status-text {
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.35;
+  margin-top: 0.18rem;
+}
+
+.bip-compact .bip-status-text {
+  font-size: 0.82rem;
+}
+
+.bip-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.bip-ctrl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #e2e8f0;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.26rem 0.62rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bip-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #fde68a;
+  color: #ffffff;
+}
+
+.bip-ctrl-btn.active {
+  background: rgba(251, 191, 36, 0.24);
+  border-color: #fbbf24;
+  color: #fef3c7;
+}
+
+/* =========================================================
+   KID'S ON-SCREEN MATH SCRATCHPAD & DOODLE CANVAS
+   ========================================================= */
+
+.kid-scratchpad-box {
+  margin-bottom: 1rem;
+  background: var(--bg-primary);
+  border: 2px solid rgba(56, 189, 248, 0.45);
+  border-radius: 20px;
+  padding: 0.75rem 0.95rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.scratchpad-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.55rem;
+}
+
+.scratchpad-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.scratchpad-badge {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.scratchpad-sub {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.scratchpad-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.scratchpad-colors {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg-secondary);
+  padding: 0.22rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+}
+
+.color-swatch-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--swatch-color, #38bdf8);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.color-swatch-btn:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch-btn.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--swatch-color, #38bdf8);
+  transform: scale(1.18);
+}
+
+.scratch-tool-btn {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scratch-tool-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: #38bdf8;
+}
+
+.scratch-tool-btn.active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.scratch-tool-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.scratchpad-canvas-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px dashed var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.scratchpad-canvas-wrap.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.scratchpad-canvas {
+  display: block;
+  width: 100%;
+  height: 185px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.scratchpad-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  opacity: 0.65;
+}
 

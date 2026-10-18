@@ -868,9 +868,13 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       const pennies = prng.nextInt(1, 4);
       const total = quarters * 25 + dimes * 10 + nickels * 5 + pennies * 1;
       const distractors = generateDistinctOptions(total, 4, 30, 150, prng).filter((x) => x !== total).slice(0, 3);
+      const qWord = quarters === 1 ? '1 quarter' : `${quarters} quarters`;
+      const dWord = dimes === 1 ? '1 dime' : `${dimes} dimes`;
+      const nWord = nickels === 1 ? '1 nickel' : `${nickels} nickels`;
+      const pWord = pennies === 1 ? '1 penny' : `${pennies} pennies`;
       return {
         ...baseMeta,
-        prompt: `Money Word Problem: Sofia has ${quarters} quarter(s), ${dimes} dime(s), ${nickels} nickel(s), and ${pennies} penny/pennies in her coin pouch. How many cents (¢) does she have in all?`,
+        prompt: `Money Word Problem: Sofia has ${qWord}, ${dWord}, ${nWord}, and ${pWord} in her coin pouch. How many cents (¢) does she have in all?`,
         correctAnswer: `${total}¢`,
         options: prng.shuffle([`${total}¢`, ...distractors.map((v) => `${v}¢`)]),
         manipulative: { type: 'money', coins: { quarters, dimes, nickels, pennies }, totalCents: total },
@@ -1130,9 +1134,9 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     case '3.NF.A.3': {
       const variant = prng.nextInt(1, 3);
       if (variant === 1) {
-        // Same numerator comparison
-        const num = prng.choice([2, 3]);
+        // Same numerator comparison (strictly proper fractions < 1)
         const denSmall = prng.choice([3, 4]);
+        const num = prng.nextInt(1, denSmall - 1);
         const denLarge = prng.choice([6, 8]);
         const greater = `${num}/${denSmall}`;
         return {
@@ -2124,24 +2128,30 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     }
 
     case '5.NF.B.3': {
-      const pairs = [
-        { num: 3, den: 4, item: 'granola bars', group: 'hikers' },
-        { num: 2, den: 5, item: 'liters of fruit smoothie', group: 'athletes' },
-        { num: 4, den: 7, item: 'pounds of trail mix', group: 'campers' },
-        { num: 5, den: 8, item: 'pans of cornbread', group: 'tables' },
+      const themes = [
+        { items: 'granola bars', singleItem: 'granola bar', group: 'hikers', singleGroup: 'hiker' },
+        { items: 'liters of fruit smoothie', singleItem: 'liter of fruit smoothie', group: 'athletes', singleGroup: 'athlete' },
+        { items: 'pounds of trail mix', singleItem: 'pound of trail mix', group: 'campers', singleGroup: 'camper' },
+        { items: 'pans of cornbread', singleItem: 'pan of cornbread', group: 'tables', singleGroup: 'table' },
+        { items: 'boxes of modeling clay', singleItem: 'box of modeling clay', group: 'art tables at Bagby Elementary', singleGroup: 'art table' },
       ];
-      const pick = prng.choice(pairs);
-      const ansStr = `${pick.num}/${pick.den}`;
-      const candidates = [`${pick.den}/${pick.num}`, `1/${pick.den}`, `${pick.num}/${pick.num + pick.den}`];
+      const fracPool = [
+        [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5],
+        [1, 6], [5, 6], [2, 7], [3, 7], [4, 7], [5, 7], [1, 8], [3, 8], [5, 8], [7, 8], [3, 10], [7, 10],
+      ];
+      const pickTheme = prng.choice(themes);
+      const [num, den] = prng.choice(fracPool);
+      const ansStr = `${num}/${den}`;
+      const candidates = [`${den}/${num}`, `1/${den}`, `${num}/${num + den}`];
       const options = generateDistinctStringOptions(ansStr, candidates, ['1/2', '2/3', '3/4', '3/5', '5/8'], 4, prng);
       return {
         ...baseMeta,
-        prompt: `Fractions as Division (a ÷ b = a/b): ${pick.den} ${pick.group} share ${pick.num} ${pick.item} equally. What fraction of a ${pick.item.slice(0, -1)} does each person/table get? (${pick.num} ÷ ${pick.den})`,
+        prompt: `Fractions as Division (a ÷ b = a/b): ${den} ${pickTheme.group} share ${num} ${num === 1 ? pickTheme.singleItem : pickTheme.items} equally. What fraction of a ${pickTheme.singleItem} does each ${pickTheme.singleGroup} get? (${num} ÷ ${den})`,
         correctAnswer: ansStr,
         options,
-        manipulative: { type: 'fraction', numerator: pick.num, denominator: pick.den },
-        explanation: `Dividing ${pick.num} wholes equally among ${pick.den} shares gives ${pick.num} ÷ ${pick.den} = ${ansStr}.`,
-        hint: `The number being shared (${pick.num}) is the numerator, and the number of equal shares (${pick.den}) is the denominator.`,
+        manipulative: { type: 'fraction', numerator: num, denominator: den },
+        explanation: `Dividing ${num} wholes equally among ${den} shares gives ${num} ÷ ${den} = ${ansStr}.`,
+        hint: `The number being shared (${num}) is the numerator, and the number of equal shares (${den}) is the denominator.`,
       };
     }
 

@@ -73,3 +73,23 @@ test('100,000-Question Exhaustive Mathematical, Pedagogical & Kid-Safety Verific
     assert.ok(stdsForGrade.length >= 6, `Grade ${g.id} must have comprehensive standard coverage`);
   }
 });
+
+test('Bip Robot Companion Media Assets & Kid-Safe Event Mapping Check', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const bipDir = path.resolve(process.cwd(), 'public', 'bip');
+
+  assert.ok(fs.existsSync(path.join(bipDir, 'greeting.mp4')), 'public/bip/greeting.mp4 must exist');
+  assert.ok(fs.existsSync(path.join(bipDir, 'events', 'Bip_healthy_4K60.mp4')), 'Bip_healthy_4K60.mp4 must exist');
+  assert.ok(fs.existsSync(path.join(bipDir, 'events', 'Bip_busy_4K60.mp4')), 'Bip_busy_4K60.mp4 must exist');
+  assert.ok(fs.existsSync(path.join(bipDir, 'events', 'Bip_recovery_4K60.mp4')), 'Bip_recovery_4K60.mp4 must exist');
+  assert.ok(fs.existsSync(path.join(bipDir, 'events', 'Bip_sleep_4K60.mp4')), 'Bip_sleep_4K60.mp4 must exist');
+  assert.ok(fs.existsSync(path.join(bipDir, 'events', 'Bip_backup_4K60.mp4')), 'Bip_backup_4K60.mp4 must exist');
+
+  const compCode = fs.readFileSync(path.resolve(process.cwd(), 'src', 'components', 'BipCompanion.jsx'), 'utf8');
+  assert.ok(
+    !compCode.includes("tryAgain: ['events/Bip_critical_4K60.mp4'"),
+    'tryAgain must never use Bip_critical_4K60.mp4 so children are never frightened or shamed'
+  );
+});
+

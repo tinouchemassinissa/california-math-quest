@@ -7,7 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png', 'bip/*.mp4', 'bip/events/*.mp4'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+      },
       manifest: {
         name: 'California Elementary Math Quest',
         short_name: 'CAMathQuest',

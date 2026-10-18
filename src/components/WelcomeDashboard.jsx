@@ -1,6 +1,7 @@
 import React from 'react';
 import { GRADES, PROGRAM_INFO } from '../data/californiaCurriculum.js';
 import { GAME_MODES } from './ModeSelector.jsx';
+import BipCompanion from './BipCompanion.jsx';
 
 const GRADE_TILE_STYLES = {
   K: { gradient: 'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)', shadow: 'rgba(244, 63, 94, 0.35)', tag: 'Counting & Shapes' },
@@ -11,12 +12,6 @@ const GRADE_TILE_STYLES = {
   '5': { gradient: 'linear-gradient(135deg, #8b5cf6 0%, #c026d3 100%)', shadow: 'rgba(192, 38, 211, 0.35)', tag: 'Decimals & Volume' },
 };
 
-export const PET_COMPANIONS = [
-  { id: 'server-bot', name: 'Byte-Bot', icon: '🤖', desc: 'Server Robo-Pet' },
-  { id: 'golden-bear', name: 'Barnaby', icon: '🐻', desc: 'CA Golden Bear' },
-  { id: 'sierra-dragon', name: 'Sparky', icon: '🐉', desc: 'Sierra Dragon' },
-];
-
 export default function WelcomeDashboard({
   studentName,
   onStudentNameChange,
@@ -26,8 +21,6 @@ export default function WelcomeDashboard({
   onSelectGrade,
   mode,
   onSelectMode,
-  petId,
-  onSelectPet,
   mistakeCount = 0,
   onStartGame,
   onOpenCurriculum,
@@ -71,7 +64,7 @@ export default function WelcomeDashboard({
 
       {/* Zero-Scroll 2-Column Bento Setup Card */}
       <form className="welcome-bento-grid" onSubmit={handleFormSubmit}>
-        {/* Left Bento Panel: Name + School + Pet Companion + Grade Tiles */}
+        {/* Left Bento Panel: Name + School + Bip Robot Companion + Grade Tiles */}
         <div className="welcome-bento-panel">
           <div className="welcome-profile-split">
             <div className="welcome-step-block">
@@ -107,25 +100,14 @@ export default function WelcomeDashboard({
 
             <div className="welcome-step-block">
               <div className="welcome-step-title">
-                <span className="step-num-circle">2</span> Celebration Pet
+                <span className="step-num-circle">2</span> Meet Bip, Your Companion
               </div>
-              <div className="welcome-pet-tiles">
-                {PET_COMPANIONS.map((pet) => {
-                  const isSelected = petId === pet.id;
-                  return (
-                    <button
-                      key={pet.id}
-                      type="button"
-                      className={`welcome-pet-tile ${isSelected ? 'selected' : ''}`}
-                      onClick={() => onSelectPet(pet.id)}
-                    >
-                      <span className="pet-tile-emoji">{pet.icon}</span>
-                      <span className="pet-tile-name">{pet.name}</span>
-                      <span className="pet-tile-desc">{pet.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <BipCompanion
+                event="idle"
+                studentName={studentName}
+                compact
+                showControls
+              />
             </div>
           </div>
 
@@ -196,14 +178,14 @@ export default function WelcomeDashboard({
           {/* Giant Animated Launch Button + 100% Verified Kid-Safety Guarantee */}
           <div className="welcome-launch-box">
             <button type="submit" className="welcome-start-btn">
-              🚀 Start {activeGradeLabel} Math Quest!
+              🚀 Start {activeGradeLabel} Math Quest with Bip!
             </button>
             <div className="welcome-safety-guarantee">
               <span>🛡️ 100% Kid-Safe & Ad-Free</span>
               <span>•</span>
               <span>✓ Formally Verified CA & Cambrian District Math</span>
               <span>•</span>
-              <span>🔊 Read-Aloud Ready</span>
+              <span>🔊 Read-Aloud & ✏️ Scratchpad Ready</span>
             </div>
           </div>
         </div>

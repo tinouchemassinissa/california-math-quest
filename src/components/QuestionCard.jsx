@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
 import NumberPad from './NumberPad.jsx';
-import MathTamagotchi from './MathTamagotchi.jsx';
+import BipCompanion from './BipCompanion.jsx';
+import ScratchpadCanvas from './ScratchpadCanvas.jsx';
 
 function speakMathText(rawText) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window) || !rawText) return;
@@ -77,16 +78,19 @@ export default function QuestionCard({
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
+  eventKey = 0,
+  isSaving = false,
   showHints,
   streak = 0,
   correctCount = 0,
-  soundEnabled = true,
-  petId = 'server-bot',
+  soundEnabled = false,
   studentName = '',
 }) {
   const [hintVisible, setHintVisible] = useState(false);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
+  const [scratchpadOpen, setScratchpadOpen] = useState(false);
+  const [bipPeekOpen, setBipPeekOpen] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [useKeypad, setUseKeypad] = useState(false);
 
@@ -95,7 +99,7 @@ export default function QuestionCard({
     setExplanationVisible(false);
     setManualInput('');
 
-    // Auto-read aloud for Kindergarten & 1st Grade early readers when sound is enabled
+    // Auto-read aloud for Kindergarten & 1st Grade early readers when sound is explicitly enabled
     if (
       soundEnabled &&
       question?.prompt &&
@@ -126,6 +130,18 @@ export default function QuestionCard({
   const timerPct = totalTime > 0 ? Math.max(0, (timeLeft / totalTime) * 100) : 100;
   const hasMultipleChoice = Array.isArray(question.options) && question.options.length > 0;
   const questStarProgress = correctCount % 5;
+
+  // Map game state to Bip's official event states (idle, thinking, correct, tryAgain, rest, saving)
+  let bipEvent = 'idle';
+  if (isSaving) {
+    bipEvent = 'saving';
+  } else if (feedback?.status === 'correct') {
+    bipEvent = 'correct';
+  } else if (feedback?.status === 'incorrect') {
+    bipEvent = 'tryAgain';
+  } else if (hintVisible || explanationVisible || scratchpadOpen) {
+    bipEvent = 'thinking';
+  }
 
   return (
     <div className={`question-card kid-question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
@@ -237,6 +253,11 @@ export default function QuestionCard({
         <VisualManipulative manipulative={question.manipulative} />
       )}
 
+      {/* On-Screen Kid's Math Scratchpad & Doodle Canvas */}
+      {scratchpadOpen && (
+        <ScratchpadCanvas questionId={question.id || question.prompt} />
+      )}
+
       {/* Big Beautiful Answer Tiles */}
       <div className="answers-container">
         {hasMultipleChoice && !useKeypad ? (
@@ -300,15 +321,14 @@ export default function QuestionCard({
         )}
       </div>
 
-      {/* ONLY AFTER ANSWERING: Pop Up the Animated Tamagotchi Celebration Stage! */}
-      {feedback && (
-        <MathTamagotchi
-          feedback={feedback}
-          streak={streak}
-          correctCount={correctCount}
-          soundEnabled={soundEnabled}
-          speciesId={petId}
+      {/* Bip Robot Companion: Appears automatically after answering (or when toggled via helper pill) */}
+      {(feedback || bipPeekOpen || isSaving) && (
+        <BipCompanion
+          event={bipEvent}
+          eventKey={eventKey}
           studentName={studentName}
+          streak={streak}
+          showControls
         />
       )}
 
@@ -316,6 +336,15 @@ export default function QuestionCard({
       <div className="card-footer-row">
         {!feedback && (
           <div className="helper-buttons-row kid-helpers-row">
+            <button
+              type="button"
+              className={`kid-helper-pill scratchpad-pill ${scratchpadOpen ? 'active' : ''}`}
+              onClick={() => setScratchpadOpen((prev) => !prev)}
+              title="Open drawing pad to draw number bonds, area models, or column math"
+            >
+              ✏️ {scratchpadOpen ? 'Hide Scratchpad' : 'Draw / Scratchpad'}
+            </button>
+
             {showHints && question.hint && (
               <button
                 type="button"
@@ -350,6 +379,15 @@ export default function QuestionCard({
                 🔢 {useKeypad ? '4 Choices (A-D)' : 'Type Answer'}
               </button>
             )}
+
+            <button
+              type="button"
+              className={`kid-helper-pill bip-pill ${bipPeekOpen ? 'active' : ''}`}
+              onClick={() => setBipPeekOpen((prev) => !prev)}
+              title="Show or hide Bip while working on a question"
+            >
+              🤖 {bipPeekOpen ? 'Hide Bip' : 'Bip Companion'}
+            </button>
           </div>
         )}
 
