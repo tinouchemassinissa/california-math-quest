@@ -10,8 +10,6 @@ export function evaluateArithmetic(input) {
   if (tokens.join('') !== clean.replace(/\s/g, '')) throw new Error('Invalid token');
   let i = 0;
   const atom = () => {
-    if (tokens[i] === '-') { i++; return new Rational(-1).multiply(atom()); }
-    if (tokens[i] === '+') { i++; return atom(); }
     if (tokens[i] === '(') { i++; const v = sum(); if (tokens[i++] !== ')') throw new Error('Missing close'); return v; }
     const t = tokens[i++];
     if (!t || !/^\d+(?:\.\d+)?$/.test(t)) throw new Error('Missing number');
@@ -21,10 +19,15 @@ export function evaluateArithmetic(input) {
   };
   const power = () => {
     let v = atom();
-    if (tokens[i] === '^') { i++; const e = atom(); if(e.d !== 1 || e.n < 0 || e.n > 6) throw new Error('Exponent out of range'); v = new Rational(v.n ** e.n, v.d ** e.n); }
+    if (tokens[i] === '^') { i++; const e = unary(); if(e.d !== 1 || e.n < 0 || e.n > 6) throw new Error('Exponent out of range'); v = new Rational(v.n ** e.n, v.d ** e.n); }
     return v;
   };
-  const product = () => { let v = power(); while (tokens[i] === '*' || tokens[i] === '/') { const op = tokens[i++]; const rhs = power(); v = op === '*' ? v.multiply(rhs) : v.divide(rhs); } return v; };
+  const unary = () => {
+    if (tokens[i] === '-') { i++; return new Rational(-1).multiply(unary()); }
+    if (tokens[i] === '+') { i++; return unary(); }
+    return power();
+  };
+  const product = () => { let v = unary(); while (tokens[i] === '*' || tokens[i] === '/') { const op = tokens[i++]; const rhs = unary(); v = op === '*' ? v.multiply(rhs) : v.divide(rhs); } return v; };
   const sum = () => { let v = product(); while (tokens[i] === '+' || tokens[i] === '-') { const op = tokens[i++]; const rhs = product(); v = op === '+' ? v.add(rhs) : v.subtract(rhs); } return v; };
   const value = sum();
   if (i !== tokens.length || !Number.isSafeInteger(value.n) || !Number.isSafeInteger(value.d)) throw new Error('Invalid or oversized expression');
@@ -44,6 +47,7 @@ export function canonicalAnswer(value) {
   return q ? `${q.value.toString()}|${q.unit}` : String(value).trim().toLowerCase();
 }
 export function isAnswerEquivalent(given, correct, { allowBareUnits = true } = {}) {
+  if (given == null || correct == null || String(given).trim() === '' || String(correct).trim() === '') return false;
   if (String(given ?? '').trim().toLowerCase() === String(correct ?? '').trim().toLowerCase()) return true;
   const g = parseQuantity(given); const c = parseQuantity(correct);
   if (!g || !c || !g.value.equals(c.value)) return false;

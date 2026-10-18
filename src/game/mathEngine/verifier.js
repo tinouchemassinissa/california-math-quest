@@ -1,16 +1,7 @@
 import { STANDARDS } from '../../data/californiaCurriculum.js';
+import { isAnswerEquivalent, parseQuantity } from './answerMath.js';
 import { semanticErrors } from './semanticChecks.js';
-/**
- * Formal Mathematical, Pedagogical, Semantic & Kid-Safety Invariant Verifier
- * Validates that every generated or ingested question satisfies strict constraints:
- * 1. Structural Invariant: Valid object with all required metadata fields.
- * 2. Uniqueness Invariant: Exactly 4 distinct options, and exactly 1 matches correctAnswer.
- * 3. Sanity & Safety Invariant: Zero NaN, Infinity, null, undefined, "[object", or HTML script tags.
- * 4. Elementary K–5 Non-Negativity Invariant: No negative numeric answers or distractors in K–5.
- * 5. Semantic Formula Invariant: Rectangle area (L × W), volume (L × W × H), and explicit arithmetic
- *    prompts must mathematically match correctAnswer.
- * 6. Manipulative Integrity Invariant: Visual manipulative payloads contain valid finite parameters.
- */
+// Bounded structural and mathematical checks; not a prose or child-safety certification.
 
 const FORBIDDEN_TOKENS = ['nan', 'undefined', '[object', '<script', 'infinity'];
 
@@ -43,6 +34,24 @@ export function verifyQuestion(question) {
       return { valid: false, error: msg, errors: [msg] };
     }
   }
+
+  const invalid = (error) => ({ valid:false, error, errors:[error] });
+  for (const field of ['id','grade','standard','title','prompt']) {
+    if (typeof question[field] !== 'string' || !question[field].trim() || question[field].length > 5000) return invalid(`Invalid text field: ${field}`);
+  }
+  for (const field of ['hint','explanation']) {
+    if (question[field] != null && (typeof question[field] !== 'string' || question[field].length > 10000)) return invalid(`Invalid text field: ${field}`);
+  }
+  const scalar = value => (typeof value === 'number' && Number.isFinite(value)) || (typeof value === 'string' && value.trim().length > 0 && value.length <= 500);
+  if (!scalar(question.correctAnswer) || !Array.isArray(question.options) || question.options.length !== 4 || !question.options.every(scalar)) return invalid('Answers must be four nonempty finite scalar choices');
+  for (const answer of [question.correctAnswer,...question.options]) {
+    const quantity = parseQuantity(answer);
+    if (quantity && quantity.value.n < 0) return invalid('Negative quantity is outside this practice bank');
+  }
+  for (let i=0;i<question.options.length;i++) for(let j=i+1;j<question.options.length;j++) {
+    if (isAnswerEquivalent(question.options[i],question.options[j]) || isAnswerEquivalent(question.options[j],question.options[i])) return invalid('Choices are ambiguous under answer checking');
+  }
+  if (question.options.filter(value=>isAnswerEquivalent(value,question.correctAnswer)).length !== 1) return invalid('Exactly one choice must be accepted by answer checking');
 
   if (!STANDARDS[question.standard] || STANDARDS[question.standard].grade !== question.grade) {
     return { valid: false, error: 'Unknown standard or grade mismatch', errors: ['Unknown standard or grade mismatch'] };

@@ -131,6 +131,8 @@ export function generateVerifiedProblem({
   maxVerificationAttempts = 15,
   allowLearnedTemplates = false,
 } = {}) {
+  if (!Number.isInteger(maxVerificationAttempts) || maxVerificationAttempts < 1 || maxVerificationAttempts > 100) throw new RangeError("Verification attempts must be an integer from 1 to 100");
+  if (seed != null && (typeof seed !== "number" || !Number.isFinite(seed))) throw new TypeError("Seed must be finite");
   const actualSeed =
     seed ??
     Math.floor(

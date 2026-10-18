@@ -55,3 +55,14 @@ Reviewed a source inventory of 375 prompt, hint and explanation entries across t
 Added child-controlled clue → picture → worked-step lessons for multiplication/division facts and supported fraction operations. Other skills retain a conceptual hint, existing diagram where available and the existing explanation. Normal correct answers no longer advance automatically; speed sprint remains timed, and opening help pauses it. Supported attempts do not raise independent mastery and are scheduled for another review.
 
 New tests enumerate multiplication operands 0–9 and division groups 1–9 with quotients 0–9, reject mismatched lesson answers, check 2,000 seeded fraction candidates and verify assisted progress handling. These checks cover arithmetic and state logic, not screen rendering, reading level or pedagogical effectiveness.
+
+## Algorithm hardening — follow-up
+
+- Fraction arithmetic uses exact BigInt intermediates, then reduces before returning safe-integer numerator/denominator fields. Noninteger, nonfinite and oversized inputs are rejected instead of silently truncated or rounded. gcd/lcm reject invalid inputs rather than entering a nonterminating loop.
+- Arithmetic parsing applies exponent precedence before unary minus and handles exponent chains from the right. Exponents remain bounded to 0–6; unsupported/oversized expressions fail.
+- Question verification checks field types before semantic parsing, rejects negative parsed quantities and uses the same acceptance rule as the student answer checker to reject ambiguous choices. Empty answers never match. These bounded checks are not a natural-language proof or a security certification.
+- Generation requires a finite seed when supplied and 1–100 integer verification attempts, preventing unbounded retry configurations.
+- The app admits only the latest asynchronous question result and accepts one answer per loaded question. A new load immediately clears the previous question. Using the eliminate-choice helper also marks practice as assisted.
+- Regression checks cover sign/exponent cases, lossy-number boundaries, malformed payloads, equivalent-choice ambiguity, retry limits, duplicate submission and out-of-order load completion. An independent BigInt reference checks 68,000 bounded fraction operations.
+
+Full follow-up validation: 57 Node tests and the production build. UI integration was compiled but not exercised in a browser; teacher, accessibility and device review remain outstanding.

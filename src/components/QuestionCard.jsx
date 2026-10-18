@@ -134,7 +134,8 @@ export default function QuestionCard({
 
   // Let Bip laser-zap 1 wrong multiple-choice distractor so Bip directly helps with the answers!
   const handleBipEliminateOption = () => {
-    if (eliminatedOption || !Array.isArray(question.options)) return;
+    if (eliminatedOption !== null || !Array.isArray(question.options)) return;
+    onGuideOpen?.(true);
     const wrongChoices = question.options.filter(
       (opt) => String(opt).trim().toLowerCase() !== String(question.correctAnswer).trim().toLowerCase()
     );

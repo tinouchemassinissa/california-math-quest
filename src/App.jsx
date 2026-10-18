@@ -1,3 +1,4 @@
+import { createQuestionLifecycle } from './game/questionLifecycle.js';
 import { isAnswerEquivalent } from './game/mathEngine/answerMath.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header.jsx';
@@ -76,6 +77,7 @@ export default function App() {
   const [questionError, setQuestionError] = useState('');
   const [guideOpen, setGuideOpen] = useState(false);
   const helpUsedRef = useRef(false);
+  const questionLifecycleRef = useRef(createQuestionLifecycle());
   const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
@@ -169,6 +171,8 @@ export default function App() {
 
   const nextQuestion = useCallback(
     async (customStandard = null, resetSprintClock = false) => {
+      const requestToken = questionLifecycleRef.current.begin();
+      setCurrentQuestion(null);
       if (autoNextTimerRef.current) {
         clearTimeout(autoNextTimerRef.current);
         autoNextTimerRef.current = null;
@@ -202,11 +206,13 @@ export default function App() {
         mode,
         preferOnline: false,
       }); } catch {
+        if (!questionLifecycleRef.current.isCurrent(requestToken)) return;
         setCurrentQuestion(null);
         setQuestionError('This question could not pass our checks. Please choose another skill or retry.');
         return;
       }
 
+      if (!questionLifecycleRef.current.publish(requestToken)) return;
       setCurrentQuestion(res.question);
       setEngineSource(res.source);
 
@@ -257,7 +263,7 @@ export default function App() {
   };
 
   const handleAnswer = (givenAnswer) => {
-    if (feedback || !currentQuestion) return;
+    if (feedback || !currentQuestion || !questionLifecycleRef.current.claim()) return;
 
     const isCorrect = isAnswerEquivalent(givenAnswer, currentQuestion.correctAnswer);
 
