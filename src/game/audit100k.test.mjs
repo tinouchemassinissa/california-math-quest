@@ -93,3 +93,51 @@ test('Bip Robot Companion Media Assets & Kid-Safe Event Mapping Check', async ()
   );
 });
 
+test('Regression Check: OER Curriculum Supplement & 8x6 Classroom Rug Area Template Verification', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const { learnFromFeed, getLearnedTemplates, synthesizeFromLearnedTemplate, clearVault } = await import(
+    './learning/curriculumVault.js'
+  );
+  const { createPRNG } = await import('./mathEngine/prng.js');
+
+  clearVault();
+  const supplementRaw = fs.readFileSync(
+    path.resolve(process.cwd(), 'public', 'curriculum_supplement.json'),
+    'utf8'
+  );
+  const supplement = JSON.parse(supplementRaw);
+  const stats = learnFromFeed(supplement.items);
+  assert.equal(stats.ingested, supplement.items.length, 'All OER supplement items must be valid and ingested');
+
+  // Verify that a corrupted 8x6 rug question with correctAnswer: 8 is rejected by verifyQuestion
+  const badRugCheck = verifyQuestion({
+    id: 'bad-rug',
+    grade: '3',
+    standard: '3.MD.C.7',
+    title: 'Area of a Rectangle',
+    prompt: 'A classroom rug is 8 feet long and 6 feet wide. What is its area in square feet?',
+    correctAnswer: 8,
+    options: [8, 10, 12, 15],
+  });
+  assert.equal(badRugCheck.valid, false, 'Verifier must reject 8x6 rug area question when correctAnswer is 8');
+
+  // Synthesize 2,000 questions across all learned OER templates and verify 100% mathematical accuracy
+  const templates = getLearnedTemplates();
+  const prng = createPRNG(424242);
+  for (const tmpl of templates) {
+    for (let i = 0; i < 100; i += 1) {
+      const synth = synthesizeFromLearnedTemplate(tmpl, prng);
+      assert.ok(synth, `Template ${tmpl.id} (${tmpl.standard}) must synthesize a valid question`);
+      const v = verifyQuestion(synth);
+      assert.equal(
+        v.valid,
+        true,
+        `Synthesized question from ${tmpl.standard} failed verification: ${v.error} | ${JSON.stringify(synth)}`
+      );
+    }
+  }
+  clearVault();
+});
+
+

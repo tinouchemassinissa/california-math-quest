@@ -241,7 +241,7 @@
       "options": ["28 sq ft", "42 sq ft", "48 sq ft", "56 sq ft"],
       "explanation": "Area of a rectangle = length × width. 8 ft × 6 ft = 48 square feet.",
       "hint": "Multiply the length by the width.",
-      "manipulative": { "type": "interactive-geometry", "mode": "area", "targetWidth": 8, "targetHeight": 6, "unit": "ft" }
+      "manipulative": { "type": "interactive-geometry", "mode": "area", "width": 8, "height": 6, "targetWidth": 8, "targetHeight": 6, "unit": "ft", "showAreaGrid": true }
     },
     {
       "id": "oer-4-OA3-01",
