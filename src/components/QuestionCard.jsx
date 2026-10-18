@@ -1,3 +1,4 @@
+import GuidedLesson from './GuidedLesson.jsx';
 import { buildLessonGuide } from '../game/coachGuide.js';
 import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
@@ -75,6 +76,8 @@ export default function QuestionCard({
   onAnswer,
   onSkip,
   onNextAfterAnswer,
+  onPracticeSimilar,
+  onGuideOpen,
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
@@ -87,6 +90,7 @@ export default function QuestionCard({
   studentName = '',
 }) {
   const [hintVisible, setHintVisible] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const guide = buildLessonGuide(question);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
@@ -98,6 +102,7 @@ export default function QuestionCard({
 
   useEffect(() => {
     setHintVisible(false);
+    setGuideOpen(false);
     setExplanationVisible(false);
     setManualInput('');
     setHoveredOption(null);
@@ -176,7 +181,7 @@ export default function QuestionCard({
             type="button"
             className="standard-info-chip"
             onClick={() => setStandardDetailsOpen((v) => !v)}
-            title="Click to view official California CCSS-M, Cambrian Eureka Math & CAASPP details"
+            title="View the practice skill and source information"
           >
             ℹ️ {question.standard} {standardDetailsOpen ? '▲' : '▼'}
           </button>
@@ -264,6 +269,11 @@ export default function QuestionCard({
       {question.manipulative && (
         <VisualManipulative manipulative={question.manipulative} />
       )}
+
+      <GuidedLesson key={`guide-${question.id}`} question={question} open={guideOpen}
+        onOpen={() => { setGuideOpen(true); onGuideOpen?.(true); }}
+        onClose={() => { setGuideOpen(false); onGuideOpen?.(false); }}
+        onPracticeSimilar={onPracticeSimilar} onSpeak={speakMathText} />
 
       {/* On-Screen Kid's Math Scratchpad & Doodle Canvas */}
       {scratchpadOpen && (
@@ -359,11 +369,13 @@ export default function QuestionCard({
         eliminatedOption={eliminatedOption}
         soundEnabled={soundEnabled}
         onAskHint={() => {
+          setGuideOpen(true); onGuideOpen?.(true);
           setHintVisible(true);
           if (question.hint) speakMathText(guide.firstHint);
         }}
         onEliminateOption={handleBipEliminateOption}
         onSpeakExplanation={() => {
+          setGuideOpen(true); onGuideOpen?.(true);
           setExplanationVisible(true);
           if (question.explanation) speakMathText(question.explanation);
         }}
@@ -390,7 +402,7 @@ export default function QuestionCard({
                 onClick={() => {
                   const next = !hintVisible;
                   setHintVisible(next);
-                  if (next) speakMathText(guide.firstHint);
+                  if (next) { onGuideOpen?.(true); speakMathText(guide.firstHint); }
                 }}
               >
                 💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
@@ -401,7 +413,7 @@ export default function QuestionCard({
               <button
                 type="button"
                 className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
-                onClick={() => setExplanationVisible((prev) => !prev)}
+                onClick={() => { if (!explanationVisible) onGuideOpen?.(true); setExplanationVisible((prev) => !prev); }}
               >
                 📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
               </button>
@@ -457,6 +469,7 @@ export default function QuestionCard({
 
         {feedback && (
           <div className={`feedback-alert animated-pop ${feedback.status}`}>
+            {feedback.assisted && <p>Practiced with help. Try a fresh question on your own to build independent progress.</p>}
             <div className="feedback-row-content">
               {feedback.status === 'correct' ? (
                 <span>

@@ -33,7 +33,7 @@ The elementary sections are printed pages 10–39. The changes below were compar
 
 ## Checks performed
 
-44 Node tests passed after these changes, including:
+49 Node tests passed after these changes, including:
 
 - A deterministic sample of at least 100,000 generated items across all registered skills against implemented invariants, plus existing 20,000- and 30,000-cycle state/generation simulations. These are sampled tests, not exhaustive proofs or browser end-to-end tests.
 - Independent integer calculations for single-digit multiplication/division; prime/multiple predicates; fraction operations; rectangular area/perimeter; prism/composite volume.
@@ -47,3 +47,11 @@ Browser rendering, screen-reader/physical-device testing and actual classroom le
 ## Release interpretation
 
 Passing the checks means the sampled items satisfy the explicitly implemented rules. It does not mean every possible generated question, English explanation or curriculum mapping has been independently proven correct. Visual appearance, language clarity, assessment coverage and pedagogical effectiveness require further review. Use a teacher-reviewed pilot before broad school adoption. The current practice progress score is an app heuristic, not a validated measure of a child's mastery.
+
+## Guided lessons and wording pass
+
+Reviewed a source inventory of 375 prompt, hint and explanation entries across the generator, with additional inspection of story arrays. This is a source-template wording pass, not a claim that every possible rendered sentence or every screen has been independently reviewed. Fixed an odd-number sharing contradiction, missing fraction-story questions, ambiguous unit-fraction division notation, clock wording at zero minutes, same-whole comparison assumptions, singular/plural agreement and conditional rounding language.
+
+Added child-controlled clue → picture → worked-step lessons for multiplication/division facts and supported fraction operations. Other skills retain a conceptual hint, existing diagram where available and the existing explanation. Normal correct answers no longer advance automatically; speed sprint remains timed, and opening help pauses it. Supported attempts do not raise independent mastery and are scheduled for another review.
+
+New tests enumerate multiplication operands 0–9 and division groups 1–9 with quotients 0–9, reject mismatched lesson answers, check 2,000 seeded fraction candidates and verify assisted progress handling. These checks cover arithmetic and state logic, not screen rendering, reading level or pedagogical effectiveness.

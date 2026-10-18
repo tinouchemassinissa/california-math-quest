@@ -229,7 +229,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const next = start + 30;
         return {
           ...baseMeta,
-          prompt: `Skip-counting forward by tens to 100: ${seq.join(', ')}, ❓`,
+          prompt: `Count forward by tens: ${seq.join(', ')}, ❓`,
           correctAnswer: next,
           options: prng.shuffle(generateDistinctOptions(next, 4, 10, 100, prng)),
           explanation: `When counting forward by tens, add 10 to ${seq[seq.length - 1]}: ${seq[seq.length - 1]} + 10 = ${next}.`,
@@ -268,7 +268,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         ...baseMeta,
         prompt:
           count > 5
-            ? `Cardinality & 5-Groups: The top row of the ten-frame has 5 dots and the bottom row has ${count - 5}. How many dots in all?`
+            ? `Count the dots: The top row of the ten-frame has 5 dots and the bottom row has ${count - 5}. How many dots in all?`
             : `How many dots are shown inside the ten-frame below?`,
         correctAnswer: count,
         options: prng.shuffle([count, ...distractors]),
@@ -308,7 +308,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const stories = [
           `In the Bagby Elementary garden, ${a} ladybugs are on a leaf and ${b} more fly over. How many ladybugs are there in all?`,
           `Monterey Bay rangers spotted ${a} sea otters floating in the kelp forest, and ${b} more swam over. How many sea otters are there in all?`,
-          `Maya picked ${a} California golden poppies in the meadow and ${b} more by the trail. How many poppies did she pick altogether?`,
+          `Maya counted ${a} California golden poppies in the meadow and ${b} more by the trail. How many poppies did she count altogether?`,
         ];
         return {
           ...baseMeta,
@@ -316,7 +316,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           correctAnswer: sum,
           options: prng.shuffle([sum, ...distractors]),
           manipulative: { type: 'ten-frame', count: sum, groups: [a, b], total: 10 },
-          explanation: `Put the two parts together (Number Bond ${a} and ${b}): ${a} + ${b} = ${sum}.`,
+          explanation: `Put the two parts together: ${a} + ${b} = ${sum}.`,
           hint: `Start at ${a} and count forward ${b} more.`,
         };
       } else {
@@ -361,18 +361,18 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const distractors = generateDistinctOptions(teen, 4, 11, 19, prng).filter((x) => x !== teen).slice(0, 3);
         return {
           ...baseMeta,
-          prompt: `Teen Numbers as "10 Ones and Some More Ones": 10 ones and ${ones} extra ones compose what number? (10 + ${ones} = ❓)`,
+          prompt: `What number is made from 10 ones and ${ones} more ones? (10 + ${ones} = ❓)`,
           correctAnswer: teen,
           options: prng.shuffle([teen, ...distractors]),
           manipulative: { type: 'double-ten-frame', count: teen, firstFull: 10, secondCount: ones },
-          explanation: `In the "Say Ten" way (Eureka Math), ten-${ones} is 10 + ${ones} = ${teen}.`,
+          explanation: `One full ten-frame shows 10. Add ${ones} more: 10 + ${ones} = ${teen}.`,
           hint: `1 full ten-frame (10) plus ${ones} more ones equals ${teen}.`,
         };
       } else {
         const distractors = generateDistinctOptions(ones, 4, 1, 9, prng).filter((x) => x !== ones).slice(0, 3);
         return {
           ...baseMeta,
-          prompt: `Decompose the teen number ${teen} into 10 ones and some further ones: ${teen} = 10 + ❓`,
+          prompt: `Split ${teen} into 10 ones and some more ones: ${teen} = 10 + ❓`,
           correctAnswer: ones,
           options: prng.shuffle([ones, ...distractors]),
           manipulative: { type: 'double-ten-frame', count: teen, firstFull: 10, secondCount: ones },
@@ -722,7 +722,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const ans = num % 2 === 0 ? 'Even' : 'Odd';
         return {
           ...baseMeta,
-          prompt: `A teacher has ${num} pencils to share equally between 2 students with none left over. Is ${num} an Even or Odd number?`,
+          prompt: `A teacher has ${num} pencils. Pair the pencils, then decide: is ${num} even or odd?`,
           correctAnswer: ans,
           options: ['Even', 'Odd', 'Both', 'Neither'],
           explanation: `${num} divided into pairs ${ans === 'Even' ? 'has 0 left over (Even)' : 'has 1 left over (Odd)'}.`,
@@ -811,7 +811,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           correctAnswer: diff,
           options: prng.shuffle([diff, ...distractors]),
           explanation: `Unbundle 1 ten into 10 ones when needed, then subtract ones and tens: ${top} - ${bottom} = ${diff}.`,
-          hint: `Do not subtract the smaller top ones digit from the bottom ones digit—unbundle a ten first!`,
+          hint: `If the top ones digit is smaller than the bottom ones digit, exchange one ten for ten ones before subtracting.`,
         };
       }
     }
@@ -848,7 +848,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         correctAnswer: timeStr,
         options: prng.shuffle([timeStr, ...distractors]),
         manipulative: { type: 'clock', hour, minute },
-        explanation: `The hour hand is past ${hour}. Skip-counting by 5s from 12 to ${minute / 5} gives ${minute} minutes. Time: ${timeStr}.`,
+        explanation: `The hour hand is ${minute === 0 ? 'at' : 'past'} ${hour}. The minute hand shows ${minute} minutes after the hour. Time: ${timeStr}.`,
         hint: `Each number on the clock face represents 5 minutes.`,
       };
     }
@@ -1098,11 +1098,11 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       const options = generateDistinctFractionOptions(num, den, 4, prng);
       return {
         ...baseMeta,
-        prompt: `Unit Fractions & Equal Parts: A whole fraction strip is partitioned into ${den} equal parts, and ${num} of those parts (each of size 1/${den}) are shaded. What fraction of the whole is shaded?`,
+        prompt: `Unit Fractions & Equal Parts: A whole fraction strip is partitioned into ${den} equal parts, and ${num} ${num === 1 ? 'part is' : 'parts are'} shaded. Each part is 1/${den} of the whole. What fraction of the whole is shaded?`,
         correctAnswer: fracStr,
         options,
         manipulative: { type: 'fraction', numerator: num, denominator: den },
-        explanation: `${num} copies of the unit fraction 1/${den} form the fraction ${fracStr}.`,
+        explanation: `${num} ${num === 1 ? 'copy' : 'copies'} of 1/${den} ${num === 1 ? 'makes' : 'make'} ${fracStr}.`,
         hint: `Numerator (top) = ${num} shaded parts; Denominator (bottom) = ${den} equal parts in the whole.`,
       };
     }
@@ -1114,11 +1114,11 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       const options = generateDistinctFractionOptions(num, den, 4, prng);
       return {
         ...baseMeta,
-        prompt: `Fractions on a Number Line: The interval from 0 to 1 is partitioned into ${den} equal lengths. What fraction is located ${num} intervals to the right of 0?`,
+        prompt: `Fractions on a Number Line: The interval from 0 to 1 is partitioned into ${den} equal lengths. What fraction is located ${num} equal ${num === 1 ? 'interval' : 'intervals'} to the right of 0?`,
         correctAnswer: fracStr,
         options,
         manipulative: { type: 'fraction-number-line', numerator: num, denominator: den },
-        explanation: `Each interval has length 1/${den}. Moving ${num} intervals from 0 reaches ${fracStr}.`,
+        explanation: `Each interval has length 1/${den}. Moving ${num} ${num === 1 ? 'interval' : 'intervals'} from 0 reaches ${fracStr}.`,
         hint: `Count ${num} hops of size 1/${den} starting at 0.`,
       };
     }
@@ -1133,11 +1133,11 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const greater = `${num}/${denSmall}`;
         return {
           ...baseMeta,
-          prompt: `Comparing Fractions with the Same Numerator: Which fraction is GREATER, ${num}/${denSmall} or ${num}/${denLarge}?`,
+          prompt: `Comparing Fractions with the Same Numerator: Both fractions refer to the same-sized whole. Which is greater, ${num}/${denSmall} or ${num}/${denLarge}?`,
           correctAnswer: greater,
           options: prng.shuffle([`${num}/${denSmall}`, `${num}/${denLarge}`, 'They are equal', `${num}/${denSmall + denLarge}`]),
           manipulative: { type: 'fraction', numerator: num, denominator: denSmall },
-          explanation: `Both fractions have ${num} parts, but fourths/thirds are larger parts than sixths/eighths because the whole is cut into fewer pieces. Therefore ${num}/${denSmall} > ${num}/${denLarge}.`,
+          explanation: `Both fractions refer to the same-sized whole and have ${num} parts. A piece of size 1/${denSmall} is larger than a piece of size 1/${denLarge}. Therefore ${num}/${denSmall} > ${num}/${denLarge}.`,
           hint: `When numerators are the same, the fraction with the SMALLER denominator has larger pieces!`,
         };
       } else if (variant === 2) {
@@ -1162,7 +1162,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const n2 = prng.nextInt(5, den - 1);
         return {
           ...baseMeta,
-          prompt: `Comparing Fractions with the Same Denominator: Which fraction is GREATER, ${n1}/${den} or ${n2}/${den}?`,
+          prompt: `Comparing Fractions with the Same Denominator: Both fractions refer to the same-sized whole. Which is greater, ${n1}/${den} or ${n2}/${den}?`,
           correctAnswer: `${n2}/${den}`,
           options: prng.shuffle([`${n1}/${den}`, `${n2}/${den}`, 'They are equal', `1/${den}`]),
           manipulative: { type: 'fraction', numerator: n2, denominator: den },
@@ -1466,7 +1466,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt: `Round ${num.toLocaleString()} to the nearest THOUSAND.`,
         correctAnswer: rounded.toLocaleString(),
         options: prng.shuffle([rounded.toLocaleString(), ...distractors.slice(0, 3).map((v) => v.toLocaleString())]),
-        explanation: `Inspect the hundreds digit of ${num.toLocaleString()}. 5 or greater rounds the thousands place up, giving ${rounded.toLocaleString()}.`,
+        explanation: `The hundreds digit of ${num.toLocaleString()} is ${Math.floor(num / 100) % 10}. ${Math.floor(num / 100) % 10 >= 5 ? "It is at least 5, so round the thousands place up" : "It is less than 5, so keep the thousands digit"} and replace the digits to its right with zeros: ${rounded.toLocaleString()}.`,
         hint: `Check the hundreds digit to decide whether the thousands digit rounds up or stays the same.`,
       };
     }
@@ -1581,7 +1581,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
       const pick = prng.choice(comparisons);
       return {
         ...baseMeta,
-        prompt: `Compare Fractions with Unlike Denominators: Which fraction is GREATER, ${pick.f1} or ${pick.f2}?`,
+        prompt: `Both fractions refer to the same-sized whole. Which fraction is greater, ${pick.f1} or ${pick.f2}?`,
         correctAnswer: pick.greater,
         options: prng.shuffle([pick.f1, pick.f2, 'They are equal', '1/8']),
         explanation: pick.exp,
@@ -1759,7 +1759,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           options: prng.shuffle([`${angle}°`, ...distractors]),
           manipulative: { type: 'protractor', angle },
           explanation: `Since the base ray points to 0° on the right, read up from 0° along the scale to where the green ray crosses: ${angle}° (${kind} angle).`,
-          hint: `Acute angles are < 90°, right angles are 90°, and obtuse angles are > 90°. Don't read the supplementary 180° - θ scale!`,
+          hint: `An acute angle is greater than 0° and less than 90°. A right angle is 90°. An obtuse angle is greater than 90° and less than 180°. Don't read the supplementary 180° - θ scale!`,
         };
       } else {
         // Additive angle measure (4.MD.C.7)
@@ -1807,7 +1807,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
           ans: 'Acute angle',
           options: ['Acute angle', 'Obtuse angle', 'Right angle', 'Straight angle'],
           angle: 60,
-          exp: 'Angles measuring less than a 90° right angle are acute.',
+          exp: 'Angles greater than 0° and less than 90° are acute.',
         },
       ];
       const pick = prng.choice(items);
@@ -1818,7 +1818,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         options: prng.shuffle(pick.options),
         ...(pick.ans.endsWith('angle') ? { manipulative: { type: 'protractor', angle: pick.angle } } : {}),
         explanation: pick.exp,
-        hint: `Inspect the angle on the interactive protractor model.`,
+        hint: `${pick.ans.endsWith('angle') ? 'Compare the two rays with a right angle.' : 'Think about whether the lines meet and what angles they form.'}`,
       };
     }
 
@@ -2041,7 +2041,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
 
         return {
           ...baseMeta,
-          prompt: `Multi-Step Decimal Word Problem: At a California farmers market, Maya bought ${items} punnets of strawberries for $${priceEach.toFixed(2)} each, plus a jar of wildflower honey for $${extraItem.toFixed(2)}. She paid with a $${billPaid} bill. How much change did she receive?`,
+          prompt: `Multi-Step Decimal Word Problem: At a California farmers market, Maya bought ${items} baskets of strawberries for $${priceEach.toFixed(2)} each, plus a jar of wildflower honey for $${extraItem.toFixed(2)}. She paid with a $${billPaid} bill. How much change did she receive?`,
           correctAnswer: `$${changeDue.toFixed(2)}`,
           options,
           explanation: `Strawberries: ${items} × $${priceEach.toFixed(2)} = $${(items * priceEach).toFixed(2)}. Total spent: $${(items * priceEach).toFixed(2)} + $${extraItem.toFixed(2)} = $${totalCost.toFixed(2)}. Change: $${billPaid} - $${totalCost.toFixed(2)} = $${changeDue.toFixed(2)}.`,
@@ -2084,14 +2084,14 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
     case '5.NF.A.1': {
       // Procedural symbolic Rational engine for unlike-denominator addition and subtraction!
       const fracPairs = [
-        { f1: [1, 2], f2: [1, 4], storyAdd: 'Marcus hiked 1/2 mile in Yosemite Valley and then 1/4 mile to the waterfall overlook.' },
-        { f1: [1, 3], f2: [1, 6], storyAdd: 'A sourdough baker in San Francisco used 1/3 bag of flour in the morning and 1/6 bag in the afternoon.' },
-        { f1: [2, 5], f2: [3, 10], storyAdd: 'Elena completed 2/5 of her California marine biology project on Monday and 3/10 on Tuesday.' },
-        { f1: [3, 8], f2: [1, 4], storyAdd: 'A rain gauge in Mendocino collected 3/8 inch of rain before noon and 1/4 inch after noon.' },
-        { f1: [2, 3], f2: [1, 6], storyAdd: 'Leo spent 2/3 of an hour practicing piano and 1/6 of an hour reading.' },
-        { f1: [3, 4], f2: [1, 8], storyAdd: 'A water canteen held 3/4 liter of water, and Sofia added 1/8 liter more.' },
-        { f1: [1, 2], f2: [2, 5], storyAdd: 'A community garden planted 1/2 of a bed with tomatoes and 2/5 with sweet peppers.' },
-        { f1: [1, 3], f2: [1, 4], storyAdd: 'A cyclist rode 1/3 of the Lake Tahoe loop before lunch and 1/4 after lunch.' },
+        { f1: [1, 2], f2: [1, 4], storyAdd: 'Marcus hiked 1/2 mile in Yosemite Valley and then 1/4 mile to the waterfall overlook.', ask: 'How many miles did Marcus hike in total?' },
+        { f1: [1, 3], f2: [1, 6], storyAdd: 'A sourdough baker in San Francisco used 1/3 bag of flour in the morning and 1/6 bag in the afternoon.', ask: 'What fraction of a bag of flour did the baker use in total?' },
+        { f1: [2, 5], f2: [3, 10], storyAdd: 'Elena completed 2/5 of her California marine biology project on Monday and 3/10 on Tuesday.', ask: 'What fraction of the project did Elena complete in total?' },
+        { f1: [3, 8], f2: [1, 4], storyAdd: 'A rain gauge in Mendocino collected 3/8 inch of rain before noon and 1/4 inch after noon.', ask: 'How many inches of rain fell in total?' },
+        { f1: [2, 3], f2: [1, 6], storyAdd: 'Leo spent 2/3 of an hour practicing piano and 1/6 of an hour reading.', ask: 'What fraction of an hour did Leo spend on these activities in total?' },
+        { f1: [3, 4], f2: [1, 8], storyAdd: 'A water canteen held 3/4 liter of water, and Sofia added 1/8 liter more.', ask: 'How many liters of water are now in the canteen?' },
+        { f1: [1, 2], f2: [2, 5], storyAdd: 'A community garden planted 1/2 of a bed with tomatoes and 2/5 with sweet peppers.', ask: 'What fraction of the garden bed was planted in total?' },
+        { f1: [1, 3], f2: [1, 4], storyAdd: 'A cyclist rode 1/3 of the Lake Tahoe loop before lunch and 1/4 after lunch.', ask: 'What fraction of the loop did the cyclist ride in total?' },
       ];
       const pick = prng.choice(fracPairs);
       const r1 = new Rational(pick.f1[0], pick.f1[1]);
@@ -2106,7 +2106,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
 
       const isWord = forceWordProblem || (isAdd && prng.next() < 0.6);
       const prompt = isWord
-        ? `${pick.storyAdd} What fraction did they complete/use in total?`
+        ? `${pick.storyAdd} ${pick.ask}`
         : `${isAdd ? 'Add' : 'Subtract'} fractions with unlike denominators: ${pick.f1[0]}/${pick.f1[1]} ${isAdd ? '+' : '-'} ${pick.f2[0]}/${pick.f2[1]}`;
 
       return {
@@ -2114,8 +2114,8 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         prompt,
         correctAnswer: ansStr,
         options,
-        manipulative: { type: 'fraction', numerator: Math.min(res.n, res.d), denominator: Math.min(res.d, 12) },
-        explanation: `Find a common denominator for ${pick.f1[1]} and ${pick.f2[1]}, rename both fractions, and ${isAdd ? 'add' : 'subtract'} to get ${ansStr}.`,
+        manipulative: { type: 'fraction', numerator: res.n, denominator: res.d },
+        explanation: `Use denominator ${pick.f1[1] * pick.f2[1]}. Rename ${pick.f1[0]}/${pick.f1[1]} as ${pick.f1[0] * pick.f2[1]}/${pick.f1[1] * pick.f2[1]}, and ${pick.f2[0]}/${pick.f2[1]} as ${pick.f2[0] * pick.f1[1]}/${pick.f1[1] * pick.f2[1]}. ${isAdd ? 'Add' : 'Subtract'} the numerators and keep the denominator: ${pick.f1[0] * pick.f2[1]} ${isAdd ? '+' : '-'} ${pick.f2[0] * pick.f1[1]} = ${isAdd ? pick.f1[0] * pick.f2[1] + pick.f2[0] * pick.f1[1] : pick.f1[0] * pick.f2[1] - pick.f2[0] * pick.f1[1]}. Simplify the resulting fraction to ${ansStr}.`,
         hint: `Never ${isAdd ? 'add' : 'subtract'} unlike denominators directly—rename with a common denominator first!`,
       };
     }
@@ -2143,7 +2143,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         correctAnswer: ansStr,
         options,
         manipulative: { type: 'fraction', numerator: num, denominator: den },
-        explanation: `Dividing ${num} wholes equally among ${den} shares gives ${num} ÷ ${den} = ${ansStr}.`,
+        explanation: `Sharing ${num} ${num === 1 ? 'whole' : 'wholes'} equally among ${den} groups gives ${num} ÷ ${den} = ${ansStr}.`,
         hint: `The number being shared (${num}) is the numerator, and the number of equal shares (${den}) is the denominator.`,
       };
     }
@@ -2187,7 +2187,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const distractors = generateDistinctOptions(ans, 4, 4, 45, prng).filter((x) => x !== ans).slice(0, 3);
         return {
           ...baseMeta,
-          prompt: `Dividing a Whole Number by a Unit Fraction: A chef in San Francisco has ${whole} cups of olive oil and pours 1/${den} cup into each dipping bowl. How many bowls can the chef fill? (${whole} ÷ 1/${den})`,
+          prompt: `Dividing a Whole Number by a Unit Fraction: A chef in San Francisco has ${whole} cups of olive oil and pours 1/${den} cup into each dipping bowl. How many bowls can the chef fill? (${whole} ÷ (1/${den}))`,
           correctAnswer: ans,
           options: prng.shuffle([ans, ...distractors]),
           explanation: `Each 1 whole cup contains ${den} servings of size 1/${den}. So ${whole} cups contain ${whole} × ${den} = ${ans} servings.`,
@@ -2200,7 +2200,7 @@ function synthesizeQuestion(standard, prng, { forceWordProblem = false } = {}) {
         const options = generateDistinctStringOptions(ansStr, candidates, ['1/6', '1/8', '1/10', '1/12', '1/15', '1/20'], 4, prng);
         return {
           ...baseMeta,
-          prompt: `Dividing a Unit Fraction by a Whole Number: A relay team of ${whole} runners shares 1/${den} mile of a Big Sur coastal trail equally. What fraction of a mile does each runner run? (1/${den} ÷ ${whole})`,
+          prompt: `Dividing a Unit Fraction by a Whole Number: A relay team of ${whole} runners shares 1/${den} mile of a Big Sur coastal trail equally. What fraction of a mile does each runner run? ((1/${den}) ÷ ${whole})`,
           correctAnswer: ansStr,
           options,
           explanation: `Partitioning 1/${den} of a mile into ${whole} equal parts creates parts of size 1/(${den} × ${whole}) = ${ansStr} mile.`,

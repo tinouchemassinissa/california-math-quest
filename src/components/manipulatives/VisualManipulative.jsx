@@ -5,6 +5,22 @@ export default function VisualManipulative({ manipulative }) {
   if (!manipulative) return null;
 
   switch (manipulative.type) {
+    case 'guided-groups': {
+      const { groups, each } = manipulative;
+      return <div className="manipulative-container" role="img" aria-label={`${groups} equal groups with ${each} objects in each group`}>
+        <div className="manipulative-label">Equal groups</div>
+        {Array.from({length:groups},(_,i)=><div className="guided-group-row" key={i}><span className="guided-group-label">Group {i+1}</span>{each===0?<span>No objects</span>:Array.from({length:each},(_,j)=><span className="guided-dot" aria-hidden="true" key={j}/>)}</div>)}
+      </div>;
+    }
+    case 'guided-fractions': {
+      const { n1,d1,n2,d2,denominator,left,right,operation } = manipulative;
+      return <div className="manipulative-container"><div className="manipulative-label">Same-sized wholes, equal-sized pieces</div>
+        <p>{n1}/{d1} {operation} {n2}/{d2}</p>
+        {[left,right].map((n,row)=><div key={row}><span>Whole {row+1}: {row===0?`${n1}/${d1}`:`${n2}/${d2}`}</span><div className="guided-fraction-bar" role="img" aria-label={`${n} of ${denominator} equal parts shaded in whole ${row+1}`}>
+          {Array.from({length:denominator},(_,i)=><span key={i} className={i<n?(row===0?'part-left':'part-right'):''}/>)}</div></div>)}
+        <p>Each whole is divided into {denominator} equal parts.</p>
+      </div>;
+    }
     case 'shape-outline': {
       const { kind, rotation = 0 } = manipulative;
       const sides = { Triangle: 3, Square: 4, Hexagon: 6 }[kind];

@@ -24,8 +24,18 @@ export const createInitialProfile = (grade = '3', league = 'golden-bears') => ({
   updatedAt: new Date().toISOString(),
 });
 
-export function updateLearnerProfile(profile, standardCode, isCorrect, now = Date.now()) {
+export function updateLearnerProfile(profile, standardCode, isCorrect, now = Date.now(), { assisted = false } = {}) {
   const current = profile.standards[standardCode] || { ...EMPTY_STANDARD_STATS };
+  // Supported practice is valuable, but is not evidence of independent mastery.
+  if (assisted) return {
+    ...profile, totalAttempts: profile.totalAttempts + 1,
+    standards: { ...profile.standards, [standardCode]: {
+      ...current, attempts: current.attempts + 1,
+      assistedAttempts: (current.assistedAttempts || 0) + 1,
+      lastSeen: new Date(now).toISOString(), nextReview: new Date(now + 600000).toISOString(),
+      lastResult: 'assisted',
+    } }, updatedAt: new Date(now).toISOString(),
+  };
   const nextCorrectStreak = isCorrect ? current.correctStreak + 1 : 0;
 
   // Spaced repetition interval curve

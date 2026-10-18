@@ -74,6 +74,8 @@ export default function App() {
   const [lives, setLives] = useState(diffInfo.lives);
   const [feedback, setFeedback] = useState(null);
   const [questionError, setQuestionError] = useState('');
+  const [guideOpen, setGuideOpen] = useState(false);
+  const helpUsedRef = useRef(false);
   const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
@@ -172,6 +174,8 @@ export default function App() {
         autoNextTimerRef.current = null;
       }
       setFeedback(null);
+      setGuideOpen(false);
+      helpUsedRef.current = false;
       let targetStandard = customStandard || focusedStandard;
 
       if (!targetStandard) {
@@ -224,7 +228,7 @@ export default function App() {
     nextQuestion(focusedStandard, mode === 'speed-sprint');
   }, [grade, focusedStandard, mode, difficulty]);
 
-  const isTimerActive = !showWelcome && (mode === 'speed-sprint' || timedPractice);
+  const isTimerActive = !showWelcome && !guideOpen && (mode === 'speed-sprint' || timedPractice);
 
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion || !isTimerActive) return;
@@ -276,6 +280,7 @@ export default function App() {
     setFeedback({
       status: isCorrect ? 'correct' : 'incorrect',
       answer: givenAnswer,
+      assisted: helpUsedRef.current,
     });
 
     const isGameOver = mode !== 'speed-sprint' && !isCorrect && lives <= 1;
@@ -303,7 +308,7 @@ export default function App() {
     }
 
     setLearnerProfile((prev) =>
-      updateLearnerProfile(prev, currentQuestion.standard, isCorrect)
+      updateLearnerProfile(prev, currentQuestion.standard, isCorrect, Date.now(), { assisted: helpUsedRef.current })
     );
 
     if (classSession) {
@@ -322,15 +327,15 @@ export default function App() {
       );
     }
 
-    if (isGameOver) {
+    if (isGameOver && !guideOpen) {
       autoNextTimerRef.current = setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
       }, 2200);
-    } else if (isCorrect || mode === 'speed-sprint') {
+    } else if (mode === 'speed-sprint' && !guideOpen) {
       autoNextTimerRef.current = setTimeout(() => {
         nextQuestion(focusedStandard, false);
-      }, mode === 'speed-sprint' ? 750 : 6200);
+      }, 750);
     }
   };
 
@@ -463,6 +468,12 @@ export default function App() {
               onAnswer={handleAnswer}
               onSkip={() => nextQuestion(focusedStandard, false)}
               onNextAfterAnswer={() => nextQuestion(focusedStandard, false)}
+              onPracticeSimilar={(code) => nextQuestion(code, false)}
+              onGuideOpen={(open) => {
+                setGuideOpen(open);
+                if (open && !feedback) helpUsedRef.current = true;
+                if (open && autoNextTimerRef.current) { clearTimeout(autoNextTimerRef.current); autoNextTimerRef.current = null; }
+              }}
               timeLeft={timeLeft}
               totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
               feedback={feedback}
