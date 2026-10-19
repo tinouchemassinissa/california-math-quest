@@ -48,3 +48,19 @@ the new clips, and action buttons no longer force playback to resume.
 
 Verification details and remaining limits are recorded in
 `docs/PILOT_DEPLOYMENT_STATUS.md` and `public/bip/gestures/validation.json`.
+
+## Articulated v2 profile
+
+`render_school_gestures_v2.py` extends the transform hierarchy with elbow and wrist pivots in a new copy of the scene. It preserves the neutral mesh transforms and the original `.blend`. Gripper fingers remain rigid; no humanoid armature or finger-count teaching is implied.
+
+The profile is square 720×720 at 30 fps: a six-second idle and seven 3.2-second reactions. Subtle iris/pupil offsets produce gaze changes without moving the entire eye lens. Blinks are kept brief even in the longer idle. GPU rendering uses OptiX denoising when available, with CPU fallback.
+
+The app keeps the old frame visible until the next clip loads, then crossfades over 220 ms. Rapid requests discard stale loads. Only the active clip plays. Pause, reduced motion and hidden-tab handling remain supported; no animation audio is added. Both arcade and learning-path stages fit the entire square character rather than crop it into a widescreen box.
+
+Run the full media validation after rendering:
+
+```bash
+python3 tools/blender/validate_gestures.py public/bip/gestures-v2 --output public/bip/gestures-v2/validation.json
+```
+
+It checks each stream, codec, dimensions, frame count, rate, duration and audio absence, then decodes every frame and records SHA-256 digests. Visual review and physical-device performance are separate from these checks.

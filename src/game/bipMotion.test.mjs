@@ -30,7 +30,7 @@ test('reduced motion, wave, feedback replay and video completion respect pause',
   await act(()=>clip('encourage').dispatchEvent(new window.Event('loadeddata')));
   await act(()=>clip('encourage').dispatchEvent(new window.Event('ended',{bubbles:true})));
   await act(()=>clip('/idle').dispatchEvent(new window.Event('loadeddata')));
-  assert.match(document.querySelector('video.is-visible').getAttribute('src'),/gestures\/idle/);assert.equal(document.querySelector('video.is-visible').loop,true);
+  assert.match(document.querySelector('video.is-visible').getAttribute('src'),/gestures-v2\/idle/);assert.equal(document.querySelector('video.is-visible').loop,true);
   await render({feedback:{correct:true}});
   await act(()=>clip('/nod').dispatchEvent(new window.Event('error')));
   assert.ok(clip('healthy'));
@@ -63,6 +63,6 @@ test('arcade gesture buttons respect pause and all events use school renders',as
   await act(()=>document.querySelector('[aria-label="Resume Bip animation"]').click());
   assert.equal(document.querySelector('section').dataset.motion,'playing');
   await act(()=>listener({matches:true}));assert.equal(document.querySelector('section').dataset.motion,'paused');
-  for(const [path] of Object.values(BIP_CLIPS))assert.match(path,/^gestures\//);
+  for(const [path] of Object.values(BIP_CLIPS))assert.match(path,/^gestures-v2\//);
  }finally{await act(()=>root.unmount());dom.window.close();Object.assign(globalThis,previous);}
 });

@@ -7,20 +7,20 @@ import {
   playStreakChime,
 } from '../audio.js';
 
-// Teaching gestures rendered from the original Bip Blender scene, 480px / 24fps.
+// Teaching gestures rendered from the original Bip Blender scene, 720px / 30fps.
 // Deliberately avoids Bip_critical_4K60.mp4 for wrong answers so children are never frightened or shamed.
 export const BIP_CLIPS = {
-  idle: ['gestures/idle.mp4', true, 'Bip is ready to help you solve this question!'],
-  thinking: ['gestures/think.mp4', false, 'Scanning the math numbers step by step...'],
-  correct: ['gestures/nod.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
-  celebrate: ['gestures/celebrate.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
-  fireStreak: ['gestures/celebrate.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
-  starVault: ['gestures/nod.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
-  wave: ['gestures/wave.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
-  tryAgain: ['gestures/encourage.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
-  recovery: ['gestures/nod.mp4', false, 'You bounced right back! Keep going!'],
-  rest: ['gestures/rest.mp4', true, 'Time for a calm little power nap.'],
-  saving: ['gestures/think.mp4', true, 'Saving your math progress safely.'],
+  idle: ['gestures-v2/idle.mp4', true, 'Bip is ready to help you solve this question!'],
+  thinking: ['gestures-v2/think.mp4', false, 'Scanning the math numbers step by step...'],
+  correct: ['gestures-v2/nod.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
+  celebrate: ['gestures-v2/celebrate.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
+  fireStreak: ['gestures-v2/celebrate.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
+  starVault: ['gestures-v2/nod.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
+  wave: ['gestures-v2/wave.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
+  tryAgain: ['gestures-v2/encourage.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
+  recovery: ['gestures-v2/nod.mp4', false, 'You bounced right back! Keep going!'],
+  rest: ['gestures-v2/rest.mp4', true, 'Time for a calm little power nap.'],
+  saving: ['gestures-v2/think.mp4', true, 'Saving your math progress safely.'],
 };
 
 const CELEBRATION_SHOWS = [
