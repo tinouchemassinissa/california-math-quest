@@ -6,7 +6,7 @@ QUESTION={'id':'test-1','grade':'3','standard':'3.OA.C.7','title':'Equal groups'
 class StudioTests(unittest.TestCase):
  def setUp(self):
   self.temp=tempfile.TemporaryDirectory();studio.DATA=Path(self.temp.name);(studio.DATA/'sources').mkdir();studio.connect().close()
-  self.server=studio.ThreadingHTTPServer(('127.0.0.1',0),studio.Handler);self.server.login_token=secrets.token_urlsafe(32);self.server.sessions={};self.server.failures=0;self.server.login_blocked_until=0;self.server.publish_lock=threading.Lock()
+  self.server=studio.ThreadingHTTPServer(('127.0.0.1',0),studio.Handler);self.server.login_token=secrets.token_urlsafe(32);self.server.sessions={};self.server.failures=0;self.server.login_blocked_until=0;self.server.publish_lock=threading.Lock();self.server.auth_lock=threading.Lock()
   self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.port=self.server.server_port
  def tearDown(self):self.server.shutdown();self.server.server_close();self.thread.join();self.temp.cleanup()
  def call(self,path,payload=None,cookie=None,csrf=None,origin=True,host=None):
@@ -19,7 +19,9 @@ class StudioTests(unittest.TestCase):
   if body:headers['Content-Type']='application/json'
   client.request('POST' if body else 'GET',path,body,headers);res=client.getresponse();text=res.read().decode();result=(res.status,json.loads(text),res.getheader('Set-Cookie'));client.close();return result
  def login(self):
-  status,_,cookie=self.call('/api/login',{'token':self.server.login_token});self.assertEqual(status,200);cookie=cookie.split(';')[0]
+  
+  if studio.owner() is None:self.call('/api/setup',{'token':self.server.login_token,'username':'massi','password':'a long private password'})
+  status,_,cookie=self.call('/api/login',{'username':'massi','password':'a long private password'});self.assertEqual(status,200);cookie=cookie.split(';')[0]
   status,data,_=self.call('/api/drafts',cookie=cookie);self.assertEqual(status,200);return cookie,data['csrf']
  def test_auth_host_and_csrf(self):
   self.assertEqual(self.call('/api/drafts')[0],401)
@@ -41,6 +43,35 @@ class StudioTests(unittest.TestCase):
   cookie,csrf=self.login();wrong={**QUESTION,'correctAnswer':13,'options':[7,13,9,16]}
   self.assertEqual(self.call('/api/save',{'question':wrong,'approved':True,'humanReviewed':True},cookie,csrf)[0],400)
   self.assertEqual(self.call('/api/publish',{'confirmed':True},cookie,csrf)[0],400)
+ def test_logout_revokes_session(self):
+  cookie,csrf=self.login()
+  self.assertEqual(self.call('/api/logout',{},cookie)[0],403)
+  self.assertEqual(self.call('/api/logout',{},cookie,csrf)[0],200)
+  self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
+  self.assertEqual(self.call('/api/save',{'question':QUESTION},cookie,csrf)[0],403)
+ def test_setup_recovery_and_no_token_bypass(self):
+  self.assertTrue(self.call('/api/auth-state')[1]['setup_required'])
+  token=self.server.login_token
+  self.assertEqual(self.call('/api/setup',{'token':token,'username':'massi','password':'short'})[0],400)
+  status,data,cookie=self.call('/api/setup',{'token':token,'username':'massi','password':'a long private password'})
+  self.assertEqual(status,200);codes=data['recovery_codes'];self.assertEqual(len(codes),8)
+  self.assertFalse(self.call('/api/auth-state')[1]['setup_required'])
+  self.assertEqual(self.call('/api/setup',{'token':token})[0],409)
+  self.assertEqual(self.call('/api/login',{'token':token})[0],401)
+  self.assertEqual(self.call('/api/login',{'username':'massi','password':'wrong'})[0],401)
+  self.assertEqual(self.call('/api/recover',{'code':'wrong','password':'another private password'})[0],401)
+  status,new,_=self.call('/api/recover',{'code':codes[0],'password':'another private password'})
+  self.assertEqual(status,200)
+  self.assertEqual(self.call('/api/drafts',cookie=cookie.split(';')[0])[0],401)
+  self.assertEqual(self.call('/api/recover',{'code':codes[1],'password':'another private password'})[0],401)
+  self.assertEqual(self.call('/api/login',{'username':'massi','password':'a long private password'})[0],401)
+  self.assertEqual(self.call('/api/login',{'username':'massi','password':'another private password'})[0],200)
+  row=studio.owner();self.assertNotIn('another private password',str(row));self.assertNotIn(new['recovery_codes'][0],str(row))
+ def test_password_change_requires_current_password(self):
+  cookie,csrf=self.login()
+  self.assertEqual(self.call('/api/password',{'currentPassword':'wrong','password':'another private password'},cookie,csrf)[0],400)
+  self.assertEqual(self.call('/api/password',{'currentPassword':'a long private password','password':'another private password'},cookie,csrf)[0],200)
+  self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
  def test_login_throttle(self):
   for _ in range(5):self.assertEqual(self.call('/api/login',{'token':'incorrect'})[0],401)
   self.assertEqual(self.call('/api/login',{'token':self.server.login_token})[0],429)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Private loopback-only draft studio. No public listener, no automatic publishing."""
-import base64, hmac, json, os, secrets, shutil, sqlite3, subprocess, time, threading
+import hashlib, re, base64, hmac, json, os, secrets, shutil, sqlite3, subprocess, time, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -13,7 +13,27 @@ def connect():
     db=sqlite3.connect(DATA/'studio.sqlite3')
     db.execute('CREATE TABLE IF NOT EXISTS drafts (id TEXT PRIMARY KEY, question TEXT NOT NULL, approved INTEGER NOT NULL DEFAULT 0, updated REAL NOT NULL)')
     db.execute('CREATE TABLE IF NOT EXISTS history (draft_id TEXT, question TEXT, approved INTEGER, updated REAL)')
+    db.execute('CREATE TABLE IF NOT EXISTS owner (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL, recovery TEXT NOT NULL)')
+    db.commit()
     return db
+
+def owner():
+    with connect() as db:return db.execute('SELECT username,salt,password_hash,recovery FROM owner WHERE id=1').fetchone()
+
+def password_hash(password,salt):
+    return hashlib.scrypt(password.encode(),salt=bytes.fromhex(salt),n=16384,r=8,p=1).hex()
+
+def validate_credentials(username,password):
+    if not isinstance(username,str) or not re.fullmatch(r'[A-Za-z0-9_.-]{3,40}',username):raise ValueError('Username: 3–40 letters, numbers, dots, hyphens or underscores')
+    if not isinstance(password,str) or not 14<=len(password)<=256:raise ValueError('Use a password or passphrase of 14–256 characters')
+
+def write_owner(db,username,password):
+    validate_credentials(username,password)
+    salt=secrets.token_hex(16)
+    codes=[secrets.token_hex(12) for _ in range(8)]
+    hashes=[hashlib.sha256(c.encode()).hexdigest() for c in codes]
+    db.execute('INSERT OR REPLACE INTO owner VALUES (1,?,?,?,?)',(username,salt,password_hash(password,salt),json.dumps(hashes)))
+    return codes
 
 def check(question):
     image=os.environ.get('BIP_NODE_IMAGE')
@@ -52,7 +72,7 @@ class Handler(BaseHTTPRequestHandler):
         body=(json.dumps(data) if content_type=='application/json' else data).encode()
         self.send_response(status);self.send_header('Content-Type',content_type);self.send_header('Content-Length',str(len(body)))
         self.send_header('Cache-Control','no-store');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer')
-        self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+        self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         if hasattr(self,'new_cookie'):self.send_header('Set-Cookie',f'bip_studio={self.new_cookie}; HttpOnly; SameSite=Strict; Path=/; Max-Age=1800'+('; Secure' if os.environ.get('BIP_STUDIO_ORIGIN','').startswith('https://') else ''))
         self.end_headers();self.wfile.write(body)
     def allowed_origins(self):
@@ -72,8 +92,9 @@ class Handler(BaseHTTPRequestHandler):
             name={'/':'index.html','/studio.js':'studio.js','/studio.css':'studio.css'}[route]
             mime={'/':'text/html; charset=utf-8','/studio.js':'text/javascript','/studio.css':'text/css'}[route]
             return self.respond(200,(ROOT/'admin'/name).read_text(),mime)
+        if route=='/api/auth-state':return self.respond(200,{'setup_required':owner() is None})
         session=self.session()
-        if not session:return self.respond(401,{'error':'Sign in with the private server token'})
+        if not session:return self.respond(401,{'error':'Sign in to your owner account'})
         if route=='/api/drafts':
             with connect() as db:rows=db.execute('SELECT question,approved,updated FROM drafts ORDER BY updated DESC').fetchall()
             return self.respond(200,{'csrf':session['csrf'],'drafts':[{'question':json.loads(q),'approved':bool(a),'updated':t} for q,a,t in rows],'ocr_available':bool(shutil.which('tesseract') or os.environ.get('BIP_OCR_IMAGE')),'source_count':len(list((DATA/'sources').glob('*'))),'source_bytes':sum(p.stat().st_size for p in (DATA/'sources').glob('*') if p.is_file())})
@@ -84,18 +105,53 @@ class Handler(BaseHTTPRequestHandler):
             length=int(self.headers.get('Content-Length','0'))
             if length<=0 or length>LIMIT:return self.respond(413,{'error':'Request too large'})
             payload=json.loads(self.rfile.read(length));route=urlparse(self.path).path
-            if route=='/api/login':
-                if time.time()<self.server.login_blocked_until:return self.respond(429,{'error':'Wait a minute before trying again'})
-                token=payload.get('token','')
-                if not isinstance(token,str) or not hmac.compare_digest(token,self.server.login_token):
-                    self.server.failures+=1
-                    if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
-                    return self.respond(401,{'error':'Invalid token'})
-                self.server.failures=0;self.new_cookie=secrets.token_urlsafe(32)
-                self.server.sessions={self.new_cookie:{'csrf':secrets.token_urlsafe(32),'expires':time.time()+1800}}
-                return self.respond(200,{'ok':True})
+            if route in ['/api/login','/api/setup','/api/recover']:
+                if not isinstance(payload,dict):raise ValueError('Invalid request')
+                with self.server.auth_lock:
+                    if time.time()<self.server.login_blocked_until:return self.respond(429,{'error':'Wait a minute before trying again'})
+                    existing=owner();codes=None;valid=False
+                    if route=='/api/setup':
+                        if existing:return self.respond(409,{'error':'Owner already exists. Sign in instead.'})
+                        token=payload.get('token','')
+                        valid=isinstance(token,str) and bool(self.server.login_token) and hmac.compare_digest(token,self.server.login_token)
+                        if valid:
+                            with connect() as db:codes=write_owner(db,payload.get('username'),payload.get('password'))
+                            self.server.login_token=''
+                            (DATA/'login-token').unlink(missing_ok=True)
+                    elif route=='/api/login' and existing:
+                        password=payload.get('password','');username=payload.get('username','')
+                        if isinstance(password,str) and len(password)<=256 and isinstance(username,str):
+                            matched=hmac.compare_digest(password_hash(password,existing[1]),existing[2])
+                            valid=hmac.compare_digest(username,existing[0]) and matched
+                    elif route=='/api/recover' and existing:
+                        code=payload.get('code','')
+                        digest=hashlib.sha256(code.encode()).hexdigest() if isinstance(code,str) else ''
+                        valid=any(hmac.compare_digest(digest,c) for c in json.loads(existing[3]))
+                        if valid:
+                            with connect() as db:codes=write_owner(db,existing[0],payload.get('password'))
+                    if not valid:
+                        self.server.failures+=1
+                        if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
+                        return self.respond(401,{'error':'Credentials not accepted'})
+                    self.server.failures=0;self.new_cookie=secrets.token_urlsafe(32)
+                    self.server.sessions={self.new_cookie:{'csrf':secrets.token_urlsafe(32),'expires':time.time()+1800}}
+                    return self.respond(200,{'ok':True,'recovery_codes':codes})
             session=self.session()
             if not session or not hmac.compare_digest(self.headers.get('X-CSRF-Token',''),session['csrf']):return self.respond(403,{'error':'Sign in again before changing content'})
+            if route=='/api/logout':
+                self.server.sessions.clear();self.new_cookie=''
+                return self.respond(200,{'ok':True})
+            if route=='/api/password':
+                with self.server.auth_lock:
+                    if time.time()<self.server.login_blocked_until:return self.respond(429,{'error':'Wait a minute before trying again'})
+                    existing=owner();password=payload.get('currentPassword','')
+                    if not existing or not isinstance(password,str) or len(password)>256 or not hmac.compare_digest(password_hash(password,existing[1]),existing[2]):
+                        self.server.failures+=1
+                        if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
+                        raise ValueError('Current password was not accepted')
+                    with connect() as db:codes=write_owner(db,existing[0],payload.get('password'))
+                    self.server.sessions.clear()
+                    return self.respond(200,{'ok':True,'recovery_codes':codes})
             if route=='/api/check':return self.respond(200,check(public_question(payload['question'])))
             if route=='/api/save':
                 approved=payload.get('approved') is True
@@ -138,9 +194,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     os.umask(0o077);DATA.mkdir(parents=True,exist_ok=True);(DATA/'sources').mkdir(exist_ok=True)
-    connect().close();token=secrets.token_urlsafe(32);token_file=DATA/'login-token';token_file.write_text(token);token_file.chmod(0o600)
+    connect().close();token_file=DATA/'login-token';token=''
+    if owner() is None:
+        token=secrets.token_urlsafe(32);token_file.write_text(token);token_file.chmod(0o600)
+    else:token_file.unlink(missing_ok=True)
     port=int(os.environ.get('BIP_STUDIO_PORT','8765'))
-    server=ThreadingHTTPServer(('127.0.0.1',port),Handler);server.publish_lock=threading.Lock();server.login_token=token;server.sessions={};server.failures=0;server.login_blocked_until=0
+    server=ThreadingHTTPServer(('127.0.0.1',port),Handler);server.auth_lock=threading.Lock();server.publish_lock=threading.Lock();server.login_token=token;server.sessions={};server.failures=0;server.login_blocked_until=0
     print(f'Private Studio: http://127.0.0.1:{port}\nLogin token file: {token_file}\nOnly access through a local browser or SSH tunnel.',flush=True)
     server.serve_forever()
 if __name__=='__main__':main()
