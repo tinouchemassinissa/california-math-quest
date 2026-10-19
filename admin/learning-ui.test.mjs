@@ -33,7 +33,15 @@ test('child UI resumes a lesson and exposes a useful picture after a mistake',as
   await act(async()=>root.unmount());await mount();
   assert.match(document.body.textContent,/Welcome back/);
   assert.equal(choices().every(b=>b.disabled),true);
-  const next=[...document.querySelectorAll('button')].find(b=>b.textContent==='Continue →');
+  assert.match(document.body.textContent,/Not quite yet/);
+  const find=text=>[...document.querySelectorAll('button')].find(b=>b.textContent===text);
+  assert.match(document.querySelector('.journey-coaching-step').textContent,/STEP 1 OF 3/);
+  assert.ok(!document.querySelector('.journey-coaching-step').textContent.includes('3 × 4 = 12'));
+  await act(async()=>find('Show next step →').click());
+  assert.match(document.querySelector('.journey-coaching-step').textContent,/STEP 2 OF 3/);
+  await act(async()=>find('Show next step →').click());
+  assert.match(document.querySelector('.journey-coaching-step').textContent,/3 × 4 = 12/);
+  const next=find('Try the next question →');
   await act(async()=>next.click());
   assert.match(document.querySelector('.journey-question').textContent,/20 ÷ 4/);
   assert.equal(choices().some(b=>b.disabled),false);
