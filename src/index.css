@@ -3842,3 +3842,10 @@ button, input, select {
 .bip-rendered-motion .journey-bip-scene video,.bip-rendered-motion .journey-bip-spark{animation:none!important}
 .bip-companion-card[data-motion=paused] *{animation:none!important;transition:none!important}
 .bip-companion-card .bip-video-frame{animation:none!important}
+
+/* A visible teaching target, with no motion needed to understand the cue. */
+.journey-visual-focus{border:2px solid #38bdf8;border-radius:18px;padding:clamp(10px,2vw,20px);margin:16px 0;background:#38bdf80a}
+.journey-visual-cue{font-weight:700;line-height:1.6;margin:0 0 12px}
+.journey-visual-focus[data-focus=tens] .journey-places>div:nth-child(2),.journey-visual-focus[data-focus=hundreds] .journey-places>div:first-child{outline:3px solid #fbbf24;outline-offset:3px;border-radius:8px}
+.journey-visual-focus[data-focus=remaining] .journey-counter:not(.removed){outline:2px solid #38bdf8;outline-offset:2px}
+.world-home-limit summary{cursor:pointer;padding:12px}

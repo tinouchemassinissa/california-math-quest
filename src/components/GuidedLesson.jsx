@@ -7,7 +7,7 @@ export default function GuidedLesson({ question, open, onOpen, onClose, onPracti
   const [stage,setStage]=useState(0);
   const [step,setStep]=useState(0);
   if(!open)return <button className="bip-guide-launch" type="button" onClick={onOpen}>💡 Learn with Bip <span>A clue, a picture, then steps</span></button>;
-  const line=stage===0?lesson.firstHint:stage===1?'Look for equal groups or equal-sized pieces.':lesson.steps[step] || 'Read the question, then draw what you know.';
+  const line=stage===0?lesson.firstHint:stage===1?lesson.pictureHint:lesson.steps[step] || 'Read the question, then draw what you know.';
   return <section className="bip-guide" aria-label="Learn with Bip">
     <div className="bip-guide-heading"><div><span className="bip-guide-eyebrow">LET’S LEARN TOGETHER</span><h3>Bip is here to help</h3></div><button type="button" className="bip-guide-close" onClick={onClose} aria-label="Close learning guide">✕</button></div>
     <ol className="bip-guide-stages" aria-label="Learning steps">{LESSON_STAGES.map((label,i)=><li key={label}><button type="button" aria-current={stage===i?'step':undefined} onClick={()=>setStage(i)}><span>{i+1}</span>{label}</button></li>)}</ol>

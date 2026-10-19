@@ -5,6 +5,7 @@ import { buildLessonGuide } from './coachGuide.js';
 // No model-generated arithmetic. Lessons are derived from the given operands and checked.
 export function buildGuidedLesson(question) {
   const base = buildLessonGuide(question);
+  base.pictureHint=base.firstHint;
   if (!question) return { ...base, kind:'general', steps:[], visual:null };
   if (question.standard === '3.OA.C.7') {
     const m = question.prompt.match(/What is (\d+) ([×÷]) (\d+)\?/);
@@ -15,6 +16,7 @@ export function buildGuidedLesson(question) {
         const groups=division?b:a, each=division?answer:b;
         const first=Math.min(groups,5), rest=groups-first;
         return { ...base, kind:'groups', firstHint: division ? 'Share the total into equal groups. Each group must get the same number.' : 'Multiplication counts equal groups. Find how many groups there are and how many are in each group.',
+          pictureHint:'Count the groups and the objects in each group. Check that every group is equal.',
           visual:{type:'guided-groups', groups, each},
           steps: division ? [
             `Start with ${a} objects and make ${b} equal groups.`,
@@ -38,6 +40,7 @@ export function buildGuidedLesson(question) {
       const answer=new Rational(top,denom).toString();
       if (d1>0&&d2>0&&denom<=100&&top>=0&&isAnswerEquivalent(answer,question.correctAnswer)) return {
         ...base,kind:'fractions',firstHint:'Use the same-sized whole for both fractions. Before combining the pieces, make sure the pieces are the same size.',
+        pictureHint:'Compare the equal-sized pieces in the two same-sized wholes.',
         visual:{type:'guided-fractions',n1,d1,n2,d2,denominator:denom,left,right,operation:subtract?'-':'+'},
         steps:[
           `Use ${denom} equal parts in each whole. Each small part is 1/${denom}.`,

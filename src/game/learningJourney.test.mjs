@@ -73,3 +73,49 @@ test('malformed saved patterns and timestamps cannot break snapshot rendering',(
   const base={version:1,grade:'3',independent:false,checks:2,completedAt:1000,reviewAt:2000,patterns:[]};
   for(const patch of [{patterns:null},{patterns:['unexpected']},{checks:3},{reviewAt:500},{completedAt:-1}])assert.equal(readJourneyRecord(JSON.stringify({...base,...patch}),'3'),null);
 });
+
+test('resume replays checked answers and keeps assisted evidence',async()=>{
+ const {readJourneyProgress}=await import('./learningJourney.js');
+ const saved=s=>JSON.stringify({version:1,state:s});
+ let s=createJourney('3');
+ for(let n=0;n<7;n++){
+  assert.deepEqual(readJourneyProgress(saved(s),'3'),s);
+  if(s.phase==='lesson'){s=nextJourney(s);continue;}
+  s={...s,help:true};s=submitJourney(s,journeyQuestion('3',currentJourneyIndex(s)).correctAnswer);
+  assert.deepEqual(readJourneyProgress(saved(s),'3'),s);
+  s=nextJourney(s);
+ }
+ assert.equal(s.phase,'complete');assert.equal(readJourneyProgress(saved(s),'3'),null);
+});
+test('resume rejects cross-learner lesson shape, forged answers and malformed state',async()=>{
+ const {readJourneyProgress}=await import('./learningJourney.js');
+ const s=submitJourney(createJourney('3'),journeyQuestion('3',0).correctAnswer);
+ for(const state of [{...s,position:99},{...s,attempts:[{...s.attempts[0],answer:999}]},{...s,attempts:[{...s.attempts[0],correct:false}]},{...s,help:'yes'},{...s,grade:'4'}])assert.equal(readJourneyProgress(JSON.stringify({version:1,state}),'3'),null);
+ assert.equal(readJourneyProgress('{','3'),null);
+});
+test('alternate review uses unseen quantities and preserves its set on resume',async()=>{
+ const {readJourneyProgress,journeyCatalog}=await import('./learningJourney.js');
+ for(const grade of ['K','1','2','3','4','5'])for(const cfg of journeyCatalog(grade)){
+  const s={...createJourney(grade,cfg.id),phase:'review',reviewSet:1};
+  assert.equal(currentJourneyIndex(s),10);
+  assert.notEqual(journeyQuestion(grade,10,cfg.id).prompt,journeyQuestion(grade,7,cfg.id).prompt);
+  assert.deepEqual(readJourneyProgress(JSON.stringify({version:1,state:s}),grade,cfg.id),s);
+  const answered=submitJourney(s,journeyQuestion(grade,10,cfg.id).correctAnswer);
+  assert.deepEqual(readJourneyProgress(JSON.stringify({version:1,state:answered}),grade,cfg.id),answered);
+ }
+});
+test('every lesson can resume each bounded transition including assisted and incorrect answers',async()=>{
+ const {readJourneyProgress,journeyCatalog}=await import('./learningJourney.js');
+ for(const grade of ['K','1','2','3','4','5'])for(const cfg of journeyCatalog(grade))for(const assisted of [false,true]){
+  let s=createJourney(grade,cfg.id);
+  for(let step=0;s.phase!=='complete'&&step<10;step++){
+   assert.deepEqual(readJourneyProgress(JSON.stringify({version:1,state:s}),grade,cfg.id),s);
+   if(s.phase==='lesson'){s=nextJourney(s);continue;}
+   const q=journeyQuestion(grade,currentJourneyIndex(s),cfg.id);
+   s=submitJourney({...s,help:assisted},assisted?q.options.find(v=>!isAnswerEquivalent(v,q.correctAnswer)):q.correctAnswer);
+   assert.deepEqual(readJourneyProgress(JSON.stringify({version:1,state:s}),grade,cfg.id),s);
+   s=nextJourney(s);
+  }
+  assert.equal(s.phase,'complete');
+ }
+});

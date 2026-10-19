@@ -17,3 +17,19 @@ test('family database preserves attachments and atomically rejects a conflicting
  await removeWork('page-1');assert.equal((await loadFamily()).works.length,1);
  await assert.rejects(()=>saveWork({...work,id:'page-bad',learnerId:'absent'}));
 });
+
+test('backup carries learner results and resume state; failed restore rolls learning back',async()=>{
+ const {journeyStorageKey,journeyProgressKey,createJourney,journeySummary}=await import('./learningJourney.js');
+ const values=new Map();globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k)};
+ const resultKey=journeyStorageKey(learner.id,'3','multiply'),progressKey=journeyProgressKey(learner.id,'3','multiply');
+ values.set(resultKey,JSON.stringify(journeySummary(createJourney('3','multiply'),1000)));
+ values.set(progressKey,JSON.stringify({version:1,state:createJourney('3','multiply')}));
+ const backup=JSON.parse(await (await exportFamily()).text());assert.equal(backup.learning.length,2);
+ const restored={version:1,learners:[{...learner,id:'restore-1'}],works:[],plans:[],learning:backup.learning.map(e=>({...e,key:e.key.replace('child-1','restore-1')}))};
+ await importFamily(JSON.stringify(restored));assert.equal(values.has(restored.learning[1].key),true);
+ await assert.rejects(()=>importFamily(JSON.stringify(restored)));
+ const failed={...restored,learners:[{...learner,id:'restore-2'}],learning:backup.learning.map(e=>({...e,key:e.key.replace('child-1','restore-2')})),works:[{...backup.works[0],learnerId:'restore-2'}]};
+ await assert.rejects(()=>importFamily(JSON.stringify(failed)));assert.equal(values.has(failed.learning[0].key),false);
+ const corrupt={...restored,learning:[{key:restored.learning[1].key,value:'{}'}]};await assert.rejects(()=>importFamily(JSON.stringify(corrupt)));
+ delete globalThis.localStorage;
+});

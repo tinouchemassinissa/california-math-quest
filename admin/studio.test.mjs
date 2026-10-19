@@ -15,6 +15,7 @@ async function open({mfa=false,drafts=[]}={}){
  w.fetch=async(url,options)=>{const body=options?.body?JSON.parse(options.body):null;calls.push({url,body});let result={};
  if(url==='/standards.json')result=registry;
  else if(url==='/api/auth-state')result={setup_required:false,mfa_enabled:mfa};
+ else if(url==='/api/release')result={revision:'123456789abc',review_base:'main'};
  else if(url==='/api/drafts')result={csrf:'test',drafts,mfa_enabled:mfa,source_count:0,source_bytes:0};
  else if(url==='/api/check')result={valid:true,errors:[]};
  else if(url==='/api/mfa/begin')result={secret:'TEST-ONLY',uri:'otpauth://totp/Test?secret=JBSWY3DPEHPK3PXP&issuer=Test'};

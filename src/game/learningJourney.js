@@ -32,9 +32,17 @@ export const EXTRA_JOURNEYS = {
   {id:'subtract-fractions',title:'Rename fractions to subtract',standard:'5.NF.A.1',kind:'fraction',operation:'subtract',values:[[3,4,1,2],[5,6,1,3],[1,2,1,4],[2,3,1,6],[7,8,1,4],[4,5,1,2],[5,6,1,4],[3,4,1,6],[7,10,1,5],[1,2,1,2]]},
   {id:'fraction-sums',title:'Explore more unlike fraction sums',standard:'5.NF.A.1',kind:'fraction',values:[[1,3,1,2],[1,4,1,5],[1,6,1,3],[1,5,1,10],[1,8,1,4],[2,5,1,4],[1,6,1,8],[1,3,1,9],[1,2,1,10],[1,4,1,4]]}],
 };
+const EXTRA_REVIEW={
+ K:{starter:[[1,8],[2,7]],'take-away':[[10,2],[10,7]],'make-ten':[[0,10],[10,0]]},
+ '1':{starter:[[6,5],[7,6]],subtract:[[12,7],[14,9]],'missing-part':[[2,9],[9,9]]},
+ '2':{starter:[[2,0,7],[5,6,0]],tens:[[2,0,7],[5,6,0]],hundreds:[[2,0,7],[5,6,0]]},
+ '3':{starter:[[8,4],[9,6]],multiply:[[8,4],[9,6]],divide:[[8,4],[9,6]]},
+ '4':{starter:[[1,7,3,7],[2,11,5,11]],'subtract-fractions':[[6,7,2,7],[8,11,3,11]],'fraction-sums':[[2,7,4,7],[3,11,6,11]]},
+ '5':{starter:[[1,5,1,6],[1,7,1,2]],'subtract-fractions':[[4,7,1,2],[5,8,1,3]],'fraction-sums':[[2,7,1,4],[3,8,1,6]]}
+};
 export function journeyCatalog(grade){
  const base=JOURNEYS[grade];if(!base)throw new RangeError('Unsupported grade');
- return [{...base,id:'starter'},...EXTRA_JOURNEYS[grade].map(item=>({...item,values:item.values||base.values}))];
+ return [{...base,id:'starter'},...EXTRA_JOURNEYS[grade].map(item=>({...item,values:item.values||base.values}))].map(item=>({...item,values:[...item.values,...EXTRA_REVIEW[grade][item.id]]}));
 }
 export function journeyConfig(grade,lessonId='starter'){
  const config=journeyCatalog(grade).find(c=>c.id===lessonId);if(!config)throw new RangeError('Unsupported lesson');return config;
@@ -88,14 +96,14 @@ export function journeyQuestion(grade,index,lessonId="starter") {
   return {...question,lessonVisual:visual,pattern};
 }
 export function createJourney(grade,lessonId='starter'){journeyConfig(grade,lessonId);return {grade,lessonId,phase:'diagnostic',position:0,attempts:[],feedback:null,help:false};}
-export function currentJourneyIndex(state){if(state.phase==='lesson'&&state.support)return 9;return {diagnostic:0,lesson:2,guided:3,check:5,review:7}[state.phase]+state.position;}
+export function currentJourneyIndex(state){if(state.phase==='review'&&state.reviewSet===1)return 10+state.position;if(state.phase==='lesson'&&state.support)return 9;return {diagnostic:0,lesson:2,guided:3,check:5,review:7}[state.phase]+state.position;}
 export function submitJourney(state,answer){
   if(state.feedback||!['diagnostic','guided','check','review'].includes(state.phase))return state;
   const question=journeyQuestion(state.grade,currentJourneyIndex(state),state.lessonId);
   if(!question.options.some(o=>isAnswerEquivalent(o,answer)))return state;
   const correct=isAnswerEquivalent(answer,question.correctAnswer);
   const pattern=!correct&&isAnswerEquivalent(answer,question.pattern.answer)?question.pattern.code:null;
-  const attempt={item:question.id,phase:state.phase,correct,assisted:state.help||state.phase==='guided',pattern};
+  const attempt={item:question.id,phase:state.phase,answer,correct,assisted:state.help||state.phase==='guided',pattern};
   return {...state,attempts:[...state.attempts,attempt],feedback:attempt};
 }
 export function nextJourney(state){
@@ -110,7 +118,35 @@ export function journeySummary(state,now=Date.now()){
   const checks=state.attempts.filter(a=>a.phase==='check'||a.phase==='review').slice(-2);
   const independent=checks.length===2&&checks.every(a=>a.correct&&!a.assisted);
   const counts={};for(const a of state.attempts)if(a.pattern)counts[a.pattern]=(counts[a.pattern]||0)+1;
-  return {version:JOURNEY_VERSION,grade:state.grade,lessonId:state.lessonId||"starter",independent,checks:checks.length,patterns:Object.keys(counts).filter(k=>counts[k]>=2),completedAt:now,reviewAt:now+(independent?86400000:600000)};
+  return {version:JOURNEY_VERSION,grade:state.grade,lessonId:state.lessonId||"starter",independent,reviewSet:state.reviewSet??0,checks:checks.length,patterns:Object.keys(counts).filter(k=>counts[k]>=2),completedAt:now,reviewAt:now+(independent?86400000:600000)};
 }
 export function journeyStorageKey(name,grade,lessonId="starter"){return `bip_journey_v${JOURNEY_VERSION}:${encodeURIComponent(String(name).trim().toLowerCase()||'guest')}:${grade}:${lessonId}`;}
-export function readJourneyRecord(raw,grade,lessonId="starter"){try{const r=JSON.parse(raw);return r?.version===JOURNEY_VERSION&&r.grade===grade&&(r.lessonId||'starter')===lessonId&&typeof r.independent==='boolean'&&Number.isFinite(r.reviewAt)&&Number.isFinite(r.completedAt)&&r.completedAt>=0&&r.reviewAt>=r.completedAt&&Number.isInteger(r.checks)&&r.checks>=0&&r.checks<=2&&Array.isArray(r.patterns)&&r.patterns.every(p=>['operation-added','denominators-subtracted','denominators-added','digits-added','numbers-added','first-group-only'].includes(p))?r:null;}catch{return null;}}
+export function readJourneyRecord(raw,grade,lessonId="starter"){try{const r=JSON.parse(raw);return r?.version===JOURNEY_VERSION&&r.grade===grade&&(r.lessonId||'starter')===lessonId&&typeof r.independent==='boolean'&&(r.reviewSet===undefined||r.reviewSet===0||r.reviewSet===1)&&Number.isFinite(r.reviewAt)&&Number.isFinite(r.completedAt)&&r.completedAt>=0&&r.reviewAt>=r.completedAt&&Number.isInteger(r.checks)&&r.checks>=0&&r.checks<=2&&Array.isArray(r.patterns)&&r.patterns.every(p=>['operation-added','denominators-subtracted','denominators-added','digits-added','numbers-added','first-group-only'].includes(p))?r:null;}catch{return null;}}
+
+// Rebuild saved attempts through the same checked transitions; never trust saved scores.
+export function journeyProgressKey(name,grade,lessonId='starter'){return journeyStorageKey(name,grade,lessonId)+':progress';}
+export function readJourneyProgress(raw,grade,lessonId='starter'){
+ try{
+  if(typeof raw!=='string'||raw.length>20000)return null;
+  const data=JSON.parse(raw),target=data.state;
+  if(data.version!==JOURNEY_VERSION||!target||target.grade!==grade||target.lessonId!==lessonId||target.phase==='complete'||typeof target.help!=='boolean'||!Array.isArray(target.attempts)||target.attempts.length>8)return null;
+  let state=createJourney(grade,lessonId);
+  if(target.reviewSet!==undefined&&target.reviewSet!==0&&target.reviewSet!==1)return null;
+  if(target.phase==='review'||target.attempts[0]?.phase==='review')state={...state,phase:'review',...(target.reviewSet===undefined?{}:{reviewSet:target.reviewSet})};
+  for(const attempt of target.attempts){
+   if(state.feedback)state=nextJourney(state);
+   if(state.phase==='lesson')state=nextJourney(state);
+   if(attempt.phase!==state.phase||typeof attempt.assisted!=='boolean')return null;
+   state={...state,help:attempt.assisted&&state.phase!=='guided'};
+   state=submitJourney(state,attempt.answer);
+   if(JSON.stringify(state.feedback)!==JSON.stringify(attempt))return null;
+  }
+  if(!target.feedback&&state.feedback)state=nextJourney(state);
+  // A worked example may have been completed before leaving.
+  if(state.phase==='lesson'&&target.phase==='guided')state=nextJourney(state);
+  if(state.phase!==target.phase||state.position!==target.position||Boolean(state.feedback)!==Boolean(target.feedback))return null;
+  if(target.feedback&&JSON.stringify(state.feedback)!==JSON.stringify(target.feedback))return null;
+  if(state.help&&!target.help)return null;
+  return {...state,help:target.help};
+ }catch{return null;}
+}

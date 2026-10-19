@@ -1,7 +1,7 @@
 import React,{useEffect,useRef,useState} from 'react';
 import { bipLessonReaction, BIP_IDLE_CLIP, BIP_WAVE_CLIP, BIP_FALLBACK_CLIP } from '../game/bipLessonReaction.js';
 
-export default function JourneyBip({phase,feedback,help,eventKey}){
+export default function JourneyBip({phase,feedback,help,eventKey,cue}){
   const video=useRef(null);
   const [paused,setPaused]=useState(()=>typeof window!=='undefined'&&Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches));
   const [manual,setManual]=useState(null);
@@ -9,6 +9,7 @@ export default function JourneyBip({phase,feedback,help,eventKey}){
   const [settled,setSettled]=useState(false);
   const [replay,setReplay]=useState(0);
   const reaction=bipLessonReaction({phase,feedback,help});
+  if(cue&&(help||phase==='lesson'||phase==='guided'||(feedback&&!feedback.correct)))reaction.label=cue;
   const clip=failed===1?BIP_FALLBACK_CLIP:manual==='wave'?BIP_WAVE_CLIP:settled?BIP_IDLE_CLIP:reaction.clip;
   const gesture=paused?'still':manual==='wave'?'wave':settled?'breathe':reaction.gesture;
   useEffect(()=>{setManual(null);setFailed(0);setSettled(false);},[eventKey,phase,help,feedback?.correct]);

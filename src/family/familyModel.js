@@ -1,4 +1,4 @@
-import { journeyCatalog } from '../game/learningJourney.js';
+import { journeyCatalog,journeyStorageKey,readJourneyRecord,readJourneyProgress } from '../game/learningJourney.js';
 export const FAMILY_VERSION=1;
 export const MAX_FILE_BYTES=8*1024*1024;
 export const MAX_TOTAL_BYTES=50*1024*1024;
@@ -42,8 +42,28 @@ export function parseBackup(input){
  const unique=items=>new Set(items.map(x=>x.id)).size===items.length;
  if(!unique(learners)||!unique(data.works)||!unique(data.plans))throw new Error('Duplicate record IDs in backup');
  for(const work of data.works){validateWork(work,learners);if(typeof work.data!=='string'||work.data.length>Math.ceil(MAX_FILE_BYTES/3)*4||(work.data.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(work.data)))throw new Error('Invalid backup attachment');}
- data.plans.forEach(p=>validatePlan(p,learners));return {version:FAMILY_VERSION,learners,works:data.works,plans:data.plans};
+ data.plans.forEach(p=>validatePlan(p,learners));
+ const learning=validateLearningBackup(data.learning??[],learners);
+ return {version:FAMILY_VERSION,learners,works:data.works,plans:data.plans,learning};
 }
 export function parentStrategy(grade){
  return {K:['Count real objects','Ask: “How do you know you counted each one?”','Move counters into two groups, then join or remove them.'],1:['Make a ten','Ask: “Which part would fill ten first?”','Use counters before asking for a written number sentence.'],2:['Use place-value blocks','Ask: “What is this digit worth in its place?”','A hundred is ten tens; a ten is ten ones.'],3:['Draw equal groups','Ask: “How many groups, and how many in each?”','Connect multiplication and division using the same quantities.'],4:['Use the same-sized whole','Ask: “Are the pieces the same size?”','For like denominators, combine or remove pieces without changing their size.'],5:['Rename fraction pieces','Ask: “Can you show equivalent fractions with equal-sized parts?”','Find a common denominator before adding or subtracting.']}[grade];
+}
+
+export function validateLearningBackup(entries,learners){
+ if(!Array.isArray(entries)||entries.length>1800)throw new Error('Invalid learning backup');
+ const allowed=new Map();
+ for(const learner of learners)for(const lesson of journeyCatalog(learner.grade)){
+  const key=journeyStorageKey(learner.id,learner.grade,lesson.id);
+  allowed.set(key,{grade:learner.grade,lessonId:lesson.id,progress:false});
+  allowed.set(key+':progress',{grade:learner.grade,lessonId:lesson.id,progress:true});
+ }
+ const seen=new Set();
+ return entries.map(entry=>{
+  const spec=allowed.get(entry?.key);
+  if(!spec||seen.has(entry.key)||typeof entry.value!=='string'||entry.value.length>20000)throw new Error('Invalid learning record');
+  seen.add(entry.key);
+  if(!(spec.progress?readJourneyProgress:readJourneyRecord)(entry.value,spec.grade,spec.lessonId))throw new Error('Learning record failed validation');
+  return {key:entry.key,value:entry.value};
+ });
 }

@@ -128,6 +128,11 @@ class Handler(BaseHTTPRequestHandler):
         if route=='/api/auth-state':return self.respond(200,{'setup_required':owner() is None,'mfa_enabled':mfa_state() is not None})
         session=self.session()
         if not session:return self.respond(401,{'error':'Sign in to your owner account'})
+        if route=='/api/release':
+            try:
+                revision=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,timeout=5,check=True).stdout.strip()
+            except (OSError,subprocess.SubprocessError):revision='unknown'
+            return self.respond(200,{'revision':revision,'deployment':'Not verified by Studio','review_base':os.environ.get('BIP_PUBLISH_BASE','main')})
         if route=='/api/drafts':
             with connect() as db:rows=db.execute('SELECT question,approved,updated FROM drafts ORDER BY updated DESC').fetchall()
             return self.respond(200,{'csrf':session['csrf'],'mfa_enabled':mfa_state() is not None,'drafts':[{'question':json.loads(q),'approved':bool(a),'updated':t} for q,a,t in rows],'ocr_available':bool(shutil.which('tesseract') or os.environ.get('BIP_OCR_IMAGE')),'source_count':len(list((DATA/'sources').glob('*'))),'source_bytes':sum(p.stat().st_size for p in (DATA/'sources').glob('*') if p.is_file())})

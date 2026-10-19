@@ -5,7 +5,7 @@ import { journeyCatalog,journeyQuestion,createJourney,submitJourney,nextJourney,
 import {isAnswerEquivalent} from './mathEngine/answerMath.js';
 import {bipLessonReaction} from './bipLessonReaction.js';
 
-test('all 180 fixed lesson items match independent arithmetic and visual quantities',()=>{
+test('all 216 fixed lesson items match independent arithmetic and visual quantities',()=>{
  let count=0;
  for(const grade of ['K','1','2','3','4','5']){
   const lessons=journeyCatalog(grade);assert.equal(lessons.length,3);
@@ -27,7 +27,7 @@ test('all 180 fixed lesson items match independent arithmetic and visual quantit
    assert.equal(q.options.filter(v=>isAnswerEquivalent(v,q.correctAnswer)).length,1);
   }
  }
- assert.equal(count,180);
+ assert.equal(count,216);
 });
 test('all eighteen paths complete and keep lesson records separate',()=>{
  for(const grade of ['K','1','2','3','4','5'])for(const cfg of journeyCatalog(grade)){
