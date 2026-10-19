@@ -55,3 +55,20 @@ export function buildGuidedLesson(question) {
 
 export const LESSON_STAGES = ['Try a clue', 'See a picture', 'Solve together'];
 export function advanceLesson(stage) { return Math.min(2, Math.max(0, stage + 1)); }
+
+// Small, checked turns before a worked solution; unsupported formats use a thinking prompt.
+export function buildTogetherTurns(question) {
+  const m=question?.manipulative;
+  if(m?.type==='coordinate' && Number.isInteger(m.x) && Number.isInteger(m.y)) return [
+    {prompt:'Start at zero. How many spaces across is the star?',answer:m.x,hint:'Follow the horizontal axis from zero to below the star.'},
+    {prompt:'Now look up. How many spaces above zero is the star?',answer:m.y,hint:'Follow the vertical axis upward to the height of the star.'},
+    {prompt:'Put your two numbers together: across first, then up.',answer:`(${m.x}, ${m.y})`,hint:'Write your answer as (across, up).'},
+  ];
+  return [];
+}
+export function scratchpadPrompt(question) {
+  if(question?.manipulative?.type==='coordinate') return 'Sketch the axes. Mark zero, count across, then count up to the star.';
+  if(/fraction|NF/.test(question?.standard||'')) return 'Draw two same-sized wholes. Split them into equal parts and shade the fractions.';
+  if(/OA/.test(question?.standard||'')) return 'Draw equal groups or counters. Label what you know and what you need to find.';
+  return 'Write what you know. Draw a picture or show one small step, then choose your answer.';
+}

@@ -250,7 +250,7 @@ export default function QuestionCard({
 
       {/* On-Screen Kid's Math Scratchpad & Doodle Canvas */}
       {scratchpadOpen && (
-        <ScratchpadCanvas questionId={question.id || question.prompt} />
+        <ScratchpadCanvas questionId={question.id || question.prompt} question={question} />
       )}
 
       {/* Big Beautiful Answer Tiles (Interactive with Bip Hover & 50/50 Laser Zap!) */}

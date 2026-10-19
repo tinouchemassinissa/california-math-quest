@@ -3898,3 +3898,13 @@ button, input, select {
 .mistake-choice-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;}
 .mistake-choice-actions button{min-height:48px;font-size:1rem;flex:1 1 180px;}
 .bip-guide:focus{outline:2px solid #a5b4fc;outline-offset:4px;}
+
+/* Comfortable thinking tools on phones and desktops. */
+.scratchpad-prompt {font-weight:700;margin:12px 0;}
+.scratchpad-notes {display:grid;gap:6px;}
+.scratchpad-notes textarea,.bip-guide-work input {font:inherit;color:var(--text-primary);background:var(--bg-secondary);border:1px solid #64748b;border-radius:10px;padding:12px;max-width:100%;box-sizing:border-box;}
+.scratchpad-notes textarea {min-height:70px;width:100%;resize:vertical;}
+.bip-guide-work form {display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.bip-guide-work form p,.bip-guide-work form>span {flex-basis:100%;}
+.scratchpad-tools button {min-height:40px;}
+.scratchpad-canvas {height:260px;}

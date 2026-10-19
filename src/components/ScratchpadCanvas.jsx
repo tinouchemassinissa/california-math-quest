@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
+import { scratchpadPrompt } from '../game/guidedLesson.js';
+
 const PEN_COLORS = [
   { id: 'blue', color: '#38bdf8', label: 'Sky Blue' },
   { id: 'green', color: '#10b981', label: 'Emerald Green' },
@@ -8,7 +10,7 @@ const PEN_COLORS = [
   { id: 'purple', color: '#a855f7', label: 'Cosmic Purple' },
 ];
 
-export default function ScratchpadCanvas({ questionId }) {
+export default function ScratchpadCanvas({ questionId, question }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [penColor, setPenColor] = useState(PEN_COLORS[0].color);
@@ -16,6 +18,8 @@ export default function ScratchpadCanvas({ questionId }) {
   const [isEraser, setIsEraser] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
   const [strokes, setStrokes] = useState([]);
+  const [redoStrokes,setRedoStrokes]=useState([]);
+  const [notes,setNotes]=useState('');
   const currentStrokeRef = useRef(null);
 
   const redrawCanvas = useCallback(
@@ -58,7 +62,7 @@ export default function ScratchpadCanvas({ questionId }) {
 
   // Clear scratchpad automatically when moving to a new question
   useEffect(() => {
-    setStrokes([]);
+    setStrokes([]);setRedoStrokes([]);setNotes('');currentStrokeRef.current=null;setIsDrawing(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -91,6 +95,8 @@ export default function ScratchpadCanvas({ questionId }) {
         // Ignore pointer capture errors
       }
     }
+    if(currentStrokeRef.current)return;
+    setRedoStrokes([]);
     const pt = getCoordinates(e);
     const newStroke = {
       color: penColor,
@@ -104,7 +110,7 @@ export default function ScratchpadCanvas({ questionId }) {
   };
 
   const handlePointerMove = (e) => {
-    if (!isDrawing || !currentStrokeRef.current) return;
+    if (!currentStrokeRef.current) return;
     e.preventDefault();
     const pt = getCoordinates(e);
     currentStrokeRef.current.points.push(pt);
@@ -117,19 +123,20 @@ export default function ScratchpadCanvas({ questionId }) {
   };
 
   const handleUndo = () => {
+    setRedoStrokes(prev=>[...prev,strokes[strokes.length-1]]);
     setStrokes((prev) => prev.slice(0, -1));
   };
 
   const handleClear = () => {
-    setStrokes([]);
+    if(window.confirm('Clear your drawing?')){setStrokes([]);setRedoStrokes([]);}
   };
 
   return (
     <div className="kid-scratchpad-box animated-pop">
       <div className="scratchpad-toolbar">
         <div className="scratchpad-title-group">
-          <span className="scratchpad-badge">✏️ Math Work & Doodle Pad</span>
-          <span className="scratchpad-sub">Draw number bonds, tape diagrams, or column math!</span>
+          <span className="scratchpad-badge">✏️ My math paper</span>
+          <span className="scratchpad-sub">Draw or type your thinking. This is not graded.</span>
         </div>
 
         <div className="scratchpad-tools">
@@ -202,12 +209,16 @@ export default function ScratchpadCanvas({ questionId }) {
         </div>
       </div>
 
+      <p className="scratchpad-prompt">{scratchpadPrompt(question)}</p>
+      <label className="scratchpad-notes">My thinking <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="I know… I need to find…" maxLength={2000} /></label>
+      <p className="scratchpad-sub">Your paper stays for retries and clears on the next question. Bip cannot read your drawing.</p>
+      <button type="button" className="scratch-tool-btn" disabled={!redoStrokes.length} onClick={()=>{setStrokes(prev=>[...prev,redoStrokes[redoStrokes.length-1]]);setRedoStrokes(prev=>prev.slice(0,-1));}}>↪️ Redo</button>
       <div className={`scratchpad-canvas-wrap ${showGrid ? 'grid-bg' : ''}`}>
         <canvas
           ref={canvasRef}
           width={760}
           height={210}
-          className="scratchpad-canvas"
+          className="scratchpad-canvas" aria-label="Math drawing paper" role="img"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
