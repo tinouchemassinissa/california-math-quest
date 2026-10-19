@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Private loopback-only draft studio. No public listener, no automatic publishing."""
-import hashlib, re, base64, hmac, json, os, secrets, shutil, sqlite3, subprocess, time, threading
+import struct, hashlib, re, base64, hmac, json, os, secrets, shutil, sqlite3, subprocess, time, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = Path(os.environ.get('BIP_STUDIO_DATA', str(Path.home()/'.local/share/bip-studio'))).resolve()
@@ -14,6 +14,7 @@ def connect():
     db.execute('CREATE TABLE IF NOT EXISTS drafts (id TEXT PRIMARY KEY, question TEXT NOT NULL, approved INTEGER NOT NULL DEFAULT 0, updated REAL NOT NULL)')
     db.execute('CREATE TABLE IF NOT EXISTS history (draft_id TEXT, question TEXT, approved INTEGER, updated REAL)')
     db.execute('CREATE TABLE IF NOT EXISTS owner (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL, recovery TEXT NOT NULL)')
+    db.execute('CREATE TABLE IF NOT EXISTS mfa (id INTEGER PRIMARY KEY CHECK(id=1), secret TEXT NOT NULL, last_step INTEGER NOT NULL DEFAULT -1)')
     db.commit()
     return db
 
@@ -33,6 +34,37 @@ def write_owner(db,username,password):
     codes=[secrets.token_hex(12) for _ in range(8)]
     hashes=[hashlib.sha256(c.encode()).hexdigest() for c in codes]
     db.execute('INSERT OR REPLACE INTO owner VALUES (1,?,?,?,?)',(username,salt,password_hash(password,salt),json.dumps(hashes)))
+    return codes
+
+def totp(secret,step,digits=6):
+    key=base64.b32decode(secret)
+    digest=hmac.new(key,struct.pack('>Q',step),hashlib.sha1).digest()
+    offset=digest[-1]&15
+    value=(struct.unpack('>I',digest[offset:offset+4])[0]&0x7fffffff) % (10**digits)
+    return str(value).zfill(digits)
+
+def mfa_state():
+    with connect() as db:return db.execute('SELECT secret,last_step FROM mfa WHERE id=1').fetchone()
+
+def accept_totp(secret,code,last_step=-1,now=None):
+    if not isinstance(code,str) or not re.fullmatch(r'[0-9]{6}',code):return None
+    current=int(time.time() if now is None else now)//30
+    for step in [current,current-1,current+1]:
+        if step>last_step and hmac.compare_digest(totp(secret,step),code):return step
+    return None
+
+def verify_mfa(code):
+    state=mfa_state()
+    if state is None:return True
+    step=accept_totp(state[0],code,state[1])
+    if step is None:return False
+    with connect() as db:
+        changed=db.execute('UPDATE mfa SET last_step=? WHERE id=1 AND last_step<?',(step,step)).rowcount
+    return changed==1
+
+def new_recovery_codes(db):
+    codes=[secrets.token_hex(12) for _ in range(8)]
+    db.execute('UPDATE owner SET recovery=? WHERE id=1',(json.dumps([hashlib.sha256(c.encode()).hexdigest() for c in codes]),))
     return codes
 
 def check(question):
@@ -88,16 +120,16 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.valid_host():return self.respond(400,{'error':'Invalid host'})
         route=urlparse(self.path).path
-        if route in ['/','/studio.js','/studio.css']:
-            name={'/':'index.html','/studio.js':'studio.js','/studio.css':'studio.css'}[route]
-            mime={'/':'text/html; charset=utf-8','/studio.js':'text/javascript','/studio.css':'text/css'}[route]
+        if route in ['/','/studio.js','/studio.css','/qr.js','/standards.json','/qr-LICENSE.txt']:
+            name={'/':'index.html','/studio.js':'studio.js','/studio.css':'studio.css','/qr.js':'qr.js','/standards.json':'standards.json','/qr-LICENSE.txt':'qr-LICENSE.txt'}[route]
+            mime={'/':'text/html; charset=utf-8','/studio.js':'text/javascript','/studio.css':'text/css','/qr.js':'text/javascript','/standards.json':'application/json; charset=utf-8','/qr-LICENSE.txt':'text/plain'}[route]
             return self.respond(200,(ROOT/'admin'/name).read_text(),mime)
-        if route=='/api/auth-state':return self.respond(200,{'setup_required':owner() is None})
+        if route=='/api/auth-state':return self.respond(200,{'setup_required':owner() is None,'mfa_enabled':mfa_state() is not None})
         session=self.session()
         if not session:return self.respond(401,{'error':'Sign in to your owner account'})
         if route=='/api/drafts':
             with connect() as db:rows=db.execute('SELECT question,approved,updated FROM drafts ORDER BY updated DESC').fetchall()
-            return self.respond(200,{'csrf':session['csrf'],'drafts':[{'question':json.loads(q),'approved':bool(a),'updated':t} for q,a,t in rows],'ocr_available':bool(shutil.which('tesseract') or os.environ.get('BIP_OCR_IMAGE')),'source_count':len(list((DATA/'sources').glob('*'))),'source_bytes':sum(p.stat().st_size for p in (DATA/'sources').glob('*') if p.is_file())})
+            return self.respond(200,{'csrf':session['csrf'],'mfa_enabled':mfa_state() is not None,'drafts':[{'question':json.loads(q),'approved':bool(a),'updated':t} for q,a,t in rows],'ocr_available':bool(shutil.which('tesseract') or os.environ.get('BIP_OCR_IMAGE')),'source_count':len(list((DATA/'sources').glob('*'))),'source_bytes':sum(p.stat().st_size for p in (DATA/'sources').glob('*') if p.is_file())})
         return self.respond(404,{'error':'Not found'})
     def do_POST(self):
         if not self.valid_host() or self.headers.get('Origin') not in self.allowed_origins():return self.respond(403,{'error':'Use the same-origin loopback studio'})
@@ -123,32 +155,71 @@ class Handler(BaseHTTPRequestHandler):
                         if isinstance(password,str) and len(password)<=256 and isinstance(username,str):
                             matched=hmac.compare_digest(password_hash(password,existing[1]),existing[2])
                             valid=hmac.compare_digest(username,existing[0]) and matched
+                            if valid:valid=verify_mfa(payload.get('otp',''))
                     elif route=='/api/recover' and existing:
                         code=payload.get('code','')
                         digest=hashlib.sha256(code.encode()).hexdigest() if isinstance(code,str) else ''
                         valid=any(hmac.compare_digest(digest,c) for c in json.loads(existing[3]))
                         if valid:
-                            with connect() as db:codes=write_owner(db,existing[0],payload.get('password'))
+                            with connect() as db:
+                                codes=write_owner(db,existing[0],payload.get('password'))
+                                db.execute('DELETE FROM mfa')
                     if not valid:
                         self.server.failures+=1
                         if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
                         return self.respond(401,{'error':'Credentials not accepted'})
                     self.server.failures=0;self.new_cookie=secrets.token_urlsafe(32)
                     self.server.sessions={self.new_cookie:{'csrf':secrets.token_urlsafe(32),'expires':time.time()+1800}}
-                    return self.respond(200,{'ok':True,'recovery_codes':codes})
+                    return self.respond(200,{'ok':True,'recovery_codes':codes,'mfa_reset':route=='/api/recover'})
             session=self.session()
             if not session or not hmac.compare_digest(self.headers.get('X-CSRF-Token',''),session['csrf']):return self.respond(403,{'error':'Sign in again before changing content'})
             if route=='/api/logout':
                 self.server.sessions.clear();self.new_cookie=''
                 return self.respond(200,{'ok':True})
+            if route in ['/api/mfa/begin','/api/mfa/enable','/api/mfa/disable']:
+                with self.server.auth_lock:
+                    if self.session() is None:return self.respond(403,{'error':'Sign in again'})
+                    if time.time()<self.server.login_blocked_until:return self.respond(429,{'error':'Wait a minute before trying again'})
+                    if route=='/api/mfa/enable':
+                        pending=session.get('mfa_pending')
+                        if not pending or pending['expires']<time.time():raise ValueError('Setup expired. Start again.')
+                        if mfa_state() is not None:raise ValueError('MFA is already enabled')
+                        step=accept_totp(pending['secret'],payload.get('otp',''))
+                        valid=step is not None
+                    else:
+                        existing=owner();password=payload.get('password','')
+                        valid=existing is not None and isinstance(password,str) and len(password)<=256 and hmac.compare_digest(password_hash(password,existing[1]),existing[2])
+                        if valid and route=='/api/mfa/disable':valid=verify_mfa(payload.get('otp',''))
+                    if not valid:
+                        self.server.failures+=1
+                        if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
+                        return self.respond(401,{'error':'Password or authenticator code was not accepted. Wait for a new code if you just used one.'})
+                    self.server.failures=0
+                    if route=='/api/mfa/begin':
+                        if mfa_state() is not None:raise ValueError('MFA is already enabled')
+                        secret=base64.b32encode(secrets.token_bytes(20)).decode()
+                        session['mfa_pending']={'secret':secret,'expires':time.time()+600}
+                        uri='otpauth://totp/'+quote('Bip Studio:'+existing[0],safe='')+'?secret='+secret+'&issuer=Bip%20Studio&algorithm=SHA1&digits=6&period=30'
+                        return self.respond(200,{'secret':secret,'uri':uri})
+                    with connect() as db:
+                        if route=='/api/mfa/enable':db.execute('INSERT INTO mfa VALUES (1,?,?)',(pending['secret'],step))
+                        else:db.execute('DELETE FROM mfa')
+                        codes=new_recovery_codes(db)
+                    self.server.sessions.clear();self.new_cookie=''
+                    return self.respond(200,{'ok':True,'recovery_codes':codes})
             if route=='/api/password':
                 with self.server.auth_lock:
+                    if self.session() is None:return self.respond(403,{'error':'Sign in again'})
                     if time.time()<self.server.login_blocked_until:return self.respond(429,{'error':'Wait a minute before trying again'})
                     existing=owner();password=payload.get('currentPassword','')
                     if not existing or not isinstance(password,str) or len(password)>256 or not hmac.compare_digest(password_hash(password,existing[1]),existing[2]):
                         self.server.failures+=1
                         if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
                         raise ValueError('Current password was not accepted')
+                    if not verify_mfa(payload.get('otp','')):
+                        self.server.failures+=1
+                        if self.server.failures>=5:self.server.login_blocked_until=time.time()+60;self.server.failures=0
+                        raise ValueError('Authenticator code was not accepted. Wait for a fresh code if it was just used.')
                     with connect() as db:codes=write_owner(db,existing[0],payload.get('password'))
                     self.server.sessions.clear()
                     return self.respond(200,{'ok':True,'recovery_codes':codes})

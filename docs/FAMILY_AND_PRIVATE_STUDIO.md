@@ -20,7 +20,7 @@ Start manually:
 python3 admin/studio.py
 ```
 
-Open through an SSH tunnel, or an explicitly configured private HTTPS reverse proxy. A server-generated login token is stored in `~/.local/share/bip-studio/login-token` with mode 600. Read it privately over SSH and paste it into the Studio login. It rotates on server restart. Sessions last 30 minutes, cookies are HttpOnly/SameSite=Strict (Secure on configured HTTPS), writes require CSRF and same-origin checks, and login failures are throttled. No separate MFA/passkey system was added; private Tailscale/SSH access is another prerequisite. Never expose the loopback listener publicly or enable Tailscale Funnel for it.
+Open through an SSH tunnel or the configured private Tailscale HTTPS URL. Use the one-time setup token only to create the owner account, then sign in with username/password and authenticator MFA when enrolled. Sessions last 30 minutes, cookies are HttpOnly/SameSite=Strict (Secure on configured HTTPS), writes require CSRF and same-origin checks, and authentication failures are throttled. Never expose the loopback listener publicly or enable Tailscale Funnel for it. See the owner sign-in section below for recovery and MFA setup.
 
 Optional environment variables:
 
@@ -50,3 +50,22 @@ A Vercel Git integration is not configured by this work. GitHub PR creation is n
 ## Validation limits
 
 Node tests exercise local-storage operations with an in-memory IndexedDB implementation, backup integrity/conflicts, schemas, content validation and publisher dry-run. Python tests exercise loopback authentication/host/CSRF/approval/export controls. Initial React views are server-rendered. These do not establish browser persistence, camera-picker behavior, mobile layout, actual OCR accuracy or end-to-end GitHub/Vercel publication. Do a hands-on family pilot before classroom use.
+
+
+## Owner sign-in and authenticator MFA
+
+The private Studio now has persistent single-owner credentials. Before the owner exists, a server-only setup token creates that account once. After creation, the token is deleted and cannot sign in. Public registration is closed. Passwords use salted scrypt hashes. Sessions expire in 30 minutes and are revoked on password recovery, password change, MFA changes or a service restart.
+
+In **Security**, confirm your password, scan the locally generated QR in a TOTP authenticator (or enter the private setup key), then verify a six-digit code. MFA activates only after successful verification. Save the replacement recovery codes privately: enabling or disabling MFA replaces older codes. No SMS provider, subscription or external QR service is used. Passkeys are not implemented.
+
+Login with MFA requires password plus a fresh code. Codes use a 30-second period, a one-step clock allowance and persistent replay rejection. Failed authentication attempts are throttled. Password changes require a current code while MFA is on. To disable MFA, supply the password and a fresh code.
+
+**Lost phone:** Forgot password accepts a recovery code and a new password. Recovery revokes sessions, replaces all recovery codes, and disables the lost authenticator. Enrol the replacement phone. Recovery codes are password-equivalent secrets, not public reference numbers. No email recovery endpoint is configured.
+
+The TOTP seed must remain retrievable for code verification. It is stored in the private SQLite database under the service's restricted filesystem permissions, not in a separate encrypted vault. Server administrators and anyone with access to a database backup can obtain it. Backups must remain private.
+
+## Guided editor
+
+Choose a grade, then a learning goal filtered to the registered standards for that grade. Four separate choices feed an explicit correct-answer selector. Changing any content invalidates the prior UI check and review checkbox. Automated validation and a human review are required before local approval; the server independently validates approvals. A live student preview and next-step checklist assist review. Drafts support search and approval filters. A new-question action creates a fresh ID so separate questions do not overwrite the initial sample.
+
+The grade-specific standard choices are generated from the app registry; a test prevents drift. This remains partial K–5 coverage, not an endorsement or complete curriculum. Printed OCR proposes only one bounded Grade 3 arithmetic draft.

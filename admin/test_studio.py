@@ -1,3 +1,5 @@
+from unittest.mock import patch
+import base64, time
 import http.client, importlib.util, json, secrets, tempfile, threading, unittest
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('studio',Path(__file__).with_name('studio.py'))
@@ -23,6 +25,10 @@ class StudioTests(unittest.TestCase):
   if studio.owner() is None:self.call('/api/setup',{'token':self.server.login_token,'username':'massi','password':'a long private password'})
   status,_,cookie=self.call('/api/login',{'username':'massi','password':'a long private password'});self.assertEqual(status,200);cookie=cookie.split(';')[0]
   status,data,_=self.call('/api/drafts',cookie=cookie);self.assertEqual(status,200);return cookie,data['csrf']
+ def test_standards_endpoint_returns_an_array(self):
+  status,data,_=self.call('/standards.json')
+  self.assertEqual(status,200);self.assertIsInstance(data,list);self.assertEqual(len(data),84)
+  self.assertTrue(all('grade' in standard and 'code' in standard for standard in data))
  def test_auth_host_and_csrf(self):
   self.assertEqual(self.call('/api/drafts')[0],401)
   self.assertEqual(self.call('/api/drafts',host='evil.example')[0],400)
@@ -72,6 +78,51 @@ class StudioTests(unittest.TestCase):
   self.assertEqual(self.call('/api/password',{'currentPassword':'wrong','password':'another private password'},cookie,csrf)[0],400)
   self.assertEqual(self.call('/api/password',{'currentPassword':'a long private password','password':'another private password'},cookie,csrf)[0],200)
   self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
+ def test_totp_known_vector_and_replay(self):
+  secret=base64.b32encode(b'12345678901234567890').decode()
+  self.assertEqual(studio.totp(secret,1,8),'94287082')
+  self.assertEqual(studio.accept_totp(secret,'287082',now=59),1)
+  self.assertIsNone(studio.accept_totp(secret,'287082',last_step=1,now=59))
+  self.assertIsNone(studio.accept_totp(secret,'287082',now=180))
+  self.assertIsNone(studio.accept_totp(secret,'abcdef',now=59))
+ def test_mfa_enrol_login_replay_and_recovery(self):
+  cookie,csrf=self.login();now=int(time.time()//30)*30+5
+  self.assertEqual(self.call('/api/mfa/begin',{'password':'wrong'},cookie,csrf)[0],401)
+  status,data,_=self.call('/api/mfa/begin',{'password':'a long private password'},cookie,csrf)
+  self.assertEqual(status,200);secret=data['secret'];self.assertTrue(data['uri'].startswith('otpauth://totp/'))
+  self.assertIsNone(studio.mfa_state())
+  self.assertEqual(self.call('/api/mfa/enable',{'otp':'bad'},cookie,csrf)[0],401)
+  with patch.object(studio.time,'time',return_value=now):
+   status,data,_=self.call('/api/mfa/enable',{'otp':studio.totp(secret,now//30)},cookie,csrf)
+   self.assertEqual(status,200);codes=data['recovery_codes']
+   self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
+   self.assertEqual(self.call('/api/login',{'username':'massi','password':'a long private password'})[0],401)
+   self.assertEqual(self.call('/api/login',{'username':'massi','password':'a long private password','otp':studio.totp(secret,now//30)})[0],401)
+  with patch.object(studio.time,'time',return_value=now+30):
+   status,_,cookie=self.call('/api/login',{'username':'massi','password':'a long private password','otp':studio.totp(secret,now//30+1)})
+   self.assertEqual(status,200);cookie=cookie.split(';')[0]
+   status,data,_=self.call('/api/drafts',cookie=cookie);self.assertTrue(data['mfa_enabled']);csrf=data['csrf']
+   self.assertEqual(self.call('/api/password',{'currentPassword':'a long private password','password':'another private password'},cookie,csrf)[0],400)
+   self.assertEqual(self.call('/api/mfa/disable',{'password':'a long private password','otp':'bad'},cookie,csrf)[0],401)
+   status,data,_=self.call('/api/recover',{'code':codes[0],'password':'another private password'})
+   self.assertEqual(status,200);self.assertTrue(data['mfa_reset']);self.assertIsNone(studio.mfa_state())
+   self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
+ def test_mfa_setup_expiry_and_password_preserves_mfa(self):
+  cookie,csrf=self.login();now=int(time.time()//30)*30+5
+  status,data,_=self.call('/api/mfa/begin',{'password':'a long private password'},cookie,csrf);secret=data['secret']
+  for session in self.server.sessions.values():session['mfa_pending']['expires']=0
+  self.assertEqual(self.call('/api/mfa/enable',{'otp':studio.totp(secret,now//30)},cookie,csrf)[0],400)
+  with studio.connect() as db:db.execute('INSERT INTO mfa VALUES (1,?,-1)',(secret,))
+  with patch.object(studio.time,'time',return_value=now):
+   self.assertEqual(self.call('/api/password',{'currentPassword':'a long private password','password':'another private password','otp':studio.totp(secret,now//30)},cookie,csrf)[0],200)
+  self.assertIsNotNone(studio.mfa_state())
+  with patch.object(studio.time,'time',return_value=now+30):
+   status,_,cookie=self.call('/api/login',{'username':'massi','password':'another private password','otp':studio.totp(secret,now//30+1)})
+   self.assertEqual(status,200);cookie=cookie.split(';')[0];csrf=self.call('/api/drafts',cookie=cookie)[1]['csrf']
+  with patch.object(studio.time,'time',return_value=now+60):
+   self.assertEqual(self.call('/api/mfa/disable',{'password':'another private password','otp':studio.totp(secret,now//30+2)},cookie,csrf)[0],200)
+   self.assertIsNone(studio.mfa_state())
+   self.assertEqual(self.call('/api/drafts',cookie=cookie)[0],401)
  def test_login_throttle(self):
   for _ in range(5):self.assertEqual(self.call('/api/login',{'token':'incorrect'})[0],401)
   self.assertEqual(self.call('/api/login',{'token':self.server.login_token})[0],429)
