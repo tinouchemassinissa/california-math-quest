@@ -7,3 +7,5 @@ dist-ssr
 .DS_Store
 Thumbs.db
 Bip_Gemini_Math_Game_Handoff.zip
+__pycache__/
+*.pyc

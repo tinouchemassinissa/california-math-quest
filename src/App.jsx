@@ -1,3 +1,7 @@
+import ApprovedPractice from './components/ApprovedPractice.jsx';
+import WorldHome from './components/WorldHome.jsx';
+import KidsWorld from './components/KidsWorld.jsx';
+import FamilyWorld from './components/FamilyWorld.jsx';
 import LearningJourney from './components/LearningJourney.jsx';
 import { createQuestionLifecycle } from './game/questionLifecycle.js';
 import { isAnswerEquivalent } from './game/mathEngine/answerMath.js';
@@ -57,6 +61,8 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
+  const [portal,setPortal] = useState('home');
+  const [activeFamilyLearner,setActiveFamilyLearner] = useState(null);
   const [journeyLessonId, setJourneyLessonId] = useState('starter');
   const [journeyOpen, setJourneyOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -237,7 +243,7 @@ export default function App() {
     nextQuestion(focusedStandard, mode === 'speed-sprint');
   }, [grade, focusedStandard, mode, difficulty]);
 
-  const isTimerActive = !showWelcome && !guideOpen && (mode === 'speed-sprint' || timedPractice);
+  const isTimerActive = portal==='play' && !journeyOpen && !showWelcome && !guideOpen && (mode === 'speed-sprint' || timedPractice);
 
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion || !isTimerActive) return;
@@ -350,7 +356,7 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (showWelcome || feedback || !currentQuestion?.options || summaryOpen) return;
+      if (portal!=='play' || journeyOpen || showWelcome || feedback || !currentQuestion?.options || summaryOpen) return;
       if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
       const key = e.key;
       if (['1', '2', '3', '4'].includes(key)) {
@@ -362,7 +368,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showWelcome, currentQuestion, feedback, summaryOpen]);
+  }, [portal, journeyOpen, showWelcome, currentQuestion, feedback, summaryOpen]);
 
   const handleStartClassSession = ({ leaderName, groupName, leagueId }) => {
     const newSession = createClassSession({
@@ -390,9 +396,12 @@ export default function App() {
 
   const mistakeStandards = getMistakeReviewStandards(learnerProfile, grade);
 
+  const startFamilyLesson=(profile,lessonId='starter')=>{setActiveFamilyLearner(profile);setStudentName(profile.name);setGrade(profile.grade);setJourneyLessonId(lessonId);setPortal('kids');setJourneyOpen(true);};
+  const startFamilyPlay=profile=>{setActiveFamilyLearner(profile);setStudentName(profile.name);setGrade(profile.grade);setJourneyLessonId('starter');setPortal('play');setShowWelcome(true);};
+
   return (
     <div className="app-container">
-      {journeyOpen ? <LearningJourney key={`${studentName}-${grade}-${journeyLessonId}`} grade={grade} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : showWelcome ? (
+      {journeyOpen ? <LearningJourney key={`${activeFamilyLearner?.id||studentName}-${grade}-${journeyLessonId}`} grade={grade} learnerId={activeFamilyLearner?.id} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : portal==='published'&&activeFamilyLearner ? <ApprovedPractice profile={activeFamilyLearner} onClose={()=>setPortal('kids')}/> : portal==='home' ? <WorldHome onKids={()=>setPortal('kids')} onFamily={()=>setPortal('family')}/> : portal==='family' ? <FamilyWorld onHome={()=>setPortal('home')} onLearn={startFamilyLesson}/> : portal==='kids' ? <KidsWorld initialLearner={activeFamilyLearner} onPublished={profile=>{setActiveFamilyLearner(profile);setPortal('published');}} onHome={()=>setPortal('home')} onLearn={startFamilyLesson} onPlay={startFamilyPlay}/> : showWelcome ? (
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
@@ -430,6 +439,7 @@ export default function App() {
               if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
               setFeedback(null);
               setShowWelcome(true);
+              setPortal(activeFamilyLearner?'kids':'home');
             }}
             difficulty={difficulty}
             onDifficultyChange={(d) => {

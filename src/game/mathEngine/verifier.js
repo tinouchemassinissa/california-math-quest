@@ -3,11 +3,9 @@ import { isAnswerEquivalent, parseQuantity } from './answerMath.js';
 import { semanticErrors } from './semanticChecks.js';
 // Bounded structural and mathematical checks; not a prose or child-safety certification.
 
-const FORBIDDEN_TOKENS = ['nan', 'undefined', '[object', '<script', 'infinity'];
-
 function hasCorruptedText(value) {
   const str = String(value ?? '').toLowerCase();
-  return FORBIDDEN_TOKENS.some((tok) => str.includes(tok));
+  return /\b(?:nan|undefined|infinity)\b|\[object|<script/i.test(str);
 }
 
 function extractLeadingNumber(val) {

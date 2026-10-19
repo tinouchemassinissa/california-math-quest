@@ -17,9 +17,9 @@ function JourneyPicture({visual}){
   return <VisualManipulative manipulative={visual}/>;
 }
 const PHASES={diagnostic:'Let’s find a starting point',lesson:'Look, draw and explain',guided:'Practice with Bip',check:'Try on your own',review:'Remember it later',complete:'Your learning snapshot'};
-export default function LearningJourney({grade,studentName,onClose,lessonId="starter",onSelectLesson}){
+export default function LearningJourney({grade,studentName,onClose,lessonId="starter",onSelectLesson,learnerId}){
   const [state,setState]=useState(()=>createJourney(grade,lessonId));
-  const [record,setRecord]=useState(()=>{try{return readJourneyRecord(localStorage.getItem(journeyStorageKey(studentName,grade,lessonId)) ?? (lessonId==='starter'?localStorage.getItem(journeyStorageKey(studentName,grade,lessonId).replace(/:starter$/,'')):null),grade,lessonId);}catch{return null;}});
+  const [record,setRecord]=useState(()=>{try{return readJourneyRecord(localStorage.getItem(journeyStorageKey(learnerId||studentName,grade,lessonId)) ?? (lessonId==='starter'?localStorage.getItem(journeyStorageKey(learnerId||studentName,grade,lessonId).replace(/:starter$/,'')):null),grade,lessonId);}catch{return null;}});
   const [storageWarning,setStorageWarning]=useState(false);
   const [strategy,setStrategy]=useState(null);
   const [now,setNow]=useState(Date.now());
@@ -29,8 +29,8 @@ export default function LearningJourney({grade,studentName,onClose,lessonId="sta
     if(state.phase!=='complete')return;
     const result=journeySummary(state);
     setRecord(result);setNow(Date.now());
-    try{localStorage.setItem(journeyStorageKey(studentName,grade,lessonId),JSON.stringify(result));}catch{setStorageWarning(true);}
-  },[state,studentName,grade,lessonId]);
+    try{localStorage.setItem(journeyStorageKey(learnerId||studentName,grade,lessonId),JSON.stringify(result));}catch{setStorageWarning(true);}
+  },[state,studentName,grade,lessonId,learnerId]);
   const question=state.phase==='complete'?null:journeyQuestion(grade,currentJourneyIndex(state),lessonId);
   const showPicture=state.phase==='lesson'||state.phase==='guided'||state.help;
   const isLesson=state.phase==='lesson';
@@ -74,8 +74,8 @@ export default function LearningJourney({grade,studentName,onClose,lessonId="sta
       </>}
     </section></div>
     {record&&state.phase!=='complete'&&<aside className="journey-saved"><strong>Last snapshot:</strong> {record.independent?'Two independent answers':'Practice with more support'} · {now>=record.reviewAt?'Review is due':'Review is scheduled'}<button type="button" className="btn btn-secondary" onClick={()=>setState({...createJourney(grade,lessonId),phase:'review'})}>Open review</button></aside>}
-    <p className="journey-privacy">Snapshots stay in this browser under the learner name, grade and lesson. Use different names on a shared device. Switching or closing a lesson ends that unfinished attempt. No message or school account is sent.</p>
+    <p className="journey-privacy">Snapshots stay in this browser under the learner identifier, grade and lesson. Explorer tiles are local labels, not secure accounts. Switching or closing a lesson ends that unfinished attempt. No message or school account is sent.</p>
     {storageWarning&&<p role="alert">This browser could not save the snapshot. You can continue, but it may be lost when you leave.</p>}
-    {record&&<button type="button" className="journey-delete" onClick={()=>{try{localStorage.removeItem(journeyStorageKey(studentName,grade,lessonId));if(lessonId==='starter')localStorage.removeItem(journeyStorageKey(studentName,grade,lessonId).replace(/:starter$/,''));setRecord(null);setState(createJourney(grade,lessonId));setStrategy(null);}catch{setStorageWarning(true);}}}>Delete this learner’s saved snapshot for this lesson</button>}
+    {record&&<button type="button" className="journey-delete" onClick={()=>{try{localStorage.removeItem(journeyStorageKey(learnerId||studentName,grade,lessonId));if(lessonId==='starter')localStorage.removeItem(journeyStorageKey(learnerId||studentName,grade,lessonId).replace(/:starter$/,''));setRecord(null);setState(createJourney(grade,lessonId));setStrategy(null);}catch{setStorageWarning(true);}}}>Delete this learner’s saved snapshot for this lesson</button>}
   </main>;
 }

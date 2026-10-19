@@ -6,7 +6,7 @@
   "description": "California Elementary Math Quest - Community Mathematics Learning Platform aligned with California Common Core State Standards (Grades K-5)",
   "scripts": {
     "dev": "vite --port 5173 --host",
-    "build": "vite build",
+    "build": "node scripts/checkPublishedContent.mjs && vite build",
     "preview": "vite preview",
     "test": "node --test src/game/*.test.mjs"
   },
@@ -20,6 +20,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "fake-indexeddb": "^6.2.5",
     "vite": "^6.2.0",
     "vite-plugin-pwa": "^0.21.1",
     "workbox-window": "^7.3.0"

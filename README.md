@@ -133,3 +133,7 @@ Choose a grade and learner name on the home screen, then **Start my learning pat
 Snapshots are saved only in this browser, separately by learner name and grade. Use distinct names on shared devices. The path provides a delete-snapshot control. Unfinished lessons are not saved. Review times are shown in the app; they do not send notifications. A short check is evidence about those questions, not a certified mastery score.
 
 The private pilot now offers **three mini-lessons per grade** (18 paths; 180 fixed item definitions). Bip reacts to learning events with existing local video clips; pause and read-aloud controls are included. This remains selected K–5 practice, not a complete publisher curriculum. Lesson snapshots are separated by learner, grade and lesson. The starter path retains access to the previous snapshot key.
+
+### Two worlds, one Bip
+
+The pilot opens with **Kids’ World** and **Family & Teacher Guide**. The family guide adds local learner folders, a homework shelf, notes/status, linked practice, short daily plans, teaching strategies and collection backup/restore. Uploaded family files stay in that browser. The separate private owner Studio lives under `admin/` and is never linked from the public navigation. See [family storage and private Studio](docs/FAMILY_AND_PRIVATE_STUDIO.md) for limits, setup and the explicit review/publishing workflow.
