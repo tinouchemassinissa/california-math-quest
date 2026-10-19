@@ -42,7 +42,7 @@ export default function ClassroomModal({
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-icon">👥</span>
-            <h2>California Community Study Groups & Tutor Portal</h2>
+            <h2>Study groups & practice records</h2>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
             ✕
@@ -53,8 +53,7 @@ export default function ClassroomModal({
           <div className="classroom-banner">
             <p>
               Created for California student study circles, after-school tutoring programs, homeschools,
-              and classroom practice. Tracks standard mastery locally with <strong>100% student privacy</strong> (no
-              cloud transmission or logins), and exports structured Excel workbooks for student records.
+              and classroom practice. Saves practice records in this browser and exports Excel workbooks. These records are not proof of mastery. Anyone using this browser may open them; keep exports private.
             </p>
           </div>
 
@@ -159,7 +158,7 @@ export default function ClassroomModal({
             <form onSubmit={handleStart} className="session-start-form">
               <h3>Start a New Community Study Session</h3>
               <div className="form-group">
-                <label>California Scholar League:</label>
+                <label>Group theme:</label>
                 <select
                   value={leagueId}
                   onChange={(e) => setLeagueId(e.target.value)}

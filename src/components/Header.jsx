@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { GRADES } from '../data/californiaCurriculum.js';
 import { GAME_MODES } from './ModeSelector.jsx';
-import { DIFFICULTY_PRESETS } from '../game/learningEngine.js';
 
 export default function Header({
   studentName,
   grade,
   mode,
   onGoHome,
-  difficulty,
-  onDifficultyChange,
   score,
   streak,
   lives,
@@ -20,16 +17,9 @@ export default function Header({
   onToggleMusic,
   theme,
   onToggleTheme,
-  timedPractice,
-  onToggleTimedPractice,
-  onOpenClassroom,
-  onOpenCurriculum,
   onOpenHelp,
-  onOpenVault,
   onOpenAchievements,
-  activeClassSession,
 }) {
-  const [teacherMenuOpen, setTeacherMenuOpen] = useState(false);
 
   const gradeInfo = GRADES.find((g) => g.id === grade) || GRADES[3];
   const modeInfo = GAME_MODES.find((m) => m.id === mode) || GAME_MODES[0];
@@ -43,9 +33,9 @@ export default function Header({
             type="button"
             className="home-dashboard-btn"
             onClick={onGoHome}
-            title="Return to Welcome Dashboard to change Name, Grade, Pet, or Mode"
+            title="Back to my world"
           >
-            🏠 <span>Change Grade / Mode</span>
+            🏠 <span>My world</span>
           </button>
 
           <div className="player-active-chip">
@@ -102,15 +92,6 @@ export default function Header({
 
             <button
               type="button"
-              className={`kid-teacher-toggle ${teacherMenuOpen ? 'active' : ''}`}
-              onClick={() => setTeacherMenuOpen((v) => !v)}
-              title="Teacher & Standards Tools"
-            >
-              👩‍🏫
-            </button>
-
-            <button
-              type="button"
               className="icon-btn"
               onClick={onToggleSound}
               title={soundEnabled ? 'Sound Effects On' : 'Sound Effects Muted'}
@@ -148,71 +129,7 @@ export default function Header({
         </div>
       </div>
 
-      {/* Collapsible Teacher / Parent & Curriculum Drawer */}
-      {teacherMenuOpen && (
-        <div className="teacher-drawer">
-          <div className="teacher-drawer-left">
-            <div className="select-wrapper">
-              <label htmlFor="diff-select">Difficulty:</label>
-              <select
-                id="diff-select"
-                value={difficulty}
-                onChange={(e) => onDifficultyChange(e.target.value)}
-                className="styled-select"
-              >
-                {Object.values(DIFFICULTY_PRESETS).map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.label} ({d.multiplier}x)
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            <button
-              type="button"
-              className={`drawer-tool-btn ${timedPractice ? 'active-timer' : ''}`}
-              onClick={onToggleTimedPractice}
-            >
-              {timedPractice ? '⏱️ Timer: ON' : '🧘 Relaxed Mode (No Timer)'}
-            </button>
-          </div>
-
-          <div className="teacher-drawer-links">
-            <button
-              type="button"
-              className="drawer-tool-btn primary-tool"
-              onClick={() => {
-                setTeacherMenuOpen(false);
-                onOpenCurriculum();
-              }}
-            >
-              📘 CA Standards Practice Map
-            </button>
-
-            <button
-              type="button"
-              className="drawer-tool-btn"
-              onClick={() => {
-                setTeacherMenuOpen(false);
-                onOpenClassroom();
-              }}
-            >
-              👥 {activeClassSession ? `${activeClassSession.groupName} (${activeClassSession.activeStudent})` : 'Study Groups & Excel'}
-            </button>
-
-            <button
-              type="button"
-              className="drawer-tool-btn"
-              onClick={() => {
-                setTeacherMenuOpen(false);
-                onOpenVault();
-              }}
-            >
-              🧠 AI Knowledge Vault
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

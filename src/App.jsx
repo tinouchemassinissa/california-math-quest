@@ -12,9 +12,8 @@ import WelcomeDashboard from './components/WelcomeDashboard.jsx';
 import QuestionCard from './components/QuestionCard.jsx';
 import ClassroomModal from './components/ClassroomModal.jsx';
 import CurriculumBrowser from './components/CurriculumBrowser.jsx';
-import HelpGuide from './components/HelpGuide.jsx';
+import KidsHelp from './components/KidsHelp.jsx';
 import SummaryModal from './components/SummaryModal.jsx';
-import KnowledgeVaultModal from './components/KnowledgeVaultModal.jsx';
 import AchievementsModal from './components/AchievementsModal.jsx';
 import { STANDARDS } from './data/californiaCurriculum.js';
 import {
@@ -97,8 +96,8 @@ export default function App() {
   const [curriculumOpen, setCurriculumOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
-  const [vaultOpen, setVaultOpen] = useState(false);
   const [achievementsOpen, setAchievementsOpen] = useState(false);
+  useEffect(()=>{if(portal!=='family'||journeyOpen){setClassroomOpen(false);setCurriculumOpen(false);}},[portal,journeyOpen]);
 
   const [learnerProfile, setLearnerProfile] = useState(() => {
     try {
@@ -401,7 +400,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {journeyOpen ? <LearningJourney key={`${activeFamilyLearner?.id||studentName}-${grade}-${journeyLessonId}`} grade={grade} learnerId={activeFamilyLearner?.id} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : portal==='published'&&activeFamilyLearner ? <ApprovedPractice profile={activeFamilyLearner} onClose={()=>setPortal('kids')}/> : portal==='home' ? <WorldHome onKids={()=>setPortal('kids')} onFamily={()=>setPortal('family')}/> : portal==='family' ? <FamilyWorld onHome={()=>setPortal('home')} onLearn={startFamilyLesson}/> : portal==='kids' ? <KidsWorld initialLearner={activeFamilyLearner} onPublished={profile=>{setActiveFamilyLearner(profile);setPortal('published');}} onHome={()=>setPortal('home')} onLearn={startFamilyLesson} onPlay={startFamilyPlay}/> : showWelcome ? (
+      {journeyOpen ? <LearningJourney key={`${activeFamilyLearner?.id||studentName}-${grade}-${journeyLessonId}`} grade={grade} learnerId={activeFamilyLearner?.id} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : portal==='published'&&activeFamilyLearner ? <ApprovedPractice profile={activeFamilyLearner} onClose={()=>setPortal('kids')}/> : portal==='home' ? <WorldHome onKids={()=>setPortal('kids')} onFamily={()=>setPortal('family')}/> : portal==='family' ? <FamilyWorld onHome={()=>setPortal('home')} onLearn={startFamilyLesson} onOpenClassroom={()=>setClassroomOpen(true)} onOpenCurriculum={()=>setCurriculumOpen(true)} difficulty={difficulty} onDifficultyChange={d=>{setDifficulty(d);setLives(DIFFICULTY_PRESETS[d]?.lives||3);}} timedPractice={timedPractice} onToggleTimedPractice={()=>setTimedPractice(v=>!v)}/> : portal==='kids' ? <KidsWorld initialLearner={activeFamilyLearner} onPublished={profile=>{setActiveFamilyLearner(profile);setPortal('published');}} onHome={()=>setPortal('home')} onLearn={startFamilyLesson} onPlay={startFamilyPlay}/> : showWelcome ? (
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
@@ -423,10 +422,8 @@ export default function App() {
             }
             nextQuestion(focusedStandard, mode === 'speed-sprint');
           }}
-          onOpenCurriculum={() => setCurriculumOpen(true)}
           onOpenAchievements={() => setAchievementsOpen(true)}
-          onOpenClassroom={() => setClassroomOpen(true)}
-          onOpenVault={() => setVaultOpen(true)}
+          onBack={()=>setPortal(activeFamilyLearner?'kids':'home')}
           onStartJourney={() => setJourneyOpen(true)}
         />
       ) : (
@@ -458,11 +455,8 @@ export default function App() {
             onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
             timedPractice={timedPractice}
             onToggleTimedPractice={() => setTimedPractice((v) => !v)}
-            onOpenClassroom={() => setClassroomOpen(true)}
-            onOpenCurriculum={() => setCurriculumOpen(true)}
-            onOpenHelp={() => setHelpOpen(true)}
-            onOpenVault={() => setVaultOpen(true)}
-            onOpenAchievements={() => setAchievementsOpen(true)}
+                onOpenHelp={() => setHelpOpen(true)}
+              onOpenAchievements={() => setAchievementsOpen(true)}
             activeClassSession={classSession}
           />
 
@@ -509,25 +503,26 @@ export default function App() {
         </>
       )}
 
-      <footer className="app-footer">
+      {portal==='family'&&!journeyOpen&&<footer className="app-footer">
         <p>
           <strong>Learn with Bip</strong> • Independent practice mapped to selected California K–5 standards • Not school- or state-endorsed
         </p>
-      </footer>
+      </footer>}
 
-      <ClassroomModal
+      {portal==='family'&&!journeyOpen&&classroomOpen&&<ClassroomModal
         isOpen={classroomOpen}
         onClose={() => setClassroomOpen(false)}
         session={classSession}
         onStartSession={handleStartClassSession}
         onUpdateActiveStudent={handleUpdateActiveStudent}
-      />
+      />}
 
-      <CurriculumBrowser
+      {portal==='family'&&!journeyOpen&&curriculumOpen&&<CurriculumBrowser
         isOpen={curriculumOpen}
         onClose={() => setCurriculumOpen(false)}
         learnerProfile={learnerProfile}
         onPracticeStandard={(code) => {
+          setCurriculumOpen(false);setPortal('play');
           if (STANDARDS[code]) {
             setGrade(STANDARDS[code].grade);
           }
@@ -535,24 +530,19 @@ export default function App() {
           setShowWelcome(false);
           nextQuestion(code, false);
         }}
-      />
+      />}
 
-      <AchievementsModal
+      {portal==='play'&&!journeyOpen&&achievementsOpen&&<AchievementsModal
         isOpen={achievementsOpen}
         onClose={() => setAchievementsOpen(false)}
         learnerProfile={learnerProfile}
         currentGrade={grade}
         modeRecords={modeRecords}
-      />
+      />}
 
-      <HelpGuide isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+      {portal==='play'&&!journeyOpen&&helpOpen&&<KidsHelp onClose={() => setHelpOpen(false)}/>}
 
-      <KnowledgeVaultModal
-        isOpen={vaultOpen}
-        onClose={() => setVaultOpen(false)}
-      />
-
-      <SummaryModal
+      {portal==='play'&&!journeyOpen&&!showWelcome&&summaryOpen&&<SummaryModal
         isOpen={summaryOpen}
         onClose={() => {
           setSummaryOpen(false);
@@ -570,7 +560,7 @@ export default function App() {
         }}
         hasMistakes={roundStats.total > roundStats.correct}
         modeTitle={GAME_MODES.find((m) => m.id === mode)?.title}
-      />
+      />}
     </div>
   );
 }

@@ -1,0 +1,4 @@
+import React from 'react';
+export default function KidsHelp({onClose}){
+ return <div className="modal-overlay" onClick={onClose}><section className="modal-dialog modal-md" role="dialog" aria-modal="true" aria-labelledby="kids-help-title" onClick={e=>e.stopPropagation()}><header className="modal-header"><h2 id="kids-help-title">Let’s play with Bip!</h2><button type="button" className="btn btn-secondary" onClick={onClose}>Close</button></header><div className="modal-body"><p>👆 Pick the answer you think fits.</p><p>💡 Stuck? Ask for a picture or a clue.</p><p>💛 Mistakes are part of learning. Bip will help you try again.</p><p>🔊 Use Read to hear the words. Sound and music can be turned off.</p><p>🏠 My world takes you back to your adventures.</p><p>⏱ Quick games have a timer. Learning paths let you take your time.</p></div></section></div>;
+}

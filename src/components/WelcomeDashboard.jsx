@@ -1,5 +1,5 @@
 import React from 'react';
-import { GRADES, PROGRAM_INFO } from '../data/californiaCurriculum.js';
+import { GRADES } from '../data/californiaCurriculum.js';
 import { GAME_MODES } from './ModeSelector.jsx';
 import BipCompanion from './BipCompanion.jsx';
 
@@ -15,8 +15,6 @@ const GRADE_TILE_STYLES = {
 export default function WelcomeDashboard({
   studentName,
   onStudentNameChange,
-  leagueId = 'bagby-barracudas',
-  onSelectLeague,
   grade,
   onSelectGrade,
   mode,
@@ -24,10 +22,8 @@ export default function WelcomeDashboard({
   mistakeCount = 0,
   onStartGame,
   onStartJourney,
-  onOpenCurriculum,
   onOpenAchievements,
-  onOpenClassroom,
-  onOpenVault,
+  onBack,
 }) {
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -42,23 +38,15 @@ export default function WelcomeDashboard({
       <div className="welcome-top-bar">
         <div className="welcome-brand-group">
           <div className="welcome-hero-badge">
-            🌟 Independent California standards practice • Grades K–5
+            🌟 Explore maths with Bip
           </div>
           <h1 className="welcome-hero-title">Learn with Bip</h1>
         </div>
 
         <div className="welcome-teacher-bar">
-          <button type="button" className="welcome-tool-link" onClick={onOpenCurriculum}>
-            📘 Selected CA Skills
-          </button>
+          <button type="button" className="welcome-tool-link" onClick={onBack}>← My world</button>
           <button type="button" className="welcome-tool-link" onClick={onOpenAchievements}>
             🏆 Badges
-          </button>
-          <button type="button" className="welcome-tool-link" onClick={onOpenClassroom}>
-            👥 Study Groups
-          </button>
-          <button type="button" className="welcome-tool-link" onClick={onOpenVault}>
-            🧠 AI Vault
           </button>
         </div>
       </div>
@@ -70,32 +58,19 @@ export default function WelcomeDashboard({
           {/* Step 1: Compact Side-by-Side Name & School Row */}
           <div className="welcome-step-block">
             <label htmlFor="kid-name-input" className="welcome-step-title">
-              <span className="step-num-circle">1</span> Scholar Name & School
+              <span className="step-num-circle">1</span> Your nickname
             </label>
             <div className="kid-name-school-row">
               <input
                 id="kid-name-input"
                 type="text"
                 className="kid-name-input"
-                placeholder="Type your name (e.g., Leo, Maya)..."
+                placeholder="What should Bip call you?"
                 value={studentName}
                 onChange={(e) => onStudentNameChange(e.target.value)}
                 maxLength={24}
               />
-              {onSelectLeague && (
-                <select
-                  aria-label="Choose your Cambrian School or California Team"
-                  className="kid-school-select"
-                  value={leagueId}
-                  onChange={(e) => onSelectLeague(e.target.value)}
-                >
-                  {PROGRAM_INFO.leagues.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.badge} {l.name}
-                    </option>
-                  ))}
-                </select>
-              )}
+
             </div>
           </div>
 
@@ -110,7 +85,7 @@ export default function WelcomeDashboard({
               soundEnabled={false}
               studentName={studentName}
               compact
-              showControls
+              showControls={false}
             />
           </div>
 
@@ -148,7 +123,7 @@ export default function WelcomeDashboard({
 
         {/* Right Bento Panel: 6 Game Mode Tiles + Giant Start Button */}
         <div className="welcome-bento-panel welcome-right-panel">
-        <section className="journey-entry"><div><span className="journey-kicker">NEW · LEARN WITH BIP</span><h2>A small lesson. A real next step.</h2><p>Pictures, guided practice and a chance to try on your own. Three focused lessons per grade.</p></div><button type="button" className="btn btn-primary" onClick={onStartJourney}>Start my learning path →</button></section>
+        <section className="journey-entry"><div><span className="journey-kicker">NEW · LEARN WITH BIP</span><h2>Learn one little step at a time.</h2><p>Bip brings pictures and clues. You can always ask for help.</p></div><button type="button" className="btn btn-primary" onClick={onStartJourney}>Start my learning path →</button></section>
           <div className="welcome-step-block" style={{ flex: 1 }}>
             <div className="welcome-step-title">
               <span className="step-num-circle">4</span> Choose Your Math Adventure Mode
@@ -185,13 +160,7 @@ export default function WelcomeDashboard({
             <button type="submit" className="welcome-start-btn">
               🚀 Start {activeGradeLabel} Math Adventures with Bip!
             </button>
-            <div className="welcome-safety-guarantee">
-              <span>🛡️ Ad-Free • No Student Accounts</span>
-              <span>•</span>
-              <span>✓ Built-in Maths Checks • Teacher Review Recommended</span>
-              <span>•</span>
-              <span>🔊 Read-Aloud & ✏️ Scratchpad Ready</span>
-            </div>
+            <p className="welcome-safety-guarantee">Pick an adventure. Take your time and have fun.</p>
           </div>
         </div>
       </form>

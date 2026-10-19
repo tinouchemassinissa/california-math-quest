@@ -18,7 +18,7 @@ function JourneyPicture({visual}){
   if(visual.type==='journey-place')return <div className="journey-places">{[['hundreds',100],['tens',10],['ones',1]].map(([place,value])=><div key={place}><strong>{place}</strong><div>{Array.from({length:visual[place]},(_,i)=><span key={i} className={`journey-place-block ${place}`}>{value}</span>)}</div></div>)}</div>;
   return <VisualManipulative manipulative={visual}/>;
 }
-const PHASES={diagnostic:'Let’s find a starting point',lesson:'Look, draw and explain',guided:'Practice with Bip',check:'Try on your own',review:'Remember it later',complete:'Your learning snapshot'};
+const PHASES={diagnostic:'Let’s find a starting point',lesson:'Look, draw and explain',guided:'Practice with Bip',check:'Try on your own',review:'Remember it later',complete:'Look what you tried'};
 export default function LearningJourney({grade,studentName,onClose,lessonId="starter",onSelectLesson,learnerId}){
   const progressKey=journeyProgressKey(learnerId||studentName,grade,lessonId);
   const [resumed,setResumed]=useState(false);
@@ -84,15 +84,11 @@ export default function LearningJourney({grade,studentName,onClose,lessonId="sta
         </>}
       </>}
       {state.phase==='complete'&&record&&<>
-        <div className="journey-result"><span aria-hidden="true">{record.independent?'🌱':'🧩'}</span><h3>{record.independent?'Two questions solved independently':'Keep building with practice'}</h3><p>{record.independent?'A good start on this small skill. It does not mean the whole standard is mastered.':'Help is part of learning. Revisit the picture, then try fresh questions on your own.'}</p></div>
-        {record.patterns.length>0&&<p>More than one answer suggests trying {config.kind==='fraction'?'equal-sized fraction pieces':config.kind==='place'?'place-value blocks':config.kind==='multiply'?'equal groups':config.kind==='subtract'?'taking counters away':config.kind==='missing'?'the whole and the known part':'counting both groups'} again. This is a practice suggestion, not a diagnosis.</p>}
-        <p>Next review: {new Date(record.reviewAt).toLocaleString()}. {record.independent?'A later check helps us see what you remember.':'We’ll offer another short check soon.'}</p>
+        <div className="journey-result"><span aria-hidden="true">{record.independent?'🌱':'🧩'}</span><h3>{record.independent?'You tried it on your own!':'Keep building with practice'}</h3><p>{record.independent?'You worked through two questions without help. Keep exploring!':'Help is part of learning. Revisit the picture, then try fresh questions on your own.'}</p></div>
+        <p>Come back for another little practice when you’re ready.</p>
         <div className="journey-actions"><button type="button" className="btn btn-primary" onClick={()=>setState(s=>({...createJourney(grade,lessonId),phase:'review',reviewSet:((record?.reviewSet??0)+1)%2}))}>Try the review questions</button><button type="button" className="btn btn-secondary" onClick={()=>{setState(createJourney(grade,lessonId));setStrategy(null);}}>Repeat the lesson</button></div>
       </>}
     </section></div>
-    {record&&state.phase!=='complete'&&<aside className="journey-saved"><strong>Last snapshot:</strong> {record.independent?'Two independent answers':'Practice with more support'} · {now>=record.reviewAt?'Review is due':'Review is scheduled'}<button type="button" className="btn btn-secondary" onClick={()=>setState({...createJourney(grade,lessonId),phase:'review',reviewSet:((record?.reviewSet??0)+1)%2})}>Open review</button></aside>}
-    <p className="journey-privacy">Snapshots stay in this browser under the learner identifier, grade and lesson. Explorer tiles are local labels, not secure accounts. Unfinished lessons resume in this browser. No message or school account is sent.</p>
-    {storageWarning&&<p role="alert">This browser could not save your progress. You can continue, but it may be lost when you leave.</p>}
-    {record&&<button type="button" className="journey-delete" onClick={()=>{try{localStorage.removeItem(journeyStorageKey(learnerId||studentName,grade,lessonId));if(lessonId==='starter')localStorage.removeItem(journeyStorageKey(learnerId||studentName,grade,lessonId).replace(/:starter$/,''));setRecord(null);setState(createJourney(grade,lessonId));setStrategy(null);}catch{setStorageWarning(true);}}}>Delete this learner’s saved snapshot for this lesson</button>}
+    {storageWarning&&<p role="alert">Your progress could not be saved. Ask a grown-up to help before closing the app.</p>}
   </main>;
 }
