@@ -47,3 +47,7 @@ test('MFA UI requests password reauthentication, renders QR locally and shows re
  }finally{app.close();}
  const protectedApp=await open({mfa:true});try{assert.equal(protectedApp.el('login-otp').required,true);assert.equal(protectedApp.el('login-otp-label').hidden,false);assert.match(protectedApp.el('mfa-status').textContent,/is on/);}finally{protectedApp.close();}
 });
+
+test('release screen identifies Studio separately from app deployment',async()=>{
+ const app=await open();try{assert.match(app.el('release-version').textContent,/Studio 123456789abc/);assert.match(app.el('release-version').textContent,/App deployment not verified/);assert.equal(app.el('error').textContent,'');}finally{app.close();}
+});

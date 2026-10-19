@@ -25,6 +25,12 @@ class StudioTests(unittest.TestCase):
   if studio.owner() is None:self.call('/api/setup',{'token':self.server.login_token,'username':'massi','password':'a long private password'})
   status,_,cookie=self.call('/api/login',{'username':'massi','password':'a long private password'});self.assertEqual(status,200);cookie=cookie.split(';')[0]
   status,data,_=self.call('/api/drafts',cookie=cookie);self.assertEqual(status,200);return cookie,data['csrf']
+ def test_release_identity_requires_a_session(self):
+  self.assertEqual(self.call('/api/release')[0],401)
+  cookie,_=self.login()
+  status,data,_=self.call('/api/release',cookie=cookie)
+  self.assertEqual(status,200);self.assertIsInstance(data['revision'],str);self.assertIsInstance(data['modified'],bool)
+  self.assertEqual(data['deployment'],'Not verified by Studio')
  def test_standards_endpoint_returns_an_array(self):
   status,data,_=self.call('/standards.json')
   self.assertEqual(status,200);self.assertIsInstance(data,list);self.assertEqual(len(data),84)
