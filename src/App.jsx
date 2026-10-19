@@ -1,3 +1,4 @@
+import LearningJourney from './components/LearningJourney.jsx';
 import { createQuestionLifecycle } from './game/questionLifecycle.js';
 import { isAnswerEquivalent } from './game/mathEngine/answerMath.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -56,6 +57,7 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
+  const [journeyOpen, setJourneyOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [studentName, setStudentName] = useState(() => localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || '');
   const [petId, setPetId] = useState(() => localStorage.getItem(STORAGE_KEYS.PET_ID) || 'bip');
@@ -389,7 +391,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {showWelcome ? (
+      {journeyOpen ? <LearningJourney key={`${studentName}-${grade}`} grade={grade} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : showWelcome ? (
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
@@ -414,6 +416,7 @@ export default function App() {
           onOpenAchievements={() => setAchievementsOpen(true)}
           onOpenClassroom={() => setClassroomOpen(true)}
           onOpenVault={() => setVaultOpen(true)}
+          onStartJourney={() => setJourneyOpen(true)}
         />
       ) : (
         <>

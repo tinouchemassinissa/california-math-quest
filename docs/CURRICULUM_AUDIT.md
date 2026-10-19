@@ -66,3 +66,13 @@ New tests enumerate multiplication operands 0–9 and division groups 1–9 with
 - Regression checks cover sign/exponent cases, lossy-number boundaries, malformed payloads, equivalent-choice ambiguity, retry limits, duplicate submission and out-of-order load completion. An independent BigInt reference checks 68,000 bounded fraction operations.
 
 Full follow-up validation: 57 Node tests and the production build. UI integration was compiled but not exercised in a browser; teacher, accessibility and device review remain outstanding.
+
+## First complete learning paths
+
+Added six original bounded mini-lessons, one starting subskill per grade: joining small groups (K.OA.A.2), making ten within 20 (1.OA.C.6), hundreds/tens/ones (2.NBT.A.1), multiplication/division facts (3.OA.C.7), like-denominator fraction addition (4.NF.B.3) and unlike-denominator fraction addition (5.NF.A.1). These use familiar visual teaching strategies; they are not copied from or endorsed by Eureka Math or another publisher.
+
+The local bank contains 60 fixed operand sets, each with derived answers, choices, explanations and diagram quantities. Every set is checked against the runtime verifier and independent arithmetic in tests. The first release contains 2 starting questions, 1 example, 2 guided questions, 2 independent checks, 2 review questions and 1 simpler support example per path. Two starting misses select the support example before returning to the grade-level practice. Repeated predefined wrong-answer patterns suggest a visual strategy; a single answer does not establish a misconception. The short strategy-choice prompt is guided reflection, not a validated diagnostic assessment.
+
+Learning paths have no timers, lives, public scores or automatically advancing questions. Pictures are hidden on diagnostic/independent questions until requested; requesting them marks the response as assisted. Two correct unassisted check answers earn the narrowly worded snapshot "Two questions solved independently," not mastery. Review is scheduled after a day for that result, or ten minutes when more practice is needed; an early review button is also available. Repeated reviews reuse the two fixed review items, so they cannot demonstrate broad generalization. Snapshots remain in browser storage under normalized learner name and grade; names are labels, not authenticated identities. Unfinished lessons are not persisted. No background notification is scheduled.
+
+Validation: 65 Node tests, production build, and server rendering of all six initial paths (four choices, no initial answer-picture, escaped learner text). Browser interactions, responsive appearance and accessibility were not exercised here. Teacher review and expansion to additional subskills remain outstanding.

@@ -125,3 +125,9 @@ npm run build
 ## 👤 Author
 
 Developed by **Massinissa TINOUCHE** for California student learning communities.
+
+### Learn with Bip: first learning paths
+
+Choose a grade and learner name on the home screen, then **Start my learning path**. Each grade currently has one focused mini-lesson: a two-question starting check, a visual example, guided practice, an independent check and two later-review questions. The 60-item local bank uses original wording and pictures, with checked mathematical quantities. It is not full K–5 coverage or an endorsed Eureka Math product.
+
+Snapshots are saved only in this browser, separately by learner name and grade. Use distinct names on shared devices. The path provides a delete-snapshot control. Unfinished lessons are not saved. Review times are shown in the app; they do not send notifications. A short check is evidence about those questions, not a certified mastery score.

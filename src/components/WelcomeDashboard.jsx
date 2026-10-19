@@ -23,6 +23,7 @@ export default function WelcomeDashboard({
   onSelectMode,
   mistakeCount = 0,
   onStartGame,
+  onStartJourney,
   onOpenCurriculum,
   onOpenAchievements,
   onOpenClassroom,
@@ -142,6 +143,7 @@ export default function WelcomeDashboard({
           </div>
         </div>
 
+        <section className="journey-entry"><div><span className="journey-kicker">NEW · LEARN WITH BIP</span><h2>A small lesson. A real next step.</h2><p>Pictures, guided practice and a chance to try on your own. One starting skill per grade.</p></div><button type="button" className="btn btn-primary" onClick={onStartJourney}>Start my learning path →</button></section>
         {/* Right Bento Panel: 6 Game Mode Tiles + Giant Start Button */}
         <div className="welcome-bento-panel welcome-right-panel">
           <div className="welcome-step-block" style={{ flex: 1 }}>
