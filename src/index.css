@@ -3837,3 +3837,8 @@ button, input, select {
 @media(prefers-reduced-motion:reduce){.journey-bip *{animation:none!important;transition:none!important}}
 
 .kids-collections{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.kids-collections button{flex:1 1 180px;min-height:80px;padding:16px;border:1px solid #818cf8;border-radius:16px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}.kids-collections button[aria-pressed=true]{background:#6366f126;outline:2px solid #818cf8}.kids-collections small{display:block;line-height:1.5;margin-top:6px}
+
+/* Articulated Blender clips supply the gesture; avoid moving the whole frame twice. */
+.bip-rendered-motion .journey-bip-scene video,.bip-rendered-motion .journey-bip-spark{animation:none!important}
+.bip-companion-card[data-motion=paused] *{animation:none!important;transition:none!important}
+.bip-companion-card .bip-video-frame{animation:none!important}

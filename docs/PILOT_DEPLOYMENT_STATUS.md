@@ -70,3 +70,38 @@ visual QA and rendering remain outstanding. No source rig was found in this
 repository or the checked MSI project public folder. The original `.blend` (or
 rigged model) is required; MP4s alone cannot supply editable joint animation.
 No paid services were added.
+
+## Original Blender source recovered on MSI — 19 October
+
+Located `C:\Users\massi\Downloads\Bip_4K60_Event_Animation_Set.zip`, including
+`Bip_Master.blend`, `Bip_Healthy_Animated.blend` and the original rendering code.
+The archive is unchanged. Working source and eight editable gesture scenes are
+under `C:\dev\bip-animation\source` and `C:\dev\bip-animation\school-gestures-v1`.
+This supersedes the earlier missing-source/untested-scaffold status above.
+
+The model has transform-controlled parts, not an armature. The armature
+scaffold was replaced with a renderer for the actual controls. Blender 4.5.3 LTS
+via an isolated Python 3.11 `bpy` runtime rendered eight silent 480×480 / 24 fps
+clips on MSI's RTX 4060 (Cycles/OptiX, 12 samples): idle, wave, think, open-hand
+picture invitation, nod, encouragement, celebration and rest. Original mesh and
+materials are preserved. Hands remain fixed grippers; independent elbows,
+wrists/fingers need additional controls. No paid service was used.
+
+Journey Bip and the arcade companion now reference the new clips. The lesson
+player returns brief reactions to idle, with a legacy-clip fallback followed by
+a still poster if decoding fails. Pause/reduced-motion behavior remains active
+during interactions. The arcade companion clears its delayed effects on exit
+and question changes. New clips/poster are included in the PWA precache config.
+
+Validation: 87 Node tests and production build passed, including JSDOM controls
+for both companions. Three pure-trajectory tests passed. All eight saved Blender
+scenes were read back: foot world matrices stayed constant over all 48 frames,
+and control start/end matrices matched exactly. FFmpeg decoded all 384 video
+frames without errors; FFprobe checked H.264/yuv420p, cadence, dimensions,
+duration and absence of audio. Total video size: 761,555 bytes. Six sampled video
+frames per take plus the initial wave/point/celebration render poses were visually
+reviewed; this is not exhaustive collision or temporal-quality certification.
+See `public/bip/gestures/validation.json` and `pose-checks.json` for measurements.
+
+Live pilot deployment and Studio publishing are unchanged and still unverified
+in this follow-up. Do not infer that the owner's installed app has been updated.

@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png', 'bip/*.mp4', 'bip/events/*.mp4'],
+      includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png', 'bip/*.mp4', 'bip/events/*.mp4', 'bip/gestures/*.mp4', 'bip/gestures/*.webp'],
       workbox: {
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },

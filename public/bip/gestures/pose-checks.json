@@ -1,0 +1,50 @@
+{
+  "celebrate": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "encourage": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "idle": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "nod": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "point": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "rest": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "think": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  },
+  "wave": {
+    "frames": 48,
+    "fps": 24,
+    "feet_world_matrix_delta": 0,
+    "control_endpoint_matrix_delta": 0
+  }
+}
