@@ -10,7 +10,7 @@ export function validDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\
 export function validateLearner(record){if(!record||!cleanText(record.name,40)||!GRADES.includes(record.grade)||(typeof record.id!=='string'||!/^[-\w]{1,80}$/.test(record.id)))throw new Error('Invalid learner');return {id:record.id,name:cleanText(record.name,40),grade:record.grade};}
 export function suggestHomework(filename,grade){
  const title=String(filename).replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').slice(0,120).trim()||'New homework';
- const match=String(filename).match(/\b(\d{4}-\d{2}-\d{2})\b/);
+ const match=String(filename).match(/(?<!\d)(\d{4}-\d{2}-\d{2})(?!\d)/);
  const options=journeyCatalog(grade);
  const hint=/subtract|take.?away/i.test(filename)?'subtract':/divis|divid/i.test(filename)?'divide':/hundred/i.test(filename)?'hundreds':/tens/i.test(filename)?'tens':/missing|make.?ten/i.test(filename)?'missing':null;
  const picked=hint?options.find(o=>o.id.includes(hint)||o.kind===hint):null;

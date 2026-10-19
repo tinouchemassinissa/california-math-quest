@@ -245,7 +245,8 @@ class Handler(BaseHTTPRequestHandler):
                     result=subprocess.run(['node',str(ROOT/'admin/publish.mjs'),str(release),repo],capture_output=True,text=True,timeout=900,cwd=ROOT)
                     if result.returncode:raise ValueError('Release failed its setup or checks. No main-branch merge was performed. Inspect the private checkout.')
                     url=next((line for line in result.stdout.splitlines() if line.startswith('https://github.com/tinouchemassinissa/california-math-quest/pull/')),None)
-                    return self.respond(200,{'pull_request':url,'notice':'Review the GitHub preview before merging. Nothing was merged automatically.'})
+                    if not url:raise ValueError('GitHub did not return a review PR URL; inspect the publishing checkout before retrying')
+                    return self.respond(200,{'pull_request':url,'base':os.environ.get('BIP_PUBLISH_BASE','main'),'notice':'Review the GitHub changes and app preview before merging. This action does not deploy the app.'})
                 finally:self.server.publish_lock.release()
             if route=='/api/ocr':
                 if not shutil.which('tesseract') and not os.environ.get('BIP_OCR_IMAGE'):raise ValueError('Tesseract is not installed. Add the question manually for now.')

@@ -22,3 +22,14 @@ test('corruption detector does not reject ordinary words containing nan',()=>{
  const banana={id:'banana-1',grade:'K',standard:'K.OA.A.2',title:'Count bananas',prompt:'There are 3 bananas and 2 more. How many bananas are there?',correctAnswer:5,options:[3,4,5,6],explanation:'3 + 2 = 5.',hint:'Count each banana.'};assert.equal(verifyQuestion(banana).valid,true);assert.equal(verifyQuestion({...banana,hint:'The answer is NaN'}).valid,false);
 });
 test('bundled shared-content package passes release checks',()=>{assert.doesNotThrow(()=>validatePublicContent(JSON.parse(readFileSync('content/approved_questions.json','utf8'))));});
+
+test('publication review base is explicit and allowlisted, including before PR #1 merges',()=>{
+ const temp=mkdtempSync(join(tmpdir(),'bip-review-base-'));
+ try{
+  const input=join(temp,'approved.json');writeFileSync(input,JSON.stringify({version:1,questions:[q]}));
+  const run=base=>execFileSync(process.execPath,['admin/publish.mjs',input,temp,'--dry-run'],{encoding:'utf8',env:{...process.env,BIP_PUBLISH_BASE:base},stdio:['ignore','pipe','pipe']});
+  assert.equal(JSON.parse(run('')).base,'main');
+  assert.equal(JSON.parse(run('feat/bip-school-math-correctness')).base,'feat/bip-school-math-correctness');
+  for(const base of ['other-repository','--upload-pack=bad','../../main'])assert.throws(()=>run(base),/Unsupported publication review base/);
+ }finally{rmSync(temp,{recursive:true,force:true});}
+});

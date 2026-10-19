@@ -32,3 +32,41 @@ Vercel is not connected. No paid model API, hosting upgrade or subscription was 
 ## Validation
 
 79 Node tests and 5 Python Studio tests passed locally. Build and initial Home/Kids/Family server rendering passed. Backend auth/OCR/checking were tested on the real server. Browser/mobile rendering, local quota handling across actual devices, complete publishing and teacher review remain outstanding.
+
+## 19 October follow-up — repository changes, not a deployed release
+
+PR #1 was inspected and remains open/unmerged. The pilot URL returned HTTP 401
+without its owner session; live UI, Studio authentication and deployed revision
+were not verified. Remote SSH attempts from MSI did not establish a session.
+No server configuration or deployment was changed in this follow-up.
+
+Added two lesson collections per grade, grouping the existing 18 paths without
+claiming new standards coverage. Journey Bip now respects Pause during Wave,
+pauses its CSS overlays, reacts to runtime reduced-motion changes, replays on
+feedback changes, returns short reactions to idle, and preloads only metadata.
+Small curiosity/wave/halo motions use existing video artwork; these are not
+newly rendered articulated animations. Homework filename date recognition now
+handles underscores (the prior test depended on the current calendar date).
+
+Publishing defaults to main and now supports the explicit allowlisted
+`BIP_PUBLISH_BASE=feat/bip-school-math-correctness` for stacked content review
+while PR #1 remains open. Set this only in the private Studio service environment
+when testing that flow; it has not been set on the server. A content PR against
+that branch still requires review and a rebuilt app preview. Creating a PR is
+not publishing to the deployed app. Main still requires the app support first.
+The Studio reports the target base and rejects success responses without a PR
+URL. This target selection was dry-run tested, not live-published to GitHub.
+
+Validation: 86 Node tests, 13 Python backend tests, production build and Python
+syntax compilation passed. Node tests include 100,000 seeded generator cases,
+independent arithmetic checks on 180 fixed lesson items, collection membership,
+and JSDOM checks for pause, reduced motion, feedback and idle transitions.
+A real browser run could not start because no Chromium executable is installed.
+These checks do not establish complete K–5 coverage or validate arbitrary prose.
+
+`tools/blender/animate_bip.py` prepares eight editable actions on the original
+Bip armature. Python syntax checked only: Blender execution, rig-axis retargeting,
+visual QA and rendering remain outstanding. No source rig was found in this
+repository or the checked MSI project public folder. The original `.blend` (or
+rigged model) is required; MP4s alone cannot supply editable joint animation.
+No paid services were added.

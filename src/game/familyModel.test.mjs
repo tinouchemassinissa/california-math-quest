@@ -18,7 +18,7 @@ test('family file validation rejects disguised HTML and bounds attachment size',
 });
 test('filename suggestions stay labelled, bounded and grade-specific',()=>{
  const suggestion=suggestHomework('2026-10-18_division_practice.pdf','3');
- assert.equal(suggestion.date,'2026-10-18');assert.equal(suggestion.lessonId,'divide');
+ assert.equal(suggestion.date,'2026-10-18');assert.equal(suggestHomework('math_2026-10-18_page.pdf','3').date,'2026-10-18');assert.equal(suggestion.lessonId,'divide');
  assert.match(suggestion.source,/not been read/);assert.equal(suggestHomework('holiday.jpg','K').lessonId,null);
  assert.equal(parentStrategy('5').length,3);
 });
