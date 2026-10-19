@@ -3895,3 +3895,6 @@ button, input, select {
 .family-adult-tools>label{margin-top:16px;max-width:480px;}
 .family-adult-tools input[type=checkbox]{width:auto;min-height:20px;}
 .family-adult-tools>p{max-width:72ch;}
+.mistake-choice-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;}
+.mistake-choice-actions button{min-height:48px;font-size:1rem;flex:1 1 180px;}
+.bip-guide:focus{outline:2px solid #a5b4fc;outline-offset:4px;}

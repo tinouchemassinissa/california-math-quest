@@ -86,6 +86,7 @@ export default function App() {
   const [guideOpen, setGuideOpen] = useState(false);
   const helpUsedRef = useRef(false);
   const questionLifecycleRef = useRef(createQuestionLifecycle());
+  const retryingRef=useRef(false);
   const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
@@ -179,6 +180,7 @@ export default function App() {
 
   const nextQuestion = useCallback(
     async (customStandard = null, resetSprintClock = false) => {
+      retryingRef.current=false;
       const requestToken = questionLifecycleRef.current.begin();
       setCurrentQuestion(null);
       if (autoNextTimerRef.current) {
@@ -273,10 +275,11 @@ export default function App() {
   const handleAnswer = (givenAnswer) => {
     if (feedback || !currentQuestion || !questionLifecycleRef.current.claim()) return;
 
+    const isRetry=retryingRef.current;
     const isCorrect = isAnswerEquivalent(givenAnswer, currentQuestion.correctAnswer);
 
     const responseTime = Math.max(1, (diffInfo.timerSeconds || 25) - timeLeft);
-    const pointsEarned = isCorrect ? calculatePoints(streak, difficulty) : 0;
+    const pointsEarned = isCorrect&&!isRetry ? calculatePoints(streak, difficulty) : 0;
 
     if (soundEnabled) {
       if (isCorrect) {
@@ -294,11 +297,11 @@ export default function App() {
     setFeedback({
       status: isCorrect ? 'correct' : 'incorrect',
       answer: givenAnswer,
+      retried:isRetry,
       assisted: helpUsedRef.current,
     });
 
-    const isGameOver = mode !== 'speed-sprint' && !isCorrect && lives <= 1;
-
+    if (!isRetry) {
     if (isCorrect) {
       setScore((s) => {
         const nextScore = s + pointsEarned;
@@ -341,15 +344,9 @@ export default function App() {
       );
     }
 
-    if (isGameOver && !guideOpen) {
-      autoNextTimerRef.current = setTimeout(() => {
-        if (soundEnabled) playVictorySound();
-        setSummaryOpen(true);
-      }, 2200);
-    } else if (mode === 'speed-sprint' && !guideOpen) {
-      autoNextTimerRef.current = setTimeout(() => {
-        nextQuestion(focusedStandard, false);
-      }, 750);
+    }
+    if (isCorrect && mode === 'speed-sprint' && !guideOpen) {
+      autoNextTimerRef.current = setTimeout(() => nextQuestion(focusedStandard, false),750);
     }
   };
 
@@ -482,7 +479,8 @@ export default function App() {
               question={currentQuestion}
               onAnswer={handleAnswer}
               onSkip={() => nextQuestion(focusedStandard, false)}
-              onNextAfterAnswer={() => nextQuestion(focusedStandard, false)}
+              onNextAfterAnswer={()=>{if(mode!=='speed-sprint'&&lives<=0)setSummaryOpen(true);else nextQuestion(focusedStandard,false);}}
+              onRetry={()=>{if(feedback?.status!=='incorrect'||!questionLifecycleRef.current.retry())return;if(autoNextTimerRef.current)clearTimeout(autoNextTimerRef.current);retryingRef.current=true;helpUsedRef.current=true;setFeedback(null);setGuideOpen(false);if(mode!=='speed-sprint'&&timeLeft<=0)setTimeLeft(diffInfo.timerSeconds);}}
               onPracticeSimilar={(code) => nextQuestion(code, false)}
               onGuideOpen={(open) => {
                 setGuideOpen(open);

@@ -7,6 +7,7 @@ export function createQuestionLifecycle() {
     begin() { ready = false; published = false; return ++revision; },
     isCurrent(token) { return token === revision; },
     publish(token) { if (token !== revision || published) return false; published = true; ready = true; return true; },
+    retry() { if (!published || ready) return false; ready = true; return true; },
     claim() { if (!ready) return false; ready = false; return true; },
   };
 }

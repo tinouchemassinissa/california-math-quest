@@ -26,8 +26,8 @@ test('child UI resumes a lesson and exposes a useful picture after a mistake',as
   const choices=()=>[...document.querySelectorAll('.journey-choice')];
   // 3 × 4: choosing 7 is the known "added the operands" mistake.
   await act(async()=>choices().find(b=>b.textContent==='7').click());
-  assert.match(document.querySelector('.journey-visual-cue').textContent,/does not describe these equal groups/);
-  assert.equal(document.querySelectorAll('.guided-group-row').length,3);
+  assert.equal(document.querySelector('.journey-visual-cue'),null);
+  assert.equal(document.querySelector('.journey-worked'),null);
   const raw=localStorage.getItem(journeyProgressKey('ui-test','3'));
   assert.equal(JSON.parse(raw).state.attempts.length,1);
   await act(async()=>root.unmount());await mount();
@@ -35,13 +35,20 @@ test('child UI resumes a lesson and exposes a useful picture after a mistake',as
   assert.equal(choices().every(b=>b.disabled),true);
   assert.match(document.body.textContent,/Not quite yet/);
   const find=text=>[...document.querySelectorAll('button')].find(b=>b.textContent===text);
+  assert.equal(document.querySelector('.journey-coaching-step'),null);
+  await act(async()=>find('↻ Try again').click());
+  await act(async()=>choices().find(b=>b.textContent==='12').click());
+  assert.match(document.body.textContent,/You found it after another try/);
+  assert.equal(JSON.parse(localStorage.getItem(journeyProgressKey('ui-test','3'))).state.attempts.length,1);
+  assert.equal(JSON.parse(localStorage.getItem(journeyProgressKey('ui-test','3'))).state.attempts[0].correct,false);
+  await act(async()=>find('💛 Break it down with Bip').click());
   assert.match(document.querySelector('.journey-coaching-step').textContent,/STEP 1 OF 3/);
   assert.ok(!document.querySelector('.journey-coaching-step').textContent.includes('3 × 4 = 12'));
   await act(async()=>find('Show next step →').click());
   assert.match(document.querySelector('.journey-coaching-step').textContent,/STEP 2 OF 3/);
   await act(async()=>find('Show next step →').click());
   assert.match(document.querySelector('.journey-coaching-step').textContent,/3 × 4 = 12/);
-  const next=find('Try the next question →');
+  const next=find('Next question →');
   await act(async()=>next.click());
   assert.match(document.querySelector('.journey-question').textContent,/20 ÷ 4/);
   assert.equal(choices().some(b=>b.disabled),false);

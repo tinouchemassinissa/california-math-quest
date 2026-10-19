@@ -78,6 +78,7 @@ export default function QuestionCard({
   onNextAfterAnswer,
   onPracticeSimilar,
   onGuideOpen,
+  onRetry,
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
@@ -91,6 +92,8 @@ export default function QuestionCard({
 }) {
   const [hintVisible, setHintVisible] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [mistakeChoice,setMistakeChoice]=useState(false);
+  useEffect(()=>{if(feedback?.status==='incorrect'){setMistakeChoice(true);setGuideOpen(false);setExplanationVisible(false);setHintVisible(false);}},[feedback]);
   const guide = buildLessonGuide(question);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
@@ -161,7 +164,7 @@ export default function QuestionCard({
   }
 
   return (
-    <div className={`question-card kid-question-card ${feedback ? `feedback-${feedback.status}` : ''}`}>
+    <div className={`question-card kid-question-card ${feedback ? `feedback-${feedback.status}` : ''}`} data-mistake-choice={mistakeChoice}>
       {/* Animated Celebration Confetti Burst ONLY after a Correct Answer */}
       {feedback?.status === 'correct' && (
         <div className="celebration-burst" aria-hidden="true">
@@ -236,7 +239,7 @@ export default function QuestionCard({
       </div>
 
       {/* Manipulative Visual if present */}
-      {question.manipulative && (
+      {question.manipulative && question.manipulative.type!=='fraction' && (
         <VisualManipulative manipulative={question.manipulative} />
       )}
 
@@ -258,7 +261,7 @@ export default function QuestionCard({
               const isSelectedFeedback =
                 feedback && String(feedback.answer) === String(opt);
               const isCorrectFeedback =
-                feedback && String(question.correctAnswer) === String(opt);
+                feedback?.status === 'correct' && String(question.correctAnswer) === String(opt);
               const isZappedByBip =
                 !feedback &&
                 eliminatedOption !== null &&
@@ -344,7 +347,7 @@ export default function QuestionCard({
           if (question.hint) speakMathText(guide.firstHint);
         }}
         onEliminateOption={handleBipEliminateOption}
-        onSpeakExplanation={() => {
+        onSpeakExplanation={feedback?.status==='incorrect'?undefined:() => {
           setGuideOpen(true); onGuideOpen?.(true);
           setExplanationVisible(true);
           if (question.explanation) speakMathText(question.explanation);
@@ -439,7 +442,7 @@ export default function QuestionCard({
 
         {feedback && (
           <div className={`feedback-alert animated-pop ${feedback.status}`}>
-            {feedback.assisted && <p>Practiced with help. Try a fresh question on your own to build independent progress.</p>}
+            {feedback.assisted && <p>{feedback.retried?'You kept trying. That’s part of learning.':'Practised with help. You can try a fresh question when you’re ready.'}</p>}
             <div className="feedback-row-content">
               {feedback.status === 'correct' ? (
                 <span>
@@ -448,11 +451,10 @@ export default function QuestionCard({
                 </span>
               ) : (
                 <span>
-                  🌱 <strong>Good try{studentName ? `, ${studentName}` : ''}!</strong> The correct answer is{' '}
-                  <strong>{String(question.correctAnswer)}</strong>.
+                  🌱 <strong>Not quite yet{studentName ? `, ${studentName}` : ''}—and that’s okay.</strong> What would you like to do?
                 </span>
               )}
-              {onNextAfterAnswer && (
+              {onNextAfterAnswer && feedback.status==='correct' && (
                 <button
                   type="button"
                   className="kid-next-btn"
@@ -462,6 +464,7 @@ export default function QuestionCard({
                 </button>
               )}
             </div>
+            {feedback.status==='incorrect'&&<div className="mistake-choice-actions">{onRetry&&<button type="button" className="btn btn-primary" onClick={()=>{setMistakeChoice(false);setGuideOpen(false);setHintVisible(false);setExplanationVisible(false);setManualInput('');onRetry();}}>↻ Try again</button>}<button type="button" className="btn btn-secondary" onClick={()=>{setMistakeChoice(false);setGuideOpen(true);onGuideOpen?.(true);}}>💛 Break it down with Bip</button>{onNextAfterAnswer&&<button type="button" className="btn btn-secondary" onClick={onNextAfterAnswer}>Next question →</button>}</div>}
           </div>
         )}
       </div>

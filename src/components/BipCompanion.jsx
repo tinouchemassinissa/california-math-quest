@@ -298,7 +298,7 @@ export default function BipCompanion({
     );
   } else if (feedback?.status === 'incorrect' || event === 'tryAgain') {
     modeBadgeText = '🌱 Bounce-Back Coach';
-    statusText = `Good effort, ${displayName}. Let’s look at the worked solution and try the next problem together.`;
+    statusText = `Good effort, ${displayName}. Would you like to try again, break it down with me, or try the next question?`;
   } else if (hoveredOption !== null && !feedback) {
     modeBadgeText = '🎯 Inspecting Choice';
     statusText = `Scanning choice "${hoveredOption}"... Does "${hoveredOption}" match your math steps, ${displayName}? Click to lock it in!`;

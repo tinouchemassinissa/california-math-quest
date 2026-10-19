@@ -83,3 +83,7 @@ Packages are JSON with base64 attachments and require memory to assemble/read; p
 ## Child/adult navigation
 
 Child arcade setup, play headers, lesson pages and badges do not expose AI Vault/import controls, standards analytics, study-group administration or saved-record deletion. The old public Vault modal is not imported or rendered by the application; private Studio remains the owner content workflow. Family & Teacher Guide holds study groups/Excel, curriculum map, arcade settings, release information and explicit per-lesson saved-practice deletion. Removing practice never removes homework files. This navigation separation is not account authentication or a parental lock; local folders remain accessible to people using the same browser.
+
+## Mistakes and retries
+
+After an incorrect answer, arcade and learning paths offer Try again, Break it down with Bip, or Next question. No correct-option highlight or answer sentence is revealed by an incorrect attempt. Guided help is opt-in. Arcade retries keep the same question and do not add points, streak, lives penalties, profile mastery or duplicate classroom records; the original first attempt remains the recorded result. Learning-path retries are practice interactions and preserve the original saved attempt for assessment and resume. Incorrect answers do not trigger automatic advancement or an automatic game-over overlay; choosing Next can finish a round when no lives remain.
