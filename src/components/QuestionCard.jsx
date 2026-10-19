@@ -93,7 +93,6 @@ export default function QuestionCard({
   const [guideOpen, setGuideOpen] = useState(false);
   const guide = buildLessonGuide(question);
   const [explanationVisible, setExplanationVisible] = useState(false);
-  const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [useKeypad, setUseKeypad] = useState(false);
@@ -178,14 +177,7 @@ export default function QuestionCard({
       <div className="card-top-row kid-card-top">
         <div className="kid-skill-header">
           <span className="kid-skill-pill">🌟 {question.title}</span>
-          <button
-            type="button"
-            className="standard-info-chip"
-            onClick={() => setStandardDetailsOpen((v) => !v)}
-            title="View the practice skill and source information"
-          >
-            ℹ️ {question.standard} {standardDetailsOpen ? '▲' : '▼'}
-          </button>
+
         </div>
 
         <div className="kid-top-right">
@@ -226,29 +218,6 @@ export default function QuestionCard({
           )}
         </div>
       </div>
-
-      {/* Collapsible Official California & Cambrian District Educator Metadata Drawer */}
-      {standardDetailsOpen && (
-        <div className="educator-standard-drawer">
-          <span className="code-pill">CA CCSS-M {question.standard}</span>
-          {question.module && (
-            <span className="verified-proof-badge" style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}>
-              📘 Practice unit: {question.module}
-            </span>
-          )}
-          {question.caasppClaim && (
-            <span className="verified-proof-badge" style={{ background: 'rgba(59, 130, 246, 0.14)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.35)' }}>
-              🎯 {question.caasppClaim}
-            </span>
-          )}
-          {question.dokLevel && (
-            <span className="verified-proof-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.35)' }}>
-              ⚡ {question.dokLevel}
-            </span>
-          )}
-          <span className="verified-proof-badge">✓ Built-in checks passed • Not a certification</span>
-        </div>
-      )}
 
       {/* Main Question Prompt + Read-Aloud Speaker Button + Highlighted Math Tokens */}
       <div className="question-prompt-box kid-prompt-row">

@@ -27,6 +27,7 @@ test('child navigation contains no content imports or adult tools; adult tools r
   await click('Kids’ World');await click('TestExplorer');childClean();
   await click('Play');await waitFor(()=>document.querySelector('.welcome-dashboard'));childClean();assert.doesNotMatch(document.body.textContent,/School|Teacher Review|Selected CA Skills/);
   await click('Badges');childClean();assert.match(document.body.textContent,/My badges/);await act(async()=>document.querySelector('.modal-overlay .close-btn').click());
+  await click('Math Adventures with Bip!');await waitFor(()=>document.querySelector('.question-card'));childClean();assert.equal(document.querySelector('.standard-info-chip'),null);assert.equal(document.querySelector('.educator-standard-drawer'),null);
   await click('My world');await click('Learn');await click('Equal groups and fact families');childClean();assert.equal(document.querySelector('.journey-delete'),null);assert.equal(document.querySelector('.journey-privacy'),null);
   await click('Home');await click('Home');await click('Family & Teacher Guide');await waitFor(()=>document.querySelector('.family-adult-tools'));
   assert.match(document.body.textContent,/Study groups & Excel/);assert.match(document.body.textContent,/App version & recovery/);

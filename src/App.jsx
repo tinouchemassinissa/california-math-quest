@@ -463,7 +463,7 @@ export default function App() {
           {focusedStandard && (
             <div className="focused-standard-banner">
               <span>
-                🎯 Practicing Standard <strong>{focusedStandard}</strong> ({STANDARDS[focusedStandard]?.title})
+                🎯 Practising: <strong>{STANDARDS[focusedStandard]?.title}</strong>
               </span>
               <button
                 type="button"
