@@ -57,6 +57,7 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
+  const [journeyLessonId, setJourneyLessonId] = useState('starter');
   const [journeyOpen, setJourneyOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [studentName, setStudentName] = useState(() => localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || '');
@@ -391,7 +392,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {journeyOpen ? <LearningJourney key={`${studentName}-${grade}`} grade={grade} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : showWelcome ? (
+      {journeyOpen ? <LearningJourney key={`${studentName}-${grade}-${journeyLessonId}`} grade={grade} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : showWelcome ? (
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
@@ -400,6 +401,7 @@ export default function App() {
           grade={grade}
           onSelectGrade={(g) => {
             setGrade(g);
+            setJourneyLessonId('starter');
             setFocusedStandard(null);
           }}
           mode={mode}
