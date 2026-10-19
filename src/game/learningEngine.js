@@ -15,7 +15,7 @@ export const EMPTY_STANDARD_STATS = {
 export const createInitialProfile = (grade = '3', league = 'golden-bears') => ({
   grade,
   league,
-  playerName: 'California Math Scholar',
+  playerName: 'Math Explorer',
   totalAttempts: 0,
   totalCorrect: 0,
   currentStreak: 0,
@@ -264,7 +264,7 @@ export function computeAchievements(profile, modeRecords = {}) {
     },
     {
       id: 'speed-dash',
-      title: 'California Math Dash',
+      title: 'Bip Math Dash',
       desc: 'Achieve 500+ points in Speed Sprint mode.',
       icon: '⏱️',
       unlocked: (modeRecords['speed-sprint']?.bestScore || 0) >= 500,

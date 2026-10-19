@@ -182,7 +182,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           <div style={{ background: '#fafafa', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>📡 Sync with California CCSS-M OER Feed</h4>
             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 10px 0' }}>
-              Download and inspect example problems from the California Elementary Math repository. Items pass limited automated checks before storage. Imported drafts are excluded from normal practice until reviewed.
+              Download and inspect example problems from the Learn with Bip question library. Items pass limited automated checks before storage. Imported drafts are excluded from normal practice until reviewed.
             </p>
             <button
               className="btn btn-primary"

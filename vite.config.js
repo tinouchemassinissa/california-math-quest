@@ -19,8 +19,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       manifest: {
-        name: 'Bip’s Math Adventure',
-        short_name: 'Bip Math',
+        name: 'Learn with Bip',
+        short_name: 'Learn with Bip',
         description: 'Independent practice for selected California K–5 mathematics skills',
         theme_color: '#4f46e5',
         background_color: '#0f172a',

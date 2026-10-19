@@ -44,7 +44,7 @@ export default function WelcomeDashboard({
           <div className="welcome-hero-badge">
             🌟 Independent California standards practice • Grades K–5
           </div>
-          <h1 className="welcome-hero-title">California Elementary Math Quest</h1>
+          <h1 className="welcome-hero-title">Learn with Bip</h1>
         </div>
 
         <div className="welcome-teacher-bar">
@@ -183,7 +183,7 @@ export default function WelcomeDashboard({
           {/* Giant Animated Launch Button + 100% Verified Kid-Safety Guarantee */}
           <div className="welcome-launch-box">
             <button type="submit" className="welcome-start-btn">
-              🚀 Start {activeGradeLabel} Math Quest with Bip!
+              🚀 Start {activeGradeLabel} Math Adventures with Bip!
             </button>
             <div className="welcome-safety-guarantee">
               <span>🛡️ Ad-Free • No Student Accounts</span>

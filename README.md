@@ -1,4 +1,6 @@
-# California Elementary Math Quest 📐
+# Learn with Bip ✨
+
+*Little steps. Big discoveries.*
 
 [![CI](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

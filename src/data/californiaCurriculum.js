@@ -1,7 +1,7 @@
 import { generateVerifiedProblem } from '../game/mathEngine/problemGenerator.js';
 
 /**
- * California Elementary Mathematics Quest Curriculum (CA CCSSM)
+ * Learn with Bip mathematics practice (CA CCSSM)
  * Selected practice skills mapped to California standards. Unit organization is unofficial and coverage is partial.
  *
  * Covers Grades K through 5 across 40 curriculum modules:
@@ -14,7 +14,7 @@ import { generateVerifiedProblem } from '../game/mathEngine/problemGenerator.js'
  */
 
 export const PROGRAM_INFO = {
-  title: 'California & Cambrian Elementary Math Quest',
+  title: 'Learn with Bip · Math Adventures',
   subtitle: 'Independent K–5 practice mapped to selected California mathematics standards',
   district: 'Cambrian School District (San Jose, Silicon Valley, CA)',
   framework: 'Selected California Common Core mathematics skills (CA CCSS-M)',

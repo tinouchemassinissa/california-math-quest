@@ -58,7 +58,7 @@ const CELEBRATION_SHOWS = [
     treat: '🍦',
     particles: ['🏆', '🎊', '🍦', '💫', '🌟', '🎈'],
     getLine: (name, ans) =>
-      `High-five, ${name}! "${ans}" solved the puzzle! You are a true California Math Champion!`,
+      `High-five, ${name}! "${ans}" solved the puzzle! You are a true Math Explorer!`,
   },
 ];
 

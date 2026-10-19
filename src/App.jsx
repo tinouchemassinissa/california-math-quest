@@ -511,7 +511,7 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>California Elementary Math Quest</strong> • Independent practice mapped to selected California K–5 standards • Not school- or state-endorsed
+          <strong>Learn with Bip</strong> • Independent practice mapped to selected California K–5 standards • Not school- or state-endorsed
         </p>
       </footer>
 

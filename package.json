@@ -1,9 +1,9 @@
 {
-  "name": "california-math-quest",
+  "name": "learn-with-bip",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "California Elementary Math Quest - Community Mathematics Learning Platform aligned with California Common Core State Standards (Grades K-5)",
+  "description": "Learn with Bip - independent visual K-5 maths practice mapped to selected California standards",
   "scripts": {
     "dev": "vite --port 5173 --host",
     "build": "node scripts/checkPublishedContent.mjs && vite build",
