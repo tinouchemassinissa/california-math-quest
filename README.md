@@ -2,7 +2,7 @@
 
 *Little steps. Big discoveries.*
 
-[![CI](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml)
+[![CI](https://github.com/tinouchemassinissa/learn-with-bip/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/learn-with-bip/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Standards: CA CCSSM](https://img.shields.io/badge/Standards-California_CCSS--M-emerald)](https://www.cde.ca.gov/ci/ma/cf/)
 [![Platform](https://img.shields.io/badge/Platform-PWA_Offline--First-indigo)](https://web.dev/progressive-web-apps/)
@@ -110,8 +110,8 @@ Classroom and study group records are stored locally in the browser. On a shared
 
 ### Setup
 ```bash
-git clone https://github.com/tinouchemassinissa/california-math-quest.git
-cd california-math-quest
+git clone https://github.com/tinouchemassinissa/learn-with-bip.git
+cd learn-with-bip
 npm install
 npm run dev
 ```

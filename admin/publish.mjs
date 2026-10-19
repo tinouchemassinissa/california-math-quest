@@ -8,10 +8,10 @@ if(!input||!repoArg||flags.some(flag=>flag!=='--dry-run'))throw new Error('Usage
 const base=process.env.BIP_PUBLISH_BASE||'main';
 if(!['main','feat/bip-school-math-correctness'].includes(base))throw new Error('Unsupported publication review base');
 const incoming=JSON.parse(readFileSync(input,'utf8'));validatePublicContent(incoming);if(!incoming.questions.length)throw new Error('No approved questions to publish');
-if(flags.includes('--dry-run')){console.log(JSON.stringify({questions:incoming.questions.length,base,target:'content/approved_questions.json',repository:'tinouchemassinissa/california-math-quest',action:'Create a branch and pull request, never merge main'}));process.exit(0);}
+if(flags.includes('--dry-run')){console.log(JSON.stringify({questions:incoming.questions.length,base,target:'content/approved_questions.json',repository:'tinouchemassinissa/learn-with-bip',action:'Create a branch and pull request, never merge main'}));process.exit(0);}
 const repo=resolve(repoArg),run=(command,args,cwd=repo)=>execFileSync(command,args,{cwd,encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']}).trim();
 const origin=run('git',['remote','get-url','origin']);
-if(!['https://github.com/tinouchemassinissa/california-math-quest.git','https://github.com/tinouchemassinissa/california-math-quest','git@github.com:tinouchemassinissa/california-math-quest.git'].includes(origin))throw new Error('Unexpected GitHub origin; publication stopped');
+if(!['https://github.com/tinouchemassinissa/learn-with-bip.git','https://github.com/tinouchemassinissa/learn-with-bip','git@github.com:tinouchemassinissa/learn-with-bip.git'].includes(origin))throw new Error('Unexpected GitHub origin; publication stopped');
 if(run('git',['status','--porcelain']))throw new Error('Use a clean dedicated publishing checkout');
 run('gh',['auth','status']);run('git',['fetch','origin',base]);
 const temporary=mkdtempSync(join(tmpdir(),'bip-publish-')),work=join(temporary,'worktree'),branch=`content/bip-${Date.now()}`;
@@ -26,5 +26,5 @@ try{
  if(!run('git',['diff','--cached','--name-only'],work))throw new Error('No content changes to publish');
  run('git',['commit','-m','Add reviewed Bip shared practice'],work);run('git',['push','origin',`HEAD:refs/heads/${branch}`],work);
  const body=join(temporary,'pr-body.txt');writeFileSync(body,'Add owner-reviewed anonymous shared questions. This review PR does not deploy the app. Original scans, family records and private metadata are excluded. Content checks, tests and production build passed locally. Review the preview before merging.\n');
- console.log(run('gh',['pr','create','--repo','tinouchemassinissa/california-math-quest','--base',base,'--head',branch,'--title','Add reviewed Bip shared practice','--body-file',body],work));
+ console.log(run('gh',['pr','create','--repo','tinouchemassinissa/learn-with-bip','--base',base,'--head',branch,'--title','Add reviewed Bip shared practice','--body-file',body],work));
 }finally{if(added)run('git',['worktree','remove','--force',work]);rmSync(temporary,{recursive:true,force:true});}

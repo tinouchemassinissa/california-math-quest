@@ -1,6 +1,6 @@
 # Bip Vercel pilot
 
-Ready source: `feat/bip-school-math-correctness` in `tinouchemassinissa/california-math-quest`. Do not deploy the older default branch by mistake; PR #1 has not been assumed merged.
+Ready source: `feat/bip-school-math-correctness` in `tinouchemassinissa/learn-with-bip`. Do not deploy the older default branch by mistake; PR #1 has not been assumed merged.
 
 `vercel.json` selects Vite, installs the lockfile with `npm ci`, runs the JavaScript tests before building, and serves only `dist`. The `public: false` property concerns Vercel's source/log visibility; it does **not** make the app URL private.
 
