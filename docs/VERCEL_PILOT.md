@@ -2,13 +2,13 @@
 
 Release source: `main` in `tinouchemassinissa/learn-with-bip`, after merging PR #1. Confirm the latest main commit includes Kids’ World, Family & Teacher Guide and the Learn with Bip name before importing it into Vercel. Use feature branches for preview builds, not as the long-term production branch.
 
-`vercel.json` selects Vite, installs the lockfile with `npm ci`, runs the JavaScript tests before building, and serves only `dist`. The `public: false` property concerns Vercel's source/log visibility; it does **not** make the app URL private.
+`vercel.json` selects Vite, installs the lockfile with `npm ci`, runs the JavaScript tests before building, and serves only `dist`. Source/log visibility is disabled in the Vercel project settings (`publicSource: false`). Deployment access is protected separately with Vercel Authentication for all deployments; no `public` field belongs in vercel.json.
 
 ## Account setup before first deployment
 
 Use a Hobby account for the personal, non-commercial family trial. Do not activate a Pro trial, paid marketplace services, paid model APIs or upgrades. Confirm the account and plan through the connected Vercel account before creating a project. Confirm eligibility separately before an organized school deployment.
 
-Create a separate Bip pilot project; do not modify the existing USA Map or other apps. Link the repository and select the checked branch. Preserve private pilot access with an available Vercel Authentication protection setting, verifying whether it covers the intended preview/production URL before sharing. Do not treat a difficult-to-guess URL or `public: false` as access control.
+Create a separate Bip pilot project; do not modify the existing USA Map or other apps. Link the repository and select the checked branch. Preserve private pilot access with an available Vercel Authentication protection setting, verifying whether it covers the intended preview/production URL before sharing. Do not treat a difficult-to-guess URL or hidden source logs as access control.
 
 No app runtime secrets, home-server credentials, server tunnel, database or model inference service are required. Content Studio remains on the home server. Private homework files are browser records, not shared lesson assets.
 
