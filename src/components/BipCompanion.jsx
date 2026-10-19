@@ -1,3 +1,4 @@
+import SmoothBipVideo from './SmoothBipVideo.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   playTamagotchiChomp,
@@ -99,7 +100,6 @@ export default function BipCompanion({
   showControls = true,
   onComplete,
 }) {
-  const videoRef = useRef(null);
   const callbackRef = useRef(onComplete);
   const timers = useRef(new Set());
   const schedule = (callback, delay) => {
@@ -216,42 +216,6 @@ export default function BipCompanion({
   const [path, loop, defaultLabel] = BIP_CLIPS[resolvedEventKey] || BIP_CLIPS.idle;
   const fullSrc = `${baseUrl}/${path}`;
 
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-
-    try {
-      if (element.readyState >= 1) {
-        element.currentTime = 0;
-      }
-    } catch {
-      // Ignore if metadata is still loading
-    }
-
-    if (paused) {
-      element.pause();
-    } else {
-      const playPromise = element.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {});
-      }
-    }
-  }, [fullSrc, eventKey, paused, manualTrigger]);
-
-  const handleVideoLoadedData = () => {
-    const element = videoRef.current;
-    if (!element) return;
-    setFailed(false);
-    if (paused) {
-      element.pause();
-    } else {
-      const playPromise = element.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {});
-      }
-    }
-  };
-
   // Interactive Actions kids can trigger on Bip
   const handlePartyCelebrate = () => {
 
@@ -361,29 +325,12 @@ export default function BipCompanion({
       data-motion={paused?'paused':'playing'}
       aria-label="Bip, your interactive robot math companion"
     >
-      {/* Left: 4K60 Video Stage + Interactive Stunt & Particle Overlays */}
+      {/* Local gesture stage, with optional celebration overlays. */}
       <div className={`bip-video-frame ${stuntClass}`}>
-        <video
-          ref={videoRef}
-          src={fullSrc}
-          muted
-          playsInline
-          autoPlay={!paused}
-          loop={loop}
-          preload="metadata"
-          poster="/bip/gestures/poster.webp"
-          aria-hidden="true"
-          className="bip-video-element"
-          onLoadedData={handleVideoLoadedData}
-          onError={() => setFailed(true)}
-          onEnded={() => {
-            if (!loop) {
-              setSettled(true);
-              setManualEvent(null);
-              callbackRef.current?.(resolvedEventKey);
-            }
-          }}
-        />
+        <SmoothBipVideo src={fullSrc} eventKey={`${eventKey}-${manualTrigger}`} paused={paused} loop={loop}
+          onReady={()=>setFailed(false)} onError={()=>setFailed(true)}
+          onEnded={()=>{if(!loop){setSettled(true);setManualEvent(null);callbackRef.current?.(resolvedEventKey);}}}/>
+
 
         {/* Floating Particle Burst Overlay on Video Stage */}
         {burstParticles.length > 0 && (

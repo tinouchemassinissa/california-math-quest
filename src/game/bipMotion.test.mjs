@@ -8,7 +8,9 @@ import {JSDOM} from 'jsdom';
 const source=readFileSync('src/components/JourneyBip.jsx','utf8');
 const reactionURL=new URL('./bipLessonReaction.js',import.meta.url).href;
 const reactURL=import.meta.resolve('react');
-const compiled=await transformWithEsbuild(source.replace("'react'",JSON.stringify(reactURL)).replace("'../game/bipLessonReaction.js'",JSON.stringify(reactionURL)),'JourneyBip.jsx',{loader:'jsx'});
+const smoothCompiled=await transformWithEsbuild(readFileSync('src/components/SmoothBipVideo.jsx','utf8').replace("'react'",JSON.stringify(reactURL)),'SmoothBipVideo.jsx',{loader:'jsx'});
+const smoothURL=`data:text/javascript;base64,${Buffer.from(smoothCompiled.code).toString('base64')}`;
+const compiled=await transformWithEsbuild(source.replace("'./SmoothBipVideo.jsx'",JSON.stringify(smoothURL)).replace("'react'",JSON.stringify(reactURL)).replace("'../game/bipLessonReaction.js'",JSON.stringify(reactionURL)),'JourneyBip.jsx',{loader:'jsx'});
 const {default:JourneyBip}=await import(`data:text/javascript;base64,${Buffer.from(compiled.code).toString('base64')}`);
 test('reduced motion, wave, feedback replay and video completion respect pause',async()=>{
  const dom=new JSDOM('<div id="root"></div>',{url:'https://local.test'});
@@ -24,12 +26,15 @@ test('reduced motion, wave, feedback replay and video completion respect pause',
   await click('Wave');assert.equal(document.querySelector('aside').dataset.motion,'paused');assert.equal(document.querySelector('video').autoplay,false);
   await click('Animate');assert.equal(document.querySelector('aside').dataset.motion,'playing');
   await render({feedback:{correct:false}});assert.ok(document.querySelector('aside').classList.contains('gesture-encourage'));
-  await act(()=>document.querySelector('video').dispatchEvent(new window.Event('ended',{bubbles:true})));
-  assert.match(document.querySelector('video').getAttribute('src'),/gestures\/idle/);assert.equal(document.querySelector('video').loop,true);
+  const clip=part=>[...document.querySelectorAll('video')].find(v=>v.getAttribute('src').includes(part));
+  await act(()=>clip('encourage').dispatchEvent(new window.Event('loadeddata')));
+  await act(()=>clip('encourage').dispatchEvent(new window.Event('ended',{bubbles:true})));
+  await act(()=>clip('/idle').dispatchEvent(new window.Event('loadeddata')));
+  assert.match(document.querySelector('video.is-visible').getAttribute('src'),/gestures\/idle/);assert.equal(document.querySelector('video.is-visible').loop,true);
   await render({feedback:{correct:true}});
-  await act(()=>document.querySelector('video').dispatchEvent(new window.Event('error')));
-  assert.match(document.querySelector('video').getAttribute('src'),/healthy/);
-  await act(()=>document.querySelector('video').dispatchEvent(new window.Event('error')));
+  await act(()=>clip('/nod').dispatchEvent(new window.Event('error')));
+  assert.ok(clip('healthy'));
+  await act(()=>clip('healthy').dispatchEvent(new window.Event('error')));
   assert.equal(document.querySelector('video'),null);assert.match(document.querySelector('img').getAttribute('src'),/poster/);
   assert.ok(document.querySelector('aside').classList.contains('gesture-nod'));
   await act(()=>listener({matches:true}));assert.equal(document.querySelector('aside').dataset.motion,'paused');
@@ -37,7 +42,7 @@ test('reduced motion, wave, feedback replay and video completion respect pause',
 });
 
 const companionSource=readFileSync('src/components/BipCompanion.jsx','utf8');
-const companionCompiled=await transformWithEsbuild(companionSource.replace("'react'",JSON.stringify(reactURL)).replace("'../audio.js'",JSON.stringify(new URL('../audio.js',import.meta.url).href)),'BipCompanion.jsx',{loader:'jsx'});
+const companionCompiled=await transformWithEsbuild(companionSource.replace("'./SmoothBipVideo.jsx'",JSON.stringify(smoothURL)).replace("'react'",JSON.stringify(reactURL)).replace("'../audio.js'",JSON.stringify(new URL('../audio.js',import.meta.url).href)),'BipCompanion.jsx',{loader:'jsx'});
 const {default:BipCompanion,BIP_CLIPS}=await import(`data:text/javascript;base64,${Buffer.from(companionCompiled.code).toString('base64')}`);
 test('arcade gesture buttons respect pause and all events use school renders',async()=>{
  const dom=new JSDOM('<div id="root"></div>',{url:'https://local.test'});
