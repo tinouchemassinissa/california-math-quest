@@ -14,7 +14,7 @@ class StudioTests(unittest.TestCase):
  def call(self,path,payload=None,cookie=None,csrf=None,origin=True,host=None):
   client=http.client.HTTPConnection('127.0.0.1',self.port);headers={}
   if host:headers['Host']=host
-  if origin:headers['Origin']=f'http://127.0.0.1:{self.port}'
+  if origin:headers['Origin']=origin if isinstance(origin,str) else f'http://127.0.0.1:{self.port}'
   if cookie:headers['Cookie']=cookie
   if csrf:headers['X-CSRF-Token']=csrf
   body=json.dumps(payload) if payload is not None else None
@@ -29,6 +29,12 @@ class StudioTests(unittest.TestCase):
   status,data,_=self.call('/standards.json')
   self.assertEqual(status,200);self.assertIsInstance(data,list);self.assertEqual(len(data),84)
   self.assertTrue(all('grade' in standard and 'code' in standard for standard in data))
+ def test_additional_lan_origin_is_explicit(self):
+  origin='https://studio.massinissatinouche.com:8466'
+  with patch.dict(studio.os.environ,{'BIP_STUDIO_ADDITIONAL_ORIGINS':origin}):
+   self.assertEqual(self.call('/api/auth-state',host='studio.massinissatinouche.com:8466')[0],200)
+   self.assertEqual(self.call('/api/login',{'username':'not-configured','password':'not-a-secret'},host='studio.massinissatinouche.com:8466',origin=origin)[0],401)
+   self.assertEqual(self.call('/api/login',{'username':'x','password':'x'},host='studio.massinissatinouche.com:8466',origin='https://untrusted.example')[0],403)
  def test_auth_host_and_csrf(self):
   self.assertEqual(self.call('/api/drafts')[0],401)
   self.assertEqual(self.call('/api/drafts',host='evil.example')[0],400)

@@ -111,6 +111,7 @@ class Handler(BaseHTTPRequestHandler):
         origins={f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'}
         configured=os.environ.get('BIP_STUDIO_ORIGIN')
         if configured:origins.add(configured)
+        origins.update(origin.strip() for origin in os.environ.get('BIP_STUDIO_ADDITIONAL_ORIGINS','').split(',') if origin.strip().startswith('https://'))
         return origins
     def valid_host(self):return self.headers.get('Host') in {urlparse(origin).netloc for origin in self.allowed_origins()}
     def session(self):
