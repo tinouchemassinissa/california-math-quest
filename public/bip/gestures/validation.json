@@ -1,0 +1,113 @@
+{
+  "source_file": "Bip_Master.blend",
+  "source_sha256": "bc92fe0f9dd81cd8b51409eb6c2fce9d8ad4d2cc78d03e93ca899e1e6e82b504",
+  "renderer": "Blender 4.5.3 LTS / Cycles, 12 samples, OptiX",
+  "checks": "Full FFmpeg decode, FFprobe frame/dimension/cadence/audio checks; sampled visual review is separate.",
+  "clips": [
+    {
+      "file": "celebrate.mp4",
+      "bytes": 100538,
+      "sha256": "24cf3c0214a3ad6891a6224d7d1aeb009f3484a4ef7d410d2eb042910c4f45f7",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "encourage.mp4",
+      "bytes": 105151,
+      "sha256": "b1515287a04fa78c093aff9e1bde8d5267423b262a77a143d86f0d1d65328793",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "idle.mp4",
+      "bytes": 74926,
+      "sha256": "e7f3baa3555c6bba0c35256b1904c970ac82a578cc27740556b4d66555801e7d",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "nod.mp4",
+      "bytes": 105724,
+      "sha256": "50e3c7cef165bf24c212919a4880beb1e673f2e6b5232c809da2fb06c8320b54",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "point.mp4",
+      "bytes": 94471,
+      "sha256": "53519b60d3ccd7b07690c3f08b0539561f8cda89cd8406f05acdccd2baf6dd05",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "rest.mp4",
+      "bytes": 87912,
+      "sha256": "b0893b8222210ba0395f3b1c4af64c8e461dcd6aa2eade9d3497e79eb1f3d500",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "think.mp4",
+      "bytes": 93684,
+      "sha256": "98accdafab86f905260cf794082dc3ded084e888d56f76e5155e4fc5399ddc13",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    },
+    {
+      "file": "wave.mp4",
+      "bytes": 99149,
+      "sha256": "0fe049be5821f01a209080b9a399be41fcc16e9954ca7400dba48c1e6c9fcf7b",
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "width": 480,
+      "height": 480,
+      "fps": 24,
+      "decoded_frames": 48,
+      "duration_seconds": 2,
+      "audio_streams": 0
+    }
+  ],
+  "total_video_bytes": 761555
+}

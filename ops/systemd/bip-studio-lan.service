@@ -1,0 +1,15 @@
+[Unit]
+Description=Bip Studio HTTPS on home Wi-Fi only
+After=network-online.target bip-content-studio.service
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/python3 /home/tinouchem/cloud-stack/bip-content-studio/ops/studio_lan_cert.py
+ExecStart=/usr/bin/python3 /home/tinouchem/cloud-stack/bip-content-studio/ops/studio_lan.py
+UMask=0077
+NoNewPrivileges=yes
+Restart=on-failure
+RestartSec=10
+MemoryMax=256M
+TasksMax=64
+[Install]
+WantedBy=default.target

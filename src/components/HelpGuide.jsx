@@ -12,7 +12,7 @@ export default function HelpGuide({ isOpen, onClose }) {
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-icon">📘</span>
-            <h2>California Math Quest — Guide & Official Standards</h2>
+            <h2>Learn with Bip — Guide & Official Standards</h2>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
             ✕
@@ -54,9 +54,9 @@ export default function HelpGuide({ isOpen, onClose }) {
           <div className="help-content-pane">
             {activeTab === 'student' && (
               <div className="help-section">
-                <h3>Welcome to California Math Quest!</h3>
+                <h3>Welcome to Learn with Bip!</h3>
                 <p>
-                  California Math Quest is a free, interactive community platform designed to help California elementary
+                  Learn with Bip is a free, interactive community platform designed to help California elementary
                   students master mathematics with confidence, visual understanding, and deep fluency.
                 </p>
 

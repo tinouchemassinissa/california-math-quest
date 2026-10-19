@@ -1,7 +1,7 @@
 {
   "curriculum": "California Common Core State Standards for Mathematics (CA CCSS-M) & CAASPP Smarter Balanced",
   "version": "3.0.0",
-  "organization": "California Elementary Mathematics Open Curriculum Initiative",
+  "organization": "Learn with Bip",
   "items": [
     {
       "id": "oer-K-CC4-01",
@@ -12,24 +12,47 @@
       "title": "Count Objects and Ten-Frames",
       "prompt": "How many red counters are shown on the ten-frame below?",
       "correctAnswer": 8,
-      "options": [6, 7, 8, 9],
+      "options": [
+        6,
+        7,
+        8,
+        9
+      ],
       "explanation": "Five counters fill the top row (a 5-group) and three fill the bottom row: 5 + 3 = 8.",
       "hint": "Count the 5 counters in the top row first, then add the 3 below.",
-      "manipulative": { "type": "ten-frame", "count": 8, "total": 10 }
+      "manipulative": {
+        "type": "ten-frame",
+        "count": 8,
+        "total": 10
+      }
     },
     {
       "id": "oer-K-OA1-01",
       "grade": "K",
-      "standard": "K.OA.A.1",
+      "standard": "K.OA.A.2",
       "domain": "OA",
       "cluster": "Understand addition and subtraction",
       "title": "Adding Within 10",
       "prompt": "There are 4 frogs on a log and 3 frogs jump on. How many frogs in all?",
       "correctAnswer": 7,
-      "options": [5, 6, 7, 8],
+      "options": [
+        5,
+        6,
+        7,
+        8
+      ],
       "explanation": "Add 4 and 3 using a number bond: 4 + 3 = 7 frogs.",
       "hint": "Start at 4 and count forward 3 more: 5, 6, 7.",
-      "manipulative": { "type": "tape-diagram", "whole": "?", "parts": [{ "label": "On log", "value": 4 }, { "label": "Jump on", "value": 3 }] }
+      "manipulative": {
+        "type": "tape-diagram",
+        "parts": [
+          4,
+          3
+        ],
+        "total": 7,
+        "unknownTotal": true,
+        "unknownPartIndex": -1
+      }
     },
     {
       "id": "oer-K-OA4-01",
@@ -40,10 +63,19 @@
       "title": "Make 10 From Any Number (1–9)",
       "prompt": "Look at the ten-frame with 6 counters. How many more counters are needed to make a full 10?",
       "correctAnswer": 4,
-      "options": [3, 4, 5, 6],
+      "options": [
+        3,
+        4,
+        5,
+        6
+      ],
       "explanation": "6 + 4 = 10. There are 4 empty spaces on the ten-frame.",
       "hint": "Count the empty boxes in the ten-frame.",
-      "manipulative": { "type": "ten-frame", "count": 6, "total": 10 }
+      "manipulative": {
+        "type": "ten-frame",
+        "count": 6,
+        "total": 10
+      }
     },
     {
       "id": "oer-K-NBT1-01",
@@ -54,7 +86,12 @@
       "title": "Compose and Decompose Teen Numbers (11–19)",
       "prompt": "In Eureka Math 'Say Ten' way, 1 ten and 7 ones is ten-7. What standard number is 10 + 7?",
       "correctAnswer": 17,
-      "options": [15, 16, 17, 18],
+      "options": [
+        15,
+        16,
+        17,
+        18
+      ],
       "explanation": "1 ten (10) and 7 ones (7) compose the teen number 17: 10 + 7 = 17.",
       "hint": "Combine 10 and 7."
     },
@@ -67,7 +104,12 @@
       "title": "2D Shape Identification",
       "prompt": "Which shape has exactly 3 straight sides and 3 corners (vertices)?",
       "correctAnswer": "Triangle",
-      "options": ["Circle", "Square", "Triangle", "Rectangle"],
+      "options": [
+        "Circle",
+        "Square",
+        "Triangle",
+        "Rectangle"
+      ],
       "explanation": "A triangle is defined as a closed polygon with exactly 3 sides and 3 angles.",
       "hint": "The prefix 'tri-' means three."
     },
@@ -80,10 +122,24 @@
       "title": "Addition & Subtraction Word Problems within 20",
       "prompt": "Elena collected 14 seashells at Pismo Beach. Noah collected 8 seashells. How many FEWER seashells did Noah collect than Elena?",
       "correctAnswer": 6,
-      "options": [5, 6, 7, 22],
+      "options": [
+        5,
+        6,
+        7,
+        22
+      ],
       "explanation": "Compare using subtraction: 14 − 8 = 6 fewer seashells.",
       "hint": "Subtract 8 from 14 to find the difference.",
-      "manipulative": { "type": "tape-diagram", "whole": 14, "parts": [{ "label": "Noah", "value": 8 }, { "label": "Difference", "value": "?" }] }
+      "manipulative": {
+        "type": "tape-diagram",
+        "parts": [
+          8,
+          6
+        ],
+        "total": 14,
+        "unknownTotal": false,
+        "unknownPartIndex": 1
+      }
     },
     {
       "id": "oer-1-OA6-01",
@@ -94,10 +150,22 @@
       "title": "Addition Fluency within 20 (Make a Ten)",
       "prompt": "What is 8 + 5?",
       "correctAnswer": 13,
-      "options": [12, 13, 14, 15],
+      "options": [
+        12,
+        13,
+        14,
+        15
+      ],
       "explanation": "Take 2 from 5 to make a 10 with 8: 8 + 2 = 10, then 10 + 3 = 13.",
       "hint": "Use the make-a-ten strategy: 8 + 2 = 10.",
-      "manipulative": { "type": "number-line", "min": 0, "max": 20, "start": 8, "hop": 5, "target": 13 }
+      "manipulative": {
+        "type": "number-line",
+        "min": 0,
+        "max": 20,
+        "start": 8,
+        "hop": 5,
+        "target": 13
+      }
     },
     {
       "id": "oer-1-NBT2-01",
@@ -108,10 +176,20 @@
       "title": "Tens and Ones Place Value",
       "prompt": "The number 47 has how many tens and how many ones?",
       "correctAnswer": "4 tens and 7 ones",
-      "options": ["7 tens and 4 ones", "4 tens and 7 ones", "40 tens and 7 ones", "3 tens and 17 ones"],
+      "options": [
+        "7 tens and 4 ones",
+        "4 tens and 7 ones",
+        "40 tens and 7 ones",
+        "3 tens and 17 ones"
+      ],
       "explanation": "In 47, the 4 is in the tens place (value 40) and the 7 is in the ones place.",
       "hint": "Look at the left digit for tens and the right digit for ones.",
-      "manipulative": { "type": "place-value", "hundreds": 0, "tens": 4, "ones": 7 }
+      "manipulative": {
+        "type": "place-value",
+        "hundreds": 0,
+        "tens": 4,
+        "ones": 7
+      }
     },
     {
       "id": "oer-1-MD3-01",
@@ -122,7 +200,12 @@
       "title": "Telling Time to Half Hour",
       "prompt": "When the short hour hand is halfway between 4 and 5, and the long minute hand points to 6, what time is it?",
       "correctAnswer": "4:30",
-      "options": ["4:00", "4:30", "5:30", "6:20"],
+      "options": [
+        "4:00",
+        "4:30",
+        "5:30",
+        "6:20"
+      ],
       "explanation": "When the minute hand points to 6, 30 minutes have passed. The hour hand is past 4, so it is 4:30.",
       "hint": "Each number on the clock represents 5 minutes: 6 × 5 = 30 minutes."
     },
@@ -135,10 +218,20 @@
       "title": "Addition within 1,000 with Regrouping",
       "prompt": "Calculate using vertical regrouping: 258 + 175",
       "correctAnswer": 433,
-      "options": [423, 433, 443, 333],
+      "options": [
+        423,
+        433,
+        443,
+        333
+      ],
       "explanation": "Add ones: 8+5=13 (write 3, bundle 1 ten). Add tens: 5+7+1=13 (write 3, bundle 1 hundred). Add hundreds: 2+1+1=4. Total = 433.",
       "hint": "Remember to bundle 10 ones into 1 ten and 10 tens into 1 hundred.",
-      "manipulative": { "type": "place-value", "hundreds": 2, "tens": 5, "ones": 8 }
+      "manipulative": {
+        "type": "place-value",
+        "hundreds": 2,
+        "tens": 5,
+        "ones": 8
+      }
     },
     {
       "id": "oer-2-OA1-01",
@@ -149,10 +242,25 @@
       "title": "Two-Step Word Problem",
       "prompt": "Maya had 50 markers. She gave 14 to Leo and 16 to Sam. How many markers does Maya have left?",
       "correctAnswer": 20,
-      "options": [18, 20, 22, 30],
+      "options": [
+        18,
+        20,
+        22,
+        30
+      ],
       "explanation": "Total given away: 14 + 16 = 30 markers. Remaining: 50 - 30 = 20 markers.",
       "hint": "First find how many markers were given away in total.",
-      "manipulative": { "type": "tape-diagram", "whole": 50, "parts": [{ "label": "Leo (14)", "value": 14 }, { "label": "Sam (16)", "value": 16 }, { "label": "Left", "value": "?" }] }
+      "manipulative": {
+        "type": "tape-diagram",
+        "parts": [
+          14,
+          16,
+          20
+        ],
+        "total": 50,
+        "unknownTotal": false,
+        "unknownPartIndex": 2
+      }
     },
     {
       "id": "oer-2-MD8-01",
@@ -163,7 +271,12 @@
       "title": "Counting Money",
       "prompt": "What is the total value of 2 quarters, 3 dimes, and 4 pennies?",
       "correctAnswer": "84¢",
-      "options": ["74¢", "80¢", "84¢", "94¢"],
+      "options": [
+        "74¢",
+        "80¢",
+        "84¢",
+        "94¢"
+      ],
       "explanation": "2 quarters = 50¢. 3 dimes = 30¢. 4 pennies = 4¢. Total = 50 + 30 + 4 = 84¢.",
       "hint": "A quarter is 25¢, a dime is 10¢, and a penny is 1¢."
     },
@@ -176,16 +289,30 @@
       "title": "Picture Graphs and Bar Graphs",
       "prompt": "Use the California Wildlife Bar Graph below: How many MORE Sea Otters were spotted than Bald Eagles?",
       "correctAnswer": 7,
-      "options": [5, 7, 9, 19],
+      "options": [
+        5,
+        7,
+        9,
+        19
+      ],
       "explanation": "Sea Otters = 13, Bald Eagles = 6. Subtract to compare: 13 − 6 = 7 more Sea Otters.",
       "hint": "Subtract the Bald Eagles bar from the Sea Otters bar.",
       "manipulative": {
         "type": "bar-graph",
         "title": "California Wildlife Count",
         "categories": [
-          { "label": "Sea Otters", "value": 13 },
-          { "label": "Bald Eagles", "value": 6 },
-          { "label": "Gray Whales", "value": 9 }
+          {
+            "label": "Sea Otters",
+            "value": 13
+          },
+          {
+            "label": "Bald Eagles",
+            "value": 6
+          },
+          {
+            "label": "Gray Whales",
+            "value": 9
+          }
         ]
       }
     },
@@ -198,7 +325,12 @@
       "title": "Multiplication Fact Fluency",
       "prompt": "What is 9 × 7?",
       "correctAnswer": 63,
-      "options": [56, 63, 64, 72],
+      "options": [
+        56,
+        63,
+        64,
+        72
+      ],
       "explanation": "9 groups of 7 equals 63. You can also think (10 × 7) - 7 = 70 - 7 = 63.",
       "hint": "Think of 10 × 7 minus one group of 7."
     },
@@ -211,7 +343,12 @@
       "title": "Two-Step Word Problems (4 Operations)",
       "prompt": "A California citrus orchard packed 6 boxes with 8 oranges in each box, plus 15 loose oranges. How many oranges are there in all?",
       "correctAnswer": 63,
-      "options": [48, 58, 63, 73],
+      "options": [
+        48,
+        58,
+        63,
+        73
+      ],
       "explanation": "Step 1: 6 × 8 = 48 boxed oranges. Step 2: 48 + 15 = 63 total oranges.",
       "hint": "First multiply 6 × 8, then add 15."
     },
@@ -224,10 +361,19 @@
       "title": "Unit Fractions and Parts of a Whole",
       "prompt": "A pizza is cut into 8 equal slices. Lucas eats 3 slices. What fraction of the pizza did Lucas eat?",
       "correctAnswer": "3/8",
-      "options": ["3/5", "3/8", "5/8", "8/3"],
+      "options": [
+        "3/5",
+        "3/8",
+        "5/8",
+        "8/3"
+      ],
       "explanation": "The denominator is 8 (equal parts) and the numerator is 3 (parts eaten), making 3/8.",
       "hint": "The bottom number is the total number of equal slices.",
-      "manipulative": { "type": "fraction", "numerator": 3, "denominator": 8 }
+      "manipulative": {
+        "type": "fraction",
+        "numerator": 3,
+        "denominator": 8
+      }
     },
     {
       "id": "oer-3-MD7-01",
@@ -238,10 +384,24 @@
       "title": "Area of a Rectangle",
       "prompt": "A classroom rug is 8 feet long and 6 feet wide. What is its area in square feet?",
       "correctAnswer": "48 sq ft",
-      "options": ["28 sq ft", "42 sq ft", "48 sq ft", "56 sq ft"],
+      "options": [
+        "28 sq ft",
+        "42 sq ft",
+        "48 sq ft",
+        "56 sq ft"
+      ],
       "explanation": "Area of a rectangle = length × width. 8 ft × 6 ft = 48 square feet.",
       "hint": "Multiply the length by the width.",
-      "manipulative": { "type": "interactive-geometry", "mode": "area", "width": 8, "height": 6, "targetWidth": 8, "targetHeight": 6, "unit": "ft", "showAreaGrid": true }
+      "manipulative": {
+        "type": "interactive-geometry",
+        "mode": "area",
+        "width": 8,
+        "height": 6,
+        "targetWidth": 8,
+        "targetHeight": 6,
+        "unit": "ft",
+        "showAreaGrid": true
+      }
     },
     {
       "id": "oer-4-OA3-01",
@@ -252,8 +412,13 @@
       "title": "Multi-Step Word Problems & Remainder Interpretation",
       "prompt": "58 fourth-grade students are taking vans to the California Science Center. Each van holds 8 students. What is the MINIMUM number of vans needed so every student gets a seat?",
       "correctAnswer": 8,
-      "options": [6, 7, 8, 9],
-      "explanation": "58 ÷ 8 = 7 R 2. Seven vans hold 56 students, leaving 2 students who need an 8th van. Minimum vans = 8.",
+      "options": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "explanation": "Seven vans seat 8 × 7 = 56 students. Since 58 - 56 = 2 students remain, one more van is needed: 7 + 1 = 8 vans.",
       "hint": "Divide 58 by 8. Can the 2 remaining students be left behind?"
     },
     {
@@ -265,10 +430,19 @@
       "title": "Equivalent Fractions",
       "prompt": "Which fraction is equivalent to 3/4?",
       "correctAnswer": "6/8",
-      "options": ["5/6", "6/8", "7/9", "9/16"],
+      "options": [
+        "5/6",
+        "6/8",
+        "7/9",
+        "9/16"
+      ],
       "explanation": "Multiply numerator and denominator by 2: (3×2)/(4×2) = 6/8.",
       "hint": "Multiply both the top and bottom by 2.",
-      "manipulative": { "type": "fraction", "numerator": 3, "denominator": 4 }
+      "manipulative": {
+        "type": "fraction",
+        "numerator": 3,
+        "denominator": 4
+      }
     },
     {
       "id": "oer-4-NBT5-01",
@@ -279,7 +453,12 @@
       "title": "Multi-Digit Multiplication",
       "prompt": "Compute using an area model or partial products: 24 × 15",
       "correctAnswer": 360,
-      "options": [340, 350, 360, 380],
+      "options": [
+        340,
+        350,
+        360,
+        380
+      ],
       "explanation": "Use the distributive property: 24 × 10 = 240, and 24 × 5 = 120. 240 + 120 = 360.",
       "hint": "Break 15 into 10 + 5 and multiply each part by 24."
     },
@@ -292,7 +471,12 @@
       "title": "Perimeter and Area Formulas",
       "prompt": "A rectangular garden has a perimeter of 30 meters. If the length is 9 meters, what is the width?",
       "correctAnswer": "6 meters",
-      "options": ["5 meters", "6 meters", "7 meters", "12 meters"],
+      "options": [
+        "5 meters",
+        "6 meters",
+        "7 meters",
+        "12 meters"
+      ],
       "explanation": "Perimeter = 2 × (L + W) = 30. L + W = 15. If L = 9, then W = 15 - 9 = 6 meters.",
       "hint": "Two lengths equal 18 m. Subtract 18 from 30, then divide by 2."
     },
@@ -305,10 +489,19 @@
       "title": "Additive Angle Measure (Complementary & Supplementary)",
       "prompt": "A right angle (90°) is decomposed into two non-overlapping angles. One angle measures 38°. What is the measure of the other angle?",
       "correctAnswer": "52°",
-      "options": ["42°", "52°", "62°", "142°"],
+      "options": [
+        "42°",
+        "52°",
+        "62°",
+        "142°"
+      ],
       "explanation": "Complementary angles sum to 90°: 90° − 38° = 52°.",
       "hint": "Subtract 38° from 90°.",
-      "manipulative": { "type": "interactive-geometry", "mode": "angles", "targetAngle": 52 }
+      "manipulative": {
+        "type": "interactive-geometry",
+        "mode": "angles",
+        "targetAngle": 52
+      }
     },
     {
       "id": "oer-5-OA1-01",
@@ -319,7 +512,12 @@
       "title": "Order of Operations (PEMDAS)",
       "prompt": "Evaluate: 4 + (6 × 3) - 2",
       "correctAnswer": 20,
-      "options": [18, 20, 28, 10],
+      "options": [
+        18,
+        20,
+        28,
+        10
+      ],
       "explanation": "1. Parentheses: 6 × 3 = 18. 2. Addition & subtraction left to right: 4 + 18 - 2 = 20.",
       "hint": "Perform the operation inside the parentheses first."
     },
@@ -332,7 +530,12 @@
       "title": "Adding Fractions with Unlike Denominators",
       "prompt": "What is 1/3 + 2/5?",
       "correctAnswer": "11/15",
-      "options": ["3/8", "7/15", "11/15", "13/15"],
+      "options": [
+        "3/8",
+        "7/15",
+        "11/15",
+        "13/15"
+      ],
       "explanation": "Common denominator is 15. 1/3 = 5/15, 2/5 = 6/15. 5/15 + 6/15 = 11/15.",
       "hint": "Find the least common multiple of 3 and 5, which is 15."
     },
@@ -345,7 +548,12 @@
       "title": "Fractions as Division (a ÷ b = a/b)",
       "prompt": "5 friends equally share 3 identical pans of cornbread. What fraction of a pan does each friend receive?",
       "correctAnswer": "3/5",
-      "options": ["3/5", "5/3", "1/5", "2/5"],
+      "options": [
+        "3/5",
+        "5/3",
+        "1/5",
+        "2/5"
+      ],
       "explanation": "By CA CCSS-M 5.NF.B.3, a ÷ b = a/b. Dividing 3 pans among 5 friends gives 3 ÷ 5 = 3/5 of a pan each.",
       "hint": "Divide the number of pans Being Shared (3) by the number of Sharers (5)."
     },
@@ -358,23 +566,41 @@
       "title": "Volume of Right Rectangular Prisms",
       "prompt": "A storage container is 5 meters long, 4 meters wide, and 3 meters high. What is its volume?",
       "correctAnswer": "60 cubic meters",
-      "options": ["45 cubic meters", "50 cubic meters", "60 cubic meters", "72 cubic meters"],
+      "options": [
+        "45 cubic meters",
+        "50 cubic meters",
+        "60 cubic meters",
+        "72 cubic meters"
+      ],
       "explanation": "Volume = length × width × height = 5 × 4 × 3 = 60 cubic meters.",
       "hint": "Multiply length × width × height.",
-      "manipulative": { "type": "interactive-geometry", "mode": "volume", "targetLength": 5, "targetWidth": 4, "targetHeight": 3, "unit": "m" }
+      "manipulative": {
+        "type": "interactive-geometry",
+        "mode": "volume",
+        "targetLength": 5,
+        "targetWidth": 4,
+        "targetHeight": 3,
+        "unit": "m"
+      }
     },
     {
       "id": "oer-5-MD5c-01",
       "grade": "5",
-      "standard": "5.MD.C.5c",
+      "standard": "5.MD.C.5",
       "domain": "MD",
       "cluster": "Geometric measurement: understand concepts of volume",
       "title": "Additive Volume of Composite Solid Figures",
       "prompt": "An L-shaped sculpture base is made of two non-overlapping rectangular prisms. Prism A is 4 ft × 3 ft × 2 ft. Prism B is 5 ft × 2 ft × 3 ft. What is the total volume?",
       "correctAnswer": "54 cu ft",
-      "options": ["44 cu ft", "54 cu ft", "64 cu ft", "720 cu ft"],
+      "options": [
+        "44 cu ft",
+        "54 cu ft",
+        "64 cu ft",
+        "720 cu ft"
+      ],
       "explanation": "Volume is additive: V_A = 4×3×2 = 24 cu ft. V_B = 5×2×3 = 30 cu ft. Total V = 24 + 30 = 54 cu ft.",
-      "hint": "Calculate the volume of Prism A and Prism B separately, then add them together."
+      "hint": "Calculate the volume of Prism A and Prism B separately, then add them together.",
+      "substandard": "5.MD.C.5.c"
     }
   ]
 }

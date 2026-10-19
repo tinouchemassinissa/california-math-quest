@@ -42,7 +42,7 @@ test('Mulberry32 PRNG is 100% deterministic with matching seeds', () => {
   assert.deepEqual(seq1, seq2, 'Identical seeds must produce identical numbers');
 });
 
-test('verifyQuestion formal verification gate rejects flawed questions', () => {
+test('verifyQuestion rejects the listed malformed cases', () => {
   // Option count != 4
   const badCount = {
     id: 'test-1',
@@ -92,7 +92,7 @@ test('verifyQuestion formal verification gate rejects flawed questions', () => {
   assert.equal(verifyQuestion(nanOption).valid, false);
 });
 
-test('STRESS TEST: generateVerifiedProblem produces 100% verified error-free questions across all grades', () => {
+test('Sample generation satisfies implemented invariants across registered grades', () => {
   const grades = ['K', '1', '2', '3', '4', '5'];
   let totalVerified = 0;
 

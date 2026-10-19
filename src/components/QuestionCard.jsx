@@ -1,3 +1,5 @@
+import GuidedLesson from './GuidedLesson.jsx';
+import { buildLessonGuide } from '../game/coachGuide.js';
 import React, { useState, useEffect } from 'react';
 import VisualManipulative from './manipulatives/VisualManipulative.jsx';
 import NumberPad from './NumberPad.jsx';
@@ -74,6 +76,8 @@ export default function QuestionCard({
   onAnswer,
   onSkip,
   onNextAfterAnswer,
+  onPracticeSimilar,
+  onGuideOpen,
   timeLeft,
   totalTime,
   feedback, // { status: 'correct' | 'incorrect', answer }
@@ -86,6 +90,8 @@ export default function QuestionCard({
   studentName = '',
 }) {
   const [hintVisible, setHintVisible] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const guide = buildLessonGuide(question);
   const [explanationVisible, setExplanationVisible] = useState(false);
   const [standardDetailsOpen, setStandardDetailsOpen] = useState(false);
   const [scratchpadOpen, setScratchpadOpen] = useState(false);
@@ -96,6 +102,7 @@ export default function QuestionCard({
 
   useEffect(() => {
     setHintVisible(false);
+    setGuideOpen(false);
     setExplanationVisible(false);
     setManualInput('');
     setHoveredOption(null);
@@ -111,14 +118,10 @@ export default function QuestionCard({
     }
   }, [question?.id, question?.prompt, question?.grade, soundEnabled]);
 
-  useEffect(() => {
-    if (feedback?.status === 'incorrect') {
-      setExplanationVisible(true);
-    }
-  }, [feedback]);
+
 
   if (!question) {
-    return <div className="card loading-card">Loading verified question...</div>;
+    return <div className="card loading-card">Preparing a checked question...</div>;
   }
 
   const handleManualSubmit = (e) => {
@@ -131,7 +134,8 @@ export default function QuestionCard({
 
   // Let Bip laser-zap 1 wrong multiple-choice distractor so Bip directly helps with the answers!
   const handleBipEliminateOption = () => {
-    if (eliminatedOption || !Array.isArray(question.options)) return;
+    if (eliminatedOption !== null || !Array.isArray(question.options)) return;
+    onGuideOpen?.(true);
     const wrongChoices = question.options.filter(
       (opt) => String(opt).trim().toLowerCase() !== String(question.correctAnswer).trim().toLowerCase()
     );
@@ -178,7 +182,7 @@ export default function QuestionCard({
             type="button"
             className="standard-info-chip"
             onClick={() => setStandardDetailsOpen((v) => !v)}
-            title="Click to view official California CCSS-M, Cambrian Eureka Math & CAASPP details"
+            title="View the practice skill and source information"
           >
             ℹ️ {question.standard} {standardDetailsOpen ? '▲' : '▼'}
           </button>
@@ -229,7 +233,7 @@ export default function QuestionCard({
           <span className="code-pill">CA CCSS-M {question.standard}</span>
           {question.module && (
             <span className="verified-proof-badge" style={{ background: 'rgba(139, 92, 246, 0.14)', color: '#a78bfa', borderColor: 'rgba(139, 92, 246, 0.35)' }}>
-              📘 Cambrian Eureka: {question.module}
+              📘 Practice unit: {question.module}
             </span>
           )}
           {question.caasppClaim && (
@@ -242,7 +246,7 @@ export default function QuestionCard({
               ⚡ {question.dokLevel}
             </span>
           )}
-          <span className="verified-proof-badge">✓ 100% Verified Safe</span>
+          <span className="verified-proof-badge">✓ Built-in checks passed • Not a certification</span>
         </div>
       )}
 
@@ -266,6 +270,11 @@ export default function QuestionCard({
       {question.manipulative && (
         <VisualManipulative manipulative={question.manipulative} />
       )}
+
+      <GuidedLesson key={`guide-${question.id}`} question={question} open={guideOpen}
+        onOpen={() => { setGuideOpen(true); onGuideOpen?.(true); }}
+        onClose={() => { setGuideOpen(false); onGuideOpen?.(false); }}
+        onPracticeSimilar={onPracticeSimilar} onSpeak={speakMathText} />
 
       {/* On-Screen Kid's Math Scratchpad & Doodle Canvas */}
       {scratchpadOpen && (
@@ -355,17 +364,19 @@ export default function QuestionCard({
         studentName={studentName}
         streak={streak}
         correctCount={correctCount}
-        question={question}
+        question={{ ...question, hint: guide.firstHint }}
         feedback={feedback}
         hoveredOption={hoveredOption}
         eliminatedOption={eliminatedOption}
         soundEnabled={soundEnabled}
         onAskHint={() => {
+          setGuideOpen(true); onGuideOpen?.(true);
           setHintVisible(true);
-          if (question.hint) speakMathText(question.hint);
+          if (question.hint) speakMathText(guide.firstHint);
         }}
         onEliminateOption={handleBipEliminateOption}
         onSpeakExplanation={() => {
+          setGuideOpen(true); onGuideOpen?.(true);
           setExplanationVisible(true);
           if (question.explanation) speakMathText(question.explanation);
         }}
@@ -392,7 +403,7 @@ export default function QuestionCard({
                 onClick={() => {
                   const next = !hintVisible;
                   setHintVisible(next);
-                  if (next) speakMathText(question.hint);
+                  if (next) { onGuideOpen?.(true); speakMathText(guide.firstHint); }
                 }}
               >
                 💡 {hintVisible ? 'Hide Hint' : 'Need a Hint?'}
@@ -403,7 +414,7 @@ export default function QuestionCard({
               <button
                 type="button"
                 className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
-                onClick={() => setExplanationVisible((prev) => !prev)}
+                onClick={() => { if (!explanationVisible) onGuideOpen?.(true); setExplanationVisible((prev) => !prev); }}
               >
                 📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
               </button>
@@ -426,12 +437,12 @@ export default function QuestionCard({
           <div className="hint-callout animated-pop">
             <span className="hint-icon">💡</span>
             <div style={{ flex: 1 }}>
-              <strong>Helpful Hint:</strong> {question.hint}
+              <strong>Helpful Hint:</strong> {guide.firstHint}
             </div>
             <button
               type="button"
               className="mini-speak-btn"
-              onClick={() => speakMathText(question.hint)}
+              onClick={() => speakMathText(guide.firstHint)}
               title="Read hint aloud"
             >
               🔊
@@ -459,6 +470,7 @@ export default function QuestionCard({
 
         {feedback && (
           <div className={`feedback-alert animated-pop ${feedback.status}`}>
+            {feedback.assisted && <p>Practiced with help. Try a fresh question on your own to build independent progress.</p>}
             <div className="feedback-row-content">
               {feedback.status === 'correct' ? (
                 <span>

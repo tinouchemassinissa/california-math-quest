@@ -1,0 +1,506 @@
+[
+  {
+    "code": "K.CC.A.1",
+    "grade": "K",
+    "title": "Count to 100 by Ones and Tens",
+    "desc": "Count to 100 by ones and by tens. Identify the missing number in forward counting sequences."
+  },
+  {
+    "code": "K.CC.B.4",
+    "grade": "K",
+    "title": "Count Objects and Ten-Frames (Cardinality)",
+    "desc": "Understand the relationship between numbers and quantities; connect counting to cardinality up to 20."
+  },
+  {
+    "code": "K.CC.C.6",
+    "grade": "K",
+    "title": "Compare Quantities (Greater, Less, Equal)",
+    "desc": "Identify whether the number of objects in one group is greater than, less than, or equal to another group."
+  },
+  {
+    "code": "K.OA.A.2",
+    "grade": "K",
+    "title": "Addition & Subtraction Word Problems within 10",
+    "desc": "Solve addition and subtraction word problems, and add and subtract within 10 using objects or drawings."
+  },
+  {
+    "code": "K.OA.A.4",
+    "grade": "K",
+    "title": "Partners to Make 10 (Number Bonds to 10)",
+    "desc": "For any number from 1 to 9, find the number that makes 10 when added to the given number."
+  },
+  {
+    "code": "K.NBT.A.1",
+    "grade": "K",
+    "title": "Compose & Decompose Teen Numbers (10 Ones and More)",
+    "desc": "Compose and decompose numbers from 11 to 19 into ten ones and some further ones (e.g., 18 = 10 + 8)."
+  },
+  {
+    "code": "K.MD.A.2",
+    "grade": "K",
+    "title": "Compare Measurable Attributes (Length, Weight, Capacity)",
+    "desc": "Directly compare two objects with a measurable attribute in common, to see which object has \"more of\"/\"less of\" the attribute."
+  },
+  {
+    "code": "K.G.A.2",
+    "grade": "K",
+    "title": "Name Shapes (Current 2D Practice Subset)",
+    "desc": "Correctly name shapes (circle, triangle, rectangle, square, hexagon, cube, cone, cylinder, sphere) regardless of orientation."
+  },
+  {
+    "code": "1.OA.A.1",
+    "grade": "1",
+    "title": "Word Problems within 20 (Add To, Take From, Compare)",
+    "desc": "Use addition and subtraction within 20 to solve word problems involving situations of adding to, taking from, putting together, taking apart, and comparing."
+  },
+  {
+    "code": "1.OA.C.6",
+    "grade": "1",
+    "title": "Add & Subtract within 20 (Make-a-Ten Strategy)",
+    "desc": "Add and subtract within 20, demonstrating fluency within 10. Use strategies such as counting on, making ten, and decomposing a number leading to a ten."
+  },
+  {
+    "code": "1.OA.D.8",
+    "grade": "1",
+    "title": "Determine Unknown Whole Number in Equations",
+    "desc": "Determine the unknown whole number in an addition or subtraction equation relating three whole numbers (e.g., 8 + ? = 11, 5 = ? - 3)."
+  },
+  {
+    "code": "1.NBT.B.2",
+    "grade": "1",
+    "title": "Place Value: Bundles of Tens and Ones",
+    "desc": "Understand that the two digits of a two-digit number represent amounts of tens and ones."
+  },
+  {
+    "code": "1.NBT.B.3",
+    "grade": "1",
+    "title": "Compare Two 2-Digit Numbers (>, =, <)",
+    "desc": "Compare two two-digit numbers based on meanings of the tens and ones digits, recording the results of comparisons with >, =, and <."
+  },
+  {
+    "code": "1.NBT.C.5",
+    "grade": "1",
+    "title": "10 More and 10 Less Mentally",
+    "desc": "Given a two-digit number, mentally find 10 more or 10 less than the number, without having to count; explain the reasoning used."
+  },
+  {
+    "code": "1.MD.A.2",
+    "grade": "1",
+    "title": "Measure Length by Iterating Centimeter Cubes",
+    "desc": "Express the length of an object as a whole number of length units, by laying multiple copies of a shorter object (centimeter cubes) end to end."
+  },
+  {
+    "code": "1.MD.B.3",
+    "grade": "1",
+    "title": "Telling Time to the Hour and Half-Hour",
+    "desc": "Tell and write time in hours and half-hours using analog and digital clocks."
+  },
+  {
+    "code": "1.G.A.3",
+    "grade": "1",
+    "title": "Partition Circles & Rectangles (Halves and Fourths)",
+    "desc": "Partition circles and rectangles into two and four equal shares; describe the shares using the words halves, fourths, and quarters."
+  },
+  {
+    "code": "2.OA.A.1",
+    "grade": "2",
+    "title": "One- & Two-Step Word Problems within 100",
+    "desc": "Use addition and subtraction within 100 to solve one- and two-step word problems involving adding to, taking from, putting together, taking apart, and comparing."
+  },
+  {
+    "code": "2.OA.B.2",
+    "grade": "2",
+    "title": "Fluently Add & Subtract within 20 (Mental Strategies)",
+    "desc": "Fluently add and subtract within 20 using mental strategies. By end of Grade 2, know from memory all sums of two one-digit numbers."
+  },
+  {
+    "code": "2.OA.C.3",
+    "grade": "2",
+    "title": "Odd & Even Numbers and Equal Addends",
+    "desc": "Determine whether a group of objects (up to 20) has an odd or even number of members; write an equation to express an even number as a sum of two equal addends."
+  },
+  {
+    "code": "2.OA.C.4",
+    "grade": "2",
+    "title": "Rectangular Arrays & Repeated Addition (Up to 5×5)",
+    "desc": "Use addition to find the total number of objects arranged in rectangular arrays with up to 5 rows and up to 5 columns."
+  },
+  {
+    "code": "2.NBT.A.1",
+    "grade": "2",
+    "title": "Three-Digit Place Value (Hundreds, Tens, Ones)",
+    "desc": "Understand that the three digits of a three-digit number represent amounts of hundreds, tens, and ones (e.g., 706 = 7 hundreds, 0 tens, 6 ones)."
+  },
+  {
+    "code": "2.NBT.A.2",
+    "grade": "2",
+    "title": "Skip-Counting by 5s, 10s, and 100s within 1,000",
+    "desc": "Count within 1000; skip-count by 5s, 10s, and 100s."
+  },
+  {
+    "code": "2.NBT.B.7",
+    "grade": "2",
+    "title": "Add & Subtract within 1,000 (Place Value & Regrouping)",
+    "desc": "Add and subtract within 1000, using concrete models or drawings and strategies based on place value, properties of operations, and regrouping."
+  },
+  {
+    "code": "2.MD.B.5",
+    "grade": "2",
+    "title": "Measurement Length Word Problems (cm, m, in, ft)",
+    "desc": "Use addition and subtraction within 100 to solve word problems involving lengths that are given in the same units."
+  },
+  {
+    "code": "2.MD.C.7",
+    "grade": "2",
+    "title": "Tell & Write Time to the Nearest 5 Minutes (a.m./p.m.)",
+    "desc": "Tell and write time from analog and digital clocks to the nearest five minutes, using a.m. and p.m."
+  },
+  {
+    "code": "2.MD.C.8",
+    "grade": "2",
+    "title": "Money Word Problems (Dollar Bills, Quarters, Dimes, Nickels, Pennies)",
+    "desc": "Solve word problems involving dollar bills, quarters, dimes, nickels, and pennies, using $ and ¢ symbols appropriately."
+  },
+  {
+    "code": "2.MD.D.10",
+    "grade": "2",
+    "title": "Bar Graphs & Picture Graphs Data Problems",
+    "desc": "Draw a picture graph and a bar graph (with single-unit scale) to represent a data set with up to four categories; solve put-together, take-apart, and compare problems."
+  },
+  {
+    "code": "2.G.A.1",
+    "grade": "2",
+    "title": "Recognize & Draw Polygons by Angles and Faces",
+    "desc": "Recognize and draw shapes having specified attributes, such as a given number of angles or a given number of equal faces. Identify triangles, quadrilaterals, pentagons, hexagons, and cubes."
+  },
+  {
+    "code": "3.OA.A.3",
+    "grade": "3",
+    "title": "Multiplication & Division Word Problems within 100",
+    "desc": "Use multiplication and division within 100 to solve word problems in situations involving equal groups, arrays, and measurement quantities."
+  },
+  {
+    "code": "3.OA.A.4",
+    "grade": "3",
+    "title": "Determine Unknown Whole Number in × / ÷ Equations",
+    "desc": "Determine the unknown whole number in a multiplication or division equation relating three whole numbers (e.g., 8 × ? = 48, 5 = ? ÷ 3, 6 × 6 = ?)."
+  },
+  {
+    "code": "3.OA.B.5",
+    "grade": "3",
+    "title": "Distributive, Associative & Commutative Properties of Multiplication",
+    "desc": "Apply properties of operations as strategies to multiply and divide (e.g., knowing 8 × 5 = 40 and 8 × 2 = 16, find 8 × 7 as 40 + 16 = 56)."
+  },
+  {
+    "code": "3.OA.C.7",
+    "grade": "3",
+    "title": "Fluently Multiply & Divide within 100",
+    "desc": "Fluently multiply and divide within 100, using strategies such as the relationship between multiplication and division."
+  },
+  {
+    "code": "3.OA.D.8",
+    "grade": "3",
+    "title": "Two-Step Word Problems Using Four Operations",
+    "desc": "Solve two-step word problems using the four operations. Represent these problems using equations with a letter standing for the unknown quantity."
+  },
+  {
+    "code": "3.NBT.A.1",
+    "grade": "3",
+    "title": "Round Whole Numbers to Nearest 10 or 100",
+    "desc": "Use place value understanding to round whole numbers to the nearest 10 or 100."
+  },
+  {
+    "code": "3.NBT.A.2",
+    "grade": "3",
+    "title": "Fluently Add & Subtract within 1,000",
+    "desc": "Fluently add and subtract within 1000 using strategies and algorithms based on place value, properties of operations, and the relationship between addition and subtraction."
+  },
+  {
+    "code": "3.NF.A.1",
+    "grade": "3",
+    "title": "Unit Fractions 1/b & Fractions a/b as Equal Shares",
+    "desc": "Understand a fraction 1/b as the quantity formed by 1 part when a whole is partitioned into b equal parts; understand a fraction a/b as the quantity formed by a parts of size 1/b."
+  },
+  {
+    "code": "3.NF.A.2",
+    "grade": "3",
+    "title": "Fractions on the Number Line [0 to 1]",
+    "desc": "Understand a fraction as a number on the number line; represent fractions on a number line diagram by partitioning the interval from 0 to 1 into b equal parts."
+  },
+  {
+    "code": "3.NF.A.3",
+    "grade": "3",
+    "title": "Equivalent Fractions & Comparing Fractions (Same Numerator or Denominator)",
+    "desc": "Explain equivalence of fractions in special cases, express whole numbers as fractions, and compare two fractions with the same numerator or the same denominator."
+  },
+  {
+    "code": "3.MD.A.1",
+    "grade": "3",
+    "title": "Time to the Nearest Minute & Elapsed Time Word Problems",
+    "desc": "Tell and write time to the nearest minute and measure time intervals in minutes. Solve word problems involving addition and subtraction of time intervals in minutes."
+  },
+  {
+    "code": "3.MD.A.2",
+    "grade": "3",
+    "title": "Liquid Volume (Liters) & Mass (Grams, Kilograms) Word Problems",
+    "desc": "Measure and estimate liquid volumes and masses of objects using standard units of grams (g), kilograms (kg), and liters (l). Add, subtract, multiply, or divide to solve one-step word problems."
+  },
+  {
+    "code": "3.MD.C.7",
+    "grade": "3",
+    "title": "Area of Rectangles & Composite Figures (Tiling & Multiplication)",
+    "desc": "Relate area to the operations of multiplication and addition. Find the area of a rectangle with whole-number side lengths by tiling it and multiplying side lengths."
+  },
+  {
+    "code": "3.MD.D.8",
+    "grade": "3",
+    "title": "Perimeter of Polygons & Unknown Side Lengths",
+    "desc": "Solve real-world and mathematical problems involving perimeters of polygons, including finding the perimeter given the side lengths and finding an unknown side length."
+  },
+  {
+    "code": "3.G.A.1",
+    "grade": "3",
+    "title": "Classify Quadrilaterals (Rhombuses, Rectangles, Squares)",
+    "desc": "Understand that shapes in different categories (e.g., rhombuses, rectangles, and others) may share attributes (e.g., having four sides), and that the shared attributes can define a larger category (e.g., quadrilaterals)."
+  },
+  {
+    "code": "4.OA.A.2",
+    "grade": "4",
+    "title": "Multiplicative Comparison Word Problems (\"Times as Many\")",
+    "desc": "Multiply or divide to solve word problems involving multiplicative comparison, e.g., by using drawings and equations with a symbol for the unknown number."
+  },
+  {
+    "code": "4.OA.A.3",
+    "grade": "4",
+    "title": "Multi-Step Word Problems & Interpreting Remainders",
+    "desc": "Solve multistep word problems posed with whole numbers and having whole-number answers using the four operations, including problems in which remainders must be interpreted."
+  },
+  {
+    "code": "4.OA.B.4",
+    "grade": "4",
+    "title": "Factor Pairs, Multiples, Prime & Composite Numbers (1–100)",
+    "desc": "Find all factor pairs for a whole number in the range 1–100. Determine whether a given whole number in the range 1–100 is a multiple of a given one-digit number, and whether it is prime or composite."
+  },
+  {
+    "code": "4.OA.C.5",
+    "grade": "4",
+    "title": "Generate & Analyze Number and Shape Patterns",
+    "desc": "Generate a number or shape pattern that follows a given rule. Identify apparent features of the pattern that were not explicit in the rule itself."
+  },
+  {
+    "code": "4.NBT.A.2",
+    "grade": "4",
+    "title": "Read, Write & Compare Multi-Digit Numbers (Expanded Form to 1,000,000)",
+    "desc": "Read and write multi-digit whole numbers using base-ten numerals, number names, and expanded form. Compare two multi-digit numbers based on meanings of the digits in each place."
+  },
+  {
+    "code": "4.NBT.A.3",
+    "grade": "4",
+    "title": "Round Multi-Digit Whole Numbers to Any Place",
+    "desc": "Use place value understanding to round multi-digit whole numbers to any place up to 1,000,000."
+  },
+  {
+    "code": "4.NBT.B.4",
+    "grade": "4",
+    "title": "Fluently Add & Subtract Multi-Digit Whole Numbers (Standard Algorithm)",
+    "desc": "Fluently add and subtract multi-digit whole numbers using the standard algorithm."
+  },
+  {
+    "code": "4.NBT.B.5",
+    "grade": "4",
+    "title": "Multi-Digit Multiplication (4-Digit × 1-Digit & 2-Digit × 2-Digit)",
+    "desc": "Multiply a whole number of up to four digits by a one-digit whole number, and multiply two two-digit numbers, using strategies based on place value and the properties of operations (area models, partial products)."
+  },
+  {
+    "code": "4.NBT.B.6",
+    "grade": "4",
+    "title": "Multi-Digit Division: Quotients & Remainders (Up to 4-Digit ÷ 1-Digit)",
+    "desc": "Find whole-number quotients and remainders with up to four-digit dividends and one-digit divisors, using strategies based on place value, properties of operations, and the relationship between multiplication and division."
+  },
+  {
+    "code": "4.NF.A.1",
+    "grade": "4",
+    "title": "Equivalent Fractions (a/b = (n×a)/(n×b))",
+    "desc": "Explain why a fraction a/b is equivalent to a fraction (n × a)/(n × b) by using visual fraction models."
+  },
+  {
+    "code": "4.NF.A.2",
+    "grade": "4",
+    "title": "Compare Fractions with Unlike Numerators and Denominators",
+    "desc": "Compare two fractions with different numerators and different denominators, e.g., by creating common denominators or numerators, or by comparing to a benchmark fraction such as 1/2."
+  },
+  {
+    "code": "4.NF.B.3",
+    "grade": "4",
+    "title": "Add, Subtract & Decompose Fractions and Mixed Numbers (Like Denominators)",
+    "desc": "Understand a fraction a/b with a > 1 as a sum of fractions 1/b. Add and subtract mixed numbers with like denominators, and solve word problems involving addition and subtraction of fractions."
+  },
+  {
+    "code": "4.NF.B.4",
+    "grade": "4",
+    "title": "Multiply a Fraction by a Whole Number (n × a/b)",
+    "desc": "Apply and extend previous understandings of multiplication to multiply a fraction by a whole number, and solve word problems involving multiplication of a fraction by a whole number."
+  },
+  {
+    "code": "4.NF.C.5",
+    "grade": "4",
+    "title": "Add Tenths and Hundredths Fractions (e.g., 3/10 + 4/100 = 34/100)",
+    "desc": "Express a fraction with denominator 10 as an equivalent fraction with denominator 100, and use this technique to add two fractions with respective denominators 10 and 100."
+  },
+  {
+    "code": "4.NF.C.6",
+    "grade": "4",
+    "title": "Decimal Notation for Tenths & Hundredths Fractions",
+    "desc": "Use decimal notation for fractions with denominators 10 or 100 (e.g., rewrite 0.62 as 62/100; describe a length as 0.62 meters)."
+  },
+  {
+    "code": "4.NF.C.7",
+    "grade": "4",
+    "title": "Compare Decimals to Hundredths (>, =, <)",
+    "desc": "Compare two decimals to hundredths by reasoning about their size. Record the results of comparisons with the symbols >, =, or <."
+  },
+  {
+    "code": "4.MD.A.1",
+    "grade": "4",
+    "title": "Measurement Unit Conversions (km/m/cm, kg/g, lb/oz, L/mL, hr/min/sec)",
+    "desc": "Know relative sizes of measurement units within one system of units including km, m, cm; kg, g; lb, oz.; l, ml; hr, min, sec. Express measurements in a larger unit in terms of a smaller unit."
+  },
+  {
+    "code": "4.MD.A.3",
+    "grade": "4",
+    "title": "Area & Perimeter Formulas for Rectangles (Missing Dimensions)",
+    "desc": "Apply the area and perimeter formulas for rectangles in real-world and mathematical problems, including finding an unknown width or length."
+  },
+  {
+    "code": "4.MD.C.6",
+    "grade": "4",
+    "title": "Measure Angles with a Protractor",
+    "desc": "Measure and sketch angles in whole-number degrees using a protractor."
+  },
+  {
+    "code": "4.G.A.1",
+    "grade": "4",
+    "title": "Lines, Rays, Parallel/Perpendicular Lines and Angles",
+    "desc": "Draw points, lines, line segments, rays, angles (right, acute, obtuse), and perpendicular and parallel lines. Identify these in two-dimensional figures."
+  },
+  {
+    "code": "4.MD.C.7",
+    "grade": "4",
+    "title": "Additive Angle Measures",
+    "desc": "Find whole or unknown angle measures by combining non-overlapping adjacent angles."
+  },
+  {
+    "code": "5.OA.A.1",
+    "grade": "5",
+    "title": "Order of Operations: Parentheses, Brackets & Braces (PEMDAS)",
+    "desc": "Use parentheses, brackets, or braces in numerical expressions, and evaluate expressions with these symbols."
+  },
+  {
+    "code": "5.OA.A.2",
+    "grade": "5",
+    "title": "Write & Interpret Numerical Expressions",
+    "desc": "Write simple expressions that record calculations with numbers, and interpret numerical expressions without evaluating them."
+  },
+  {
+    "code": "5.OA.B.3",
+    "grade": "5",
+    "title": "Two-Rule Numerical Patterns & Coordinate Ordered Pairs",
+    "desc": "Generate two numerical patterns using two given rules. Identify apparent relationships between corresponding terms and form ordered pairs."
+  },
+  {
+    "code": "5.NBT.A.1",
+    "grade": "5",
+    "title": "Place Value Relationships (10 Times as Much & 1/10 of)",
+    "desc": "Recognize that in a multi-digit number, a digit in one place represents 10 times as much as it represents in the place to its right and 1/10 of what it represents in the place to its left."
+  },
+  {
+    "code": "5.NBT.A.2",
+    "grade": "5",
+    "title": "Powers of 10, Exponents & Decimal Point Shifts",
+    "desc": "Explain patterns in the number of zeros of the product when multiplying a number by powers of 10, and explain patterns in the placement of the decimal point when a decimal is multiplied or divided by a power of 10."
+  },
+  {
+    "code": "5.NBT.A.3",
+    "grade": "5",
+    "title": "Read, Write & Compare Decimals to Thousandths",
+    "desc": "Read, write, and compare decimals to thousandths using base-ten numerals, number names, and expanded form (e.g., 347.392 = 3×100 + 4×10 + 7×1 + 3×(1/10) + 9×(1/100) + 2×(1/1000))."
+  },
+  {
+    "code": "5.NBT.A.4",
+    "grade": "5",
+    "title": "Round Decimals to Tenths, Hundredths, or Whole Numbers",
+    "desc": "Use place value understanding to round decimals to any place."
+  },
+  {
+    "code": "5.NBT.B.5",
+    "grade": "5",
+    "title": "Fluently Multiply Multi-Digit Whole Numbers (Standard Algorithm)",
+    "desc": "Fluently multiply multi-digit whole numbers using the standard algorithm."
+  },
+  {
+    "code": "5.NBT.B.6",
+    "grade": "5",
+    "title": "Multi-Digit Division with Two-Digit Divisors (Up to 4-Digit ÷ 2-Digit)",
+    "desc": "Find whole-number quotients of whole numbers with up to four-digit dividends and two-digit divisors, using strategies based on place value, properties of operations, and area models."
+  },
+  {
+    "code": "5.NBT.B.7",
+    "grade": "5",
+    "title": "Add, Subtract, Multiply & Divide Decimals to Hundredths",
+    "desc": "Add, subtract, multiply, and divide decimals to hundredths, using concrete models or drawings and strategies based on place value and properties of operations."
+  },
+  {
+    "code": "5.NF.A.1",
+    "grade": "5",
+    "title": "Add & Subtract Fractions and Mixed Numbers with Unlike Denominators",
+    "desc": "Add and subtract fractions with unlike denominators (including mixed numbers) by replacing given fractions with equivalent fractions, and solve word problems (5.NF.A.2)."
+  },
+  {
+    "code": "5.NF.B.3",
+    "grade": "5",
+    "title": "Interpret Fractions as Division (a ÷ b = a/b) in Word Problems",
+    "desc": "Interpret a fraction as division of the numerator by the denominator (a/b = a ÷ b). Solve word problems involving division of whole numbers leading to answers in the form of fractions or mixed numbers."
+  },
+  {
+    "code": "5.NF.B.4",
+    "grade": "5",
+    "title": "Multiply Fractions & Fractional Side-Length Area (5.NF.B.6)",
+    "desc": "Apply and extend previous understandings of multiplication to multiply a fraction or whole number by a fraction, and find the area of a rectangle with fractional side lengths."
+  },
+  {
+    "code": "5.NF.B.7",
+    "grade": "5",
+    "title": "Divide Unit Fractions by Whole Numbers & Whole Numbers by Unit Fractions",
+    "desc": "Apply and extend previous understandings of division to divide unit fractions by whole numbers and whole numbers by unit fractions in real-world problems."
+  },
+  {
+    "code": "5.MD.A.1",
+    "grade": "5",
+    "title": "Multi-Step Measurement Unit Conversions (Metric & Customary)",
+    "desc": "Convert among different-sized standard measurement units within a given measurement system (e.g., convert 5 cm to 0.05 m), and use these conversions in solving multi-step, real-world problems."
+  },
+  {
+    "code": "5.MD.C.5",
+    "grade": "5",
+    "title": "Volume of Right Rectangular Prisms & Composite Solids (V = l×w×h & V = B×h)",
+    "desc": "Relate volume to the operations of multiplication and addition and solve real-world and mathematical problems involving volume, including additive volume of non-overlapping right rectangular prisms."
+  },
+  {
+    "code": "5.G.A.1",
+    "grade": "5",
+    "title": "Coordinate Plane: Ordered Pairs in Quadrant 1",
+    "desc": "Use a pair of perpendicular number lines (axes) to define a coordinate system, and represent real-world and mathematical problems by graphing points in the first quadrant."
+  },
+  {
+    "code": "5.G.B.4",
+    "grade": "5",
+    "title": "Classify Figures in a Hierarchy",
+    "desc": "Classify two-dimensional figures in a hierarchy based on their properties."
+  },
+  {
+    "code": "5.G.B.3",
+    "grade": "5",
+    "title": "Properties Shared by Categories and Subcategories",
+    "desc": "Understand that attributes belonging to a category of two-dimensional figures also belong to its subcategories."
+  }
+]

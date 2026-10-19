@@ -1,3 +1,4 @@
+import SmoothBipVideo from './SmoothBipVideo.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   playTamagotchiChomp,
@@ -6,20 +7,20 @@ import {
   playStreakChime,
 } from '../audio.js';
 
-// Official Bip 4K60 MP4 clips in public/bip/*
+// Teaching gestures rendered from the original Bip Blender scene, 720px / 30fps.
 // Deliberately avoids Bip_critical_4K60.mp4 for wrong answers so children are never frightened or shamed.
 export const BIP_CLIPS = {
-  idle: ['events/Bip_healthy_4K60.mp4', true, 'Bip is ready to help you solve this question!'],
-  thinking: ['events/Bip_busy_4K60.mp4', true, 'Scanning the math numbers step by step...'],
-  correct: ['events/Bip_recovery_4K60.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
-  celebrate: ['events/Bip_recovery_4K60.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
-  fireStreak: ['events/Bip_temperature_warning_4K60.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
-  starVault: ['events/Bip_backup_4K60.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
-  wave: ['greeting.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
-  tryAgain: ['events/Bip_recovery_4K60.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
-  recovery: ['events/Bip_recovery_4K60.mp4', false, 'You bounced right back! Keep going!'],
-  rest: ['events/Bip_sleep_4K60.mp4', true, 'Time for a calm little power nap.'],
-  saving: ['events/Bip_backup_4K60.mp4', true, 'Saving your math progress safely.'],
+  idle: ['gestures-v2/idle.mp4', true, 'Bip is ready to help you solve this question!'],
+  thinking: ['gestures-v2/think.mp4', false, 'Scanning the math numbers step by step...'],
+  correct: ['gestures-v2/nod.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
+  celebrate: ['gestures-v2/celebrate.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
+  fireStreak: ['gestures-v2/celebrate.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
+  starVault: ['gestures-v2/nod.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
+  wave: ['gestures-v2/wave.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
+  tryAgain: ['gestures-v2/encourage.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
+  recovery: ['gestures-v2/nod.mp4', false, 'You bounced right back! Keep going!'],
+  rest: ['gestures-v2/rest.mp4', true, 'Time for a calm little power nap.'],
+  saving: ['gestures-v2/think.mp4', true, 'Saving your math progress safely.'],
 };
 
 const CELEBRATION_SHOWS = [
@@ -57,7 +58,7 @@ const CELEBRATION_SHOWS = [
     treat: '🍦',
     particles: ['🏆', '🎊', '🍦', '💫', '🌟', '🎈'],
     getLine: (name, ans) =>
-      `High-five, ${name}! "${ans}" solved the puzzle! You are a true California Math Champion!`,
+      `High-five, ${name}! "${ans}" solved the puzzle! You are a true Math Explorer!`,
   },
 ];
 
@@ -99,8 +100,20 @@ export default function BipCompanion({
   showControls = true,
   onComplete,
 }) {
-  const videoRef = useRef(null);
   const callbackRef = useRef(onComplete);
+  const timers = useRef(new Set());
+  const schedule = (callback, delay) => {
+    const timer = setTimeout(() => {
+      timers.current.delete(timer);
+      callback();
+    }, delay);
+    timers.current.add(timer);
+    return timer;
+  };
+  useEffect(() => () => {
+    for (const timer of timers.current) clearTimeout(timer);
+    timers.current.clear();
+  }, []);
 
   const [paused, setPaused] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia
@@ -127,15 +140,25 @@ export default function BipCompanion({
     callbackRef.current = onComplete;
   }, [onComplete]);
 
+  useEffect(() => {
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const change = e => { if (e.matches) setPaused(true); };
+    media?.addEventListener('change', change);
+    return () => media?.removeEventListener('change', change);
+  }, []);
+
   const triggerParticleBurst = (emojis = ['🎉', '⭐', '⚡', '🔥', '✨', '🏆']) => {
     setBurstParticles(emojis);
-    setTimeout(() => {
+    schedule(() => {
       setBurstParticles([]);
     }, 1350);
   };
 
   // React to new question or answer attempt
   useEffect(() => {
+    for (const timer of timers.current) clearTimeout(timer);
+    timers.current.clear();
+    setBurstParticles([]);
     setSettled(false);
     setFailed(false);
     setManualEvent(null);
@@ -145,7 +168,7 @@ export default function BipCompanion({
       // Pick celebration show based on streak & eventKey so it's never just the same clip!
       const chosenIdx =
         streak >= 3
-          ? 1 // Fire Streak Overdrive (`Bip_temperature_warning_4K60.mp4`)
+          ? 1 // Use the child-friendly celebration for a streak.
           : eventKey % CELEBRATION_SHOWS.length;
       const show = CELEBRATION_SHOWS[chosenIdx];
       setActiveShowIndex(chosenIdx);
@@ -155,10 +178,10 @@ export default function BipCompanion({
 
       if (soundEnabled) {
         playTamagotchiChomp();
-        setTimeout(() => playTamagotchiDance(), 280);
+        schedule(() => playTamagotchiDance(), 280);
       }
 
-      const timer = setTimeout(() => {
+      const timer = schedule(() => {
         setStuntClass('');
         setFlyingTreat(null);
       }, 2400);
@@ -166,7 +189,7 @@ export default function BipCompanion({
     } else if (event === 'tryAgain' || feedback?.status === 'incorrect') {
       setStuntClass('stunt-gentle-nod');
       setFlyingTreat(null);
-      const timer = setTimeout(() => setStuntClass(''), 1200);
+      const timer = schedule(() => setStuntClass(''), 1200);
       return () => clearTimeout(timer);
     } else {
       setStuntClass('');
@@ -193,45 +216,9 @@ export default function BipCompanion({
   const [path, loop, defaultLabel] = BIP_CLIPS[resolvedEventKey] || BIP_CLIPS.idle;
   const fullSrc = `${baseUrl}/${path}`;
 
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-
-    try {
-      if (element.readyState >= 1) {
-        element.currentTime = 0;
-      }
-    } catch {
-      // Ignore if metadata is still loading
-    }
-
-    if (paused) {
-      element.pause();
-    } else {
-      const playPromise = element.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {});
-      }
-    }
-  }, [fullSrc, eventKey, paused, manualTrigger]);
-
-  const handleVideoLoadedData = () => {
-    const element = videoRef.current;
-    if (!element) return;
-    setFailed(false);
-    if (paused) {
-      element.pause();
-    } else {
-      const playPromise = element.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {});
-      }
-    }
-  };
-
   // Interactive Actions kids can trigger on Bip
   const handlePartyCelebrate = () => {
-    setPaused(false);
+
     setSettled(false);
     const nextIdx = (activeShowIndex + 1) % CELEBRATION_SHOWS.length;
     const show = CELEBRATION_SHOWS[nextIdx];
@@ -244,11 +231,11 @@ export default function BipCompanion({
       `🎉 PARTY MODE! Doing my ${show.badge} dance for ${displayName}!`
     );
     if (soundEnabled) playTamagotchiDance();
-    setTimeout(() => setStuntClass(''), 1800);
+    schedule(() => setStuntClass(''), 1800);
   };
 
   const handleFireBoost = () => {
-    setPaused(false);
+
     setSettled(false);
     setManualEvent('fireStreak');
     setManualTrigger((c) => c + 1);
@@ -258,11 +245,11 @@ export default function BipCompanion({
       `🔥 OVERDRIVE ENGAGED! Bip’s brass core is at 1,000% math power, ${displayName}!`
     );
     if (soundEnabled) playStreakChime(streak + 3);
-    setTimeout(() => setStuntClass(''), 1800);
+    schedule(() => setStuntClass(''), 1800);
   };
 
   const handleFeedTreat = () => {
-    setPaused(false);
+
     setSettled(false);
     const randomTreat = TREATS[Math.floor(Math.random() * TREATS.length)];
     setFlyingTreat(randomTreat);
@@ -274,14 +261,14 @@ export default function BipCompanion({
       `NOM-NOM-CRUNCH! ${randomTreat} Delicious math fuel, ${displayName}! Thank you!`
     );
     if (soundEnabled) playTamagotchiChomp();
-    setTimeout(() => {
+    schedule(() => {
       setFlyingTreat(null);
       setStuntClass('');
     }, 1800);
   };
 
   const handleHighFive = () => {
-    setPaused(false);
+
     setSettled(false);
     const nextCount = highFives + 1;
     setHighFives(nextCount);
@@ -293,7 +280,7 @@ export default function BipCompanion({
       `🙌 CLANG-FIVE x${nextCount}! Brass-to-hand high-five, ${displayName}!`
     );
     if (soundEnabled) playTamagotchiGiggle();
-    setTimeout(() => setStuntClass(''), 1400);
+    schedule(() => setStuntClass(''), 1400);
   };
 
   // Build context-aware interactive dialogue for questions, hover states, and answers
@@ -311,9 +298,7 @@ export default function BipCompanion({
     );
   } else if (feedback?.status === 'incorrect' || event === 'tryAgain') {
     modeBadgeText = '🌱 Bounce-Back Coach';
-    statusText = `Nice try picking "${feedback?.answer}"! The exact answer is "${question?.correctAnswer}". ${
-      question?.explanation || 'Let’s check the step-by-step clue below!'
-    }`;
+    statusText = `Good effort, ${displayName}. Let’s look at the worked solution and try the next problem together.`;
   } else if (hoveredOption !== null && !feedback) {
     modeBadgeText = '🎯 Inspecting Choice';
     statusText = `Scanning choice "${hoveredOption}"... Does "${hoveredOption}" match your math steps, ${displayName}? Click to lock it in!`;
@@ -337,30 +322,15 @@ export default function BipCompanion({
       className={`bip-companion-card ${compact ? 'bip-compact' : ''} state-${resolvedEventKey} ${
         isCelebrating ? 'bip-celebrating-glow' : ''
       }`}
+      data-motion={paused?'paused':'playing'}
       aria-label="Bip, your interactive robot math companion"
     >
-      {/* Left: 4K60 Video Stage + Interactive Stunt & Particle Overlays */}
+      {/* Local gesture stage, with optional celebration overlays. */}
       <div className={`bip-video-frame ${stuntClass}`}>
-        <video
-          ref={videoRef}
-          src={fullSrc}
-          muted
-          playsInline
-          autoPlay={!paused}
-          loop={loop}
-          preload="auto"
-          aria-hidden="true"
-          className="bip-video-element"
-          onLoadedData={handleVideoLoadedData}
-          onError={() => setFailed(true)}
-          onEnded={() => {
-            if (!loop) {
-              setSettled(true);
-              setManualEvent(null);
-              callbackRef.current?.(resolvedEventKey);
-            }
-          }}
-        />
+        <SmoothBipVideo src={fullSrc} eventKey={`${eventKey}-${manualTrigger}`} paused={paused} loop={loop}
+          onReady={()=>setFailed(false)} onError={()=>setFailed(true)}
+          onEnded={()=>{if(!loop){setSettled(true);setManualEvent(null);callbackRef.current?.(resolvedEventKey);}}}/>
+
 
         {/* Floating Particle Burst Overlay on Video Stage */}
         {burstParticles.length > 0 && (
@@ -421,7 +391,7 @@ export default function BipCompanion({
                 type="button"
                 className="bip-ctrl-btn bip-action-clue"
                 onClick={() => {
-                  setPaused(false);
+
                   setManualEvent('thinking');
                   setManualTrigger((c) => c + 1);
                   setCustomBubble(`💡 BIP CLUE: ${question.hint}`);
@@ -443,14 +413,14 @@ export default function BipCompanion({
                   className="bip-ctrl-btn bip-action-zap"
                   disabled={Boolean(eliminatedOption)}
                   onClick={() => {
-                    setPaused(false);
+
                     setManualEvent('thinking');
                     setManualTrigger((c) => c + 1);
                     setStuntClass('stunt-star-beam');
                     triggerParticleBurst(['⚡', '🎯', '✨', '🔍']);
                     if (soundEnabled) playStreakChime(2);
                     onEliminateOption();
-                    setTimeout(() => setStuntClass(''), 1200);
+                    schedule(() => setStuntClass(''), 1200);
                   }}
                   title="Ask Bip to scan the choices and zap 1 wrong answer!"
                 >
@@ -515,6 +485,8 @@ export default function BipCompanion({
               type="button"
               className="bip-ctrl-btn"
               onClick={() => setPaused((v) => !v)}
+              aria-label={paused ? 'Resume Bip animation' : 'Pause Bip animation'}
+              aria-pressed={paused}
               title={paused ? 'Resume video' : 'Pause video'}
             >
               {paused ? '▶️' : '⏸️'}

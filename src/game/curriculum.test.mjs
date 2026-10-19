@@ -21,7 +21,7 @@ test('curriculum has official California CCSS-M domains', () => {
   assert.ok(DOMAINS.G, 'G domain exists');
 });
 
-test('every standard in California CCSS-M has an official cluster, title, and description', () => {
+test('each registered skill has cluster, title and description metadata', () => {
   for (const std of Object.values(STANDARDS)) {
     assert.ok(std.code, 'Code required');
     assert.ok(std.cluster, `Cluster required for ${std.code}`);

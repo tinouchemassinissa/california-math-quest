@@ -44,7 +44,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
       if (res.success) {
         setSyncMessage({
           type: 'success',
-          text: `✓ Ingested ${res.ingested} official CA CCSS-M problems and synthesized ${res.templatesLearned} algorithmic templates!`,
+          text: `✓ Ingested ${res.ingested} draft problems and synthesized ${res.templatesLearned} algorithmic templates!`,
         });
       } else {
         setSyncMessage({ type: 'error', text: res.error || 'Sync failed.' });
@@ -79,26 +79,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
     }
   };
 
-  const handleSyncOpenTrivia = async () => {
-    setIsSyncing(true);
-    setSyncMessage(null);
-    try {
-      const res = await syncAndLearnFromFeed('https://opentdb.com/api.php?amount=5&category=19&type=multiple');
-      if (res.success) {
-        setSyncMessage({
-          type: 'success',
-          text: `✓ Connected to Open Trivia DB Math API: Ingested ${res.ingested} verified questions and synthesized ${res.templatesLearned} templates!`,
-        });
-      } else {
-        setSyncMessage({ type: 'error', text: res.error || 'Failed to query Open Trivia DB API.' });
-      }
-    } catch (err) {
-      setSyncMessage({ type: 'error', text: err.message || 'Network error querying Open Trivia DB API.' });
-    } finally {
-      setIsSyncing(false);
-      refreshData();
-    }
-  };
+
 
   const handleReset = () => {
     if (window.confirm('Reset the offline knowledge vault and clear all learned templates?')) {
@@ -116,7 +97,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '24px' }}>🧠</span>
-            <h2 style={{ margin: 0 }}>Curriculum Knowledge Vault & AI Learner</h2>
+            <h2 style={{ margin: 0 }}>Teacher draft library</h2>
           </div>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
@@ -138,7 +119,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
             }}
           >
             <span>
-              {isOnline ? '🌐 Connected to Internet (Live API Sync Active)' : '📴 Offline Mode (Generating via Invariant Algorithm & Learned Vault)'}
+              {isOnline ? '🌐 Internet available — imports are manual' : '📴 Offline — built-in practice is available'}
             </span>
             <span style={{ fontSize: '11px', padding: '2px 8px', background: 'rgba(0,0,0,0.06)', borderRadius: '12px' }}>
               {isOnline ? 'Online' : 'PWA Offline'}
@@ -146,8 +127,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           </div>
 
           <p style={{ fontSize: '13px', color: '#555', marginTop: 0 }}>
-            When connected online, the application pulls questions from educational feeds and APIs, validates them through the 
-            <strong> Formal Mathematical Invariant Gate</strong>, extracts sentence schemas, and learns to generate brand-new variations offline.
+            Imported questions and inferred patterns are drafts. They are excluded from normal student practice. Numerical checks do not certify wording or curriculum alignment; a teacher must review content before any future release.
           </p>
 
           {/* Vault metrics */}
@@ -202,7 +182,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           <div style={{ background: '#fafafa', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>📡 Sync with California CCSS-M OER Feed</h4>
             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 10px 0' }}>
-              Download and verify benchmark problems from the California Elementary Math repository. All items are verified before storage.
+              Download and inspect example problems from the Learn with Bip question library. Items pass limited automated checks before storage. Imported drafts are excluded from normal practice until reviewed.
             </p>
             <button
               className="btn btn-primary"
@@ -218,7 +198,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
           <div style={{ background: '#fafafa', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>🔗 Ingest Custom API / JSON Feed</h4>
             <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0' }}>
-              Connect to any classroom JSON feed or educational API. The engine will inspect and learn from valid problems.
+              Connect to any classroom JSON feed or educational API. The engine can extract draft patterns. This does not certify mathematics or California alignment.
             </p>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input
@@ -237,20 +217,7 @@ export default function KnowledgeVaultModal({ isOpen, onClose }) {
                 Learn from URL
               </button>
             </div>
-            <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #ddd', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '12px', color: '#555' }}>
-                Test with live free public math API:
-              </span>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleSyncOpenTrivia}
-                disabled={isSyncing || !isOnline}
-                style={{ fontSize: '11px', padding: '5px 12px' }}
-              >
-                🌐 Ingest from Open Trivia DB Math API
-              </button>
-            </div>
+
           </div>
 
           {/* Inspect learned templates */}

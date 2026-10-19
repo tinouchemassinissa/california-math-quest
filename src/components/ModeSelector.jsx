@@ -14,7 +14,7 @@ export const GAME_MODES = [
     id: 'speed-sprint',
     title: 'Speed Sprint',
     shortTitle: '60s Sprint',
-    subtitle: '60s California Math Fluency Dash',
+    subtitle: '60s Math Fluency Dash',
     icon: '⚡',
     badge: 'Timed Challenge',
     color: '#f43f5e',

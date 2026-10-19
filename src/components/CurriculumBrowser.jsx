@@ -7,11 +7,11 @@ export default function CurriculumBrowser({
   learnerProfile,
   onPracticeStandard,
 }) {
-  if (!isOpen) return null;
-
   const [selectedGrade, setSelectedGrade] = useState(learnerProfile?.grade || '3');
   const [selectedDomain, setSelectedDomain] = useState('ALL');
   const [viewMode, setViewMode] = useState('modules'); // 'modules' or 'standards'
+
+  if (!isOpen) return null;
 
   const gradeModules = Object.values(MODULES).filter((m) => m.grade === selectedGrade);
 
@@ -28,8 +28,8 @@ export default function CurriculumBrowser({
           <div className="modal-title-group">
             <span className="modal-icon">📐</span>
             <div>
-              <h2>California Elementary Mathematics Framework</h2>
-              <div className="modal-sub-title">Aligned with Eureka Math (A Story of Units) & CA CCSSM (Grades K–5)</div>
+              <h2>California Standards Practice Map</h2>
+              <div className="modal-sub-title">Selected K–5 skills • Independent practice, not an official or complete curriculum</div>
             </div>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
@@ -38,6 +38,7 @@ export default function CurriculumBrowser({
         </div>
 
         <div className="modal-body">
+          <p>Standards identify the skill practiced, not school approval or full coverage. <a href="https://www.cde.ca.gov/be/st/ss/documents/ccssmathstandardaug2013.pdf" target="_blank" rel="noreferrer">California standards source</a></p>
           {/* Grade selection tabs */}
           <div className="grade-tabs">
             {GRADES.map((g) => (

@@ -1,0 +1,14 @@
+{
+  "tested_commit": "5adf2028d9b45884c9cf664de3edb2614ae9cfb3",
+  "environment": "Windows MSI, headless Microsoft Edge, local Vite server",
+  "viewport": {"width":390,"height":844},
+  "reduced_motion": "reduce",
+  "wave_decoded_and_played": true,
+  "wave_kept_paused_until_animate_was_selected": true,
+  "pause_button_stopped_video": true,
+  "two_collections_and_two_lessons_in_second_collection": true,
+  "selected_lesson_opened": true,
+  "no_horizontal_overflow_in_sampled_screens": true,
+  "page_errors": [],
+  "limits": "Synthetic local Grade 3 explorer only. Not a physical phone/touch test, full K–5 browser audit, offline test or deployed-pilot verification."
+}

@@ -1,0 +1,7 @@
+[Unit]
+Description=Refresh Bip Studio LAN TLS certificate from local gateway
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/tinouchem/cloud-stack/bip-content-studio/ops/studio_lan_cert.py --refresh
+UMask=0077
+NoNewPrivileges=yes

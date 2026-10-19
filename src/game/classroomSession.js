@@ -3,7 +3,7 @@ import { PROGRAM_INFO, STANDARDS } from '../data/californiaCurriculum.js';
 
 export function createClassSession({
   leaderName = 'Study Group Lead',
-  groupName = 'California Math Group',
+  groupName = 'Bip Study Group',
   leagueId = 'golden-bears',
   now = Date.now(),
 } = {}) {
@@ -94,7 +94,7 @@ export function buildClassroomWorksheets(session) {
 
   // Sheet 1: Session Summary
   const summaryRows = [
-    ['CALIFORNIA ELEMENTARY MATH QUEST — COMMUNITY STUDY SESSION REPORT'],
+    ['LEARN WITH BIP — STUDY SESSION REPORT'],
     ['Generated', new Date().toLocaleString()],
     ['Curriculum', PROGRAM_INFO.framework],
     ['Jurisdiction', PROGRAM_INFO.jurisdiction],

@@ -23,6 +23,7 @@ export default function WelcomeDashboard({
   onSelectMode,
   mistakeCount = 0,
   onStartGame,
+  onStartJourney,
   onOpenCurriculum,
   onOpenAchievements,
   onOpenClassroom,
@@ -41,14 +42,14 @@ export default function WelcomeDashboard({
       <div className="welcome-top-bar">
         <div className="welcome-brand-group">
           <div className="welcome-hero-badge">
-            🌟 Official California CCSS-M • Cambrian School District (Eureka Math K–5)
+            🌟 Independent California standards practice • Grades K–5
           </div>
-          <h1 className="welcome-hero-title">California Elementary Math Quest</h1>
+          <h1 className="welcome-hero-title">Learn with Bip</h1>
         </div>
 
         <div className="welcome-teacher-bar">
           <button type="button" className="welcome-tool-link" onClick={onOpenCurriculum}>
-            📘 82 CA Standards
+            📘 Selected CA Skills
           </button>
           <button type="button" className="welcome-tool-link" onClick={onOpenAchievements}>
             🏆 Badges
@@ -104,7 +105,9 @@ export default function WelcomeDashboard({
               <span className="step-num-circle">2</span> Meet Bip, Your Companion
             </div>
             <BipCompanion
-              event="idle"
+              event="wave"
+              eventKey={grade}
+              soundEnabled={false}
               studentName={studentName}
               compact
               showControls
@@ -142,8 +145,10 @@ export default function WelcomeDashboard({
           </div>
         </div>
 
+
         {/* Right Bento Panel: 6 Game Mode Tiles + Giant Start Button */}
         <div className="welcome-bento-panel welcome-right-panel">
+        <section className="journey-entry"><div><span className="journey-kicker">NEW · LEARN WITH BIP</span><h2>A small lesson. A real next step.</h2><p>Pictures, guided practice and a chance to try on your own. Three focused lessons per grade.</p></div><button type="button" className="btn btn-primary" onClick={onStartJourney}>Start my learning path →</button></section>
           <div className="welcome-step-block" style={{ flex: 1 }}>
             <div className="welcome-step-title">
               <span className="step-num-circle">4</span> Choose Your Math Adventure Mode
@@ -178,12 +183,12 @@ export default function WelcomeDashboard({
           {/* Giant Animated Launch Button + 100% Verified Kid-Safety Guarantee */}
           <div className="welcome-launch-box">
             <button type="submit" className="welcome-start-btn">
-              🚀 Start {activeGradeLabel} Math Quest with Bip!
+              🚀 Start {activeGradeLabel} Math Adventures with Bip!
             </button>
             <div className="welcome-safety-guarantee">
-              <span>🛡️ 100% Kid-Safe & Ad-Free</span>
+              <span>🛡️ Ad-Free • No Student Accounts</span>
               <span>•</span>
-              <span>✓ Formally Verified CA & Cambrian District Math</span>
+              <span>✓ Built-in Maths Checks • Teacher Review Recommended</span>
               <span>•</span>
               <span>🔊 Read-Aloud & ✏️ Scratchpad Ready</span>
             </div>

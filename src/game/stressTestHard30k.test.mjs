@@ -1,3 +1,4 @@
+import { STANDARDS } from '../data/californiaCurriculum.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runHard30kStressTest } from './stressTestHard30k.mjs';
@@ -29,7 +30,7 @@ test('30,000-CYCLE HARD STRESS TEST: Interactive Geometry, Multi-Step Word Probl
 
   // Gameplay simulation
   assert.equal(result.totalAttempts, 30000);
-  assert.equal(result.standardsPracticedCount, 82);
+  assert.equal(result.standardsPracticedCount, Object.keys(STANDARDS).length);
   assert.equal(result.classroomWorksheetsValid, true);
   assert.equal(result.livesCycles.gameOversTriggered, result.livesCycles.cleanResets);
 });

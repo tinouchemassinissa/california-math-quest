@@ -1,11 +1,20 @@
-# California Elementary Math Quest 📐
+# Learn with Bip ✨
 
-[![CI](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/california-math-quest/actions/workflows/ci.yml)
+*Little steps. Big discoveries.*
+
+[![CI](https://github.com/tinouchemassinissa/learn-with-bip/actions/workflows/ci.yml/badge.svg)](https://github.com/tinouchemassinissa/learn-with-bip/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Standards: CA CCSSM](https://img.shields.io/badge/Standards-California_CCSS--M-emerald)](https://www.cde.ca.gov/ci/ma/cf/)
 [![Platform](https://img.shields.io/badge/Platform-PWA_Offline--First-indigo)](https://web.dev/progressive-web-apps/)
 
-An open, community-driven elementary school mathematics learning platform engineered for **California student communities, families, homeschoolers, and tutoring groups**, spanning **Kindergarten through 5th Grade** strictly aligned with the **California Common Core State Standards for Mathematics (CA CCSSM)** published by the **California Department of Education (CDE)**.
+An open, community-driven elementary school mathematics learning platform engineered for **California student communities, families, homeschoolers, and tutoring groups**, spanning **Kindergarten through 5th Grade** mapped to selected skills from the **California Common Core State Standards for Mathematics (CA CCSSM)** published by the **California Department of Education (CDE)**.
+
+
+## School pilot status
+
+This is an independent practice tool, not an official CDE, district or Eureka Math product. See [the curriculum audit](docs/CURRICULUM_AUDIT.md) for corrected mappings, verification scope and incomplete coverage. The registered bank now contains 84 selected standard identifiers, not all California K–5 standards.
+
+Bip uses animated clips and reviewed first hints with optional worked solutions. No conversational AI, external student-data service, subscription or paid API is required or enabled. Imported/inferred templates are excluded from default gameplay. The home server is not required for core practice. See [school deployment](docs/SCHOOL_DEPLOYMENT.md).
 
 ---
 
@@ -21,16 +30,16 @@ Students can choose and represent California regional scholar leagues designed t
 
 ---
 
-## 🎯 Official California CCSS-M Curriculum & Cluster Alignment
+## 🎯 Selected California CCSS-M practice skills
 
-The platform's procedural learning engine covers the core clusters outlined in the California Mathematics Framework:
+The practice bank samples the following skill areas. This is not complete coverage of each standard or of the state curriculum:
 
 | Grade | CCSS-M Domains | Key Official Clusters & Competencies |
 | :--- | :--- | :--- |
 | **Kindergarten (K)** | Counting & Cardinality (`K.CC`), Operations & Algebraic Thinking (`K.OA`), Number & Base Ten (`K.NBT`), Measurement & Data (`K.MD`), Geometry (`K.G`) | Count to 100 by 1s & 10s (`K.CC.1`), Cardinality with ten-frames (`K.CC.4`), Comparing quantities (`K.CC.6`), Addition/subtraction within 10 (`K.OA.2`), Partners to make 10 (`K.OA.4`), Teen number composition ($10 + n$) (`K.NBT.1`), 2D & 3D shapes (`K.G.2`). |
 | **1st Grade (G1)** | Operations & Algebraic Thinking (`1.OA`), Number & Base Ten (`1.NBT`), Measurement & Data (`1.MD`), Geometry (`1.G`) | Word problems within 20 (`1.OA.1`), Addition/subtraction fluency within 10 and strategy to 20 (`1.OA.6`), Unknown numbers in equations ($8 + ? = 14$) (`1.OA.8`), Place value tens & ones to 120 (`1.NBT.2`), 10 more/10 less mentally (`1.NBT.5`), Time to hour and half-hour (`1.MD.3`), Halves & fourths (`1.G.3`). |
 | **2nd Grade (G2)** | Operations (`2.OA`), Number & Base Ten (`2.NBT`), Measurement (`2.MD`), Geometry (`2.G`) | Fluency within 20 (`2.OA.2`), Odd & even numbers (`2.OA.3`), Skip-counting by 5s, 10s, 100s up to 1,000 (`2.NBT.2`), Regrouping addition & subtraction within 1,000 (`2.NBT.7`), Time to 5 minutes (`2.MD.7`), US coins & bills ($25¢, 10¢, 5¢, 1¢, \$1$) (`2.MD.8`), Polygon attributes (`2.G.1`). |
-| **3rd Grade (G3)** | Operations (`3.OA`), Number & Base Ten (`3.NBT`), Fractions (`3.NF`), Measurement (`3.MD`) | Multiplication & division word problems (`3.OA.3`), Fact fluency 0–12 (`3.OA.7`), Rounding to nearest 10 & 100 (`3.NBT.1`), Unit fractions ($1/b$) & number lines (`3.NF.1`, `3.NF.2`), Area in square units ($l \times w$) (`3.MD.7`), Perimeter of polygons (`3.MD.8`). |
+| **3rd Grade (G3)** | Operations (`3.OA`), Number & Base Ten (`3.NBT`), Fractions (`3.NF`), Measurement (`3.MD`) | Multiplication & division word problems (`3.OA.3`), Single-digit multiplication/division facts (`3.OA.7`), Rounding to nearest 10 & 100 (`3.NBT.1`), Unit fractions ($1/b$) & number lines (`3.NF.1`, `3.NF.2`), Area in square units ($l \times w$) (`3.MD.7`), Perimeter of polygons (`3.MD.8`). |
 | **4th Grade (G4)** | Operations (`4.OA`), Base Ten (`4.NBT`), Fractions & Decimals (`4.NF`), Measurement (`4.MD`) | Multi-step word problems with remainders (`4.OA.3`), Prime & composite numbers (`4.OA.4`), Multi-digit multiplication (`4.NBT.5`), Equivalent fractions (`4.NF.1`), Adding fractions with like denominators (`4.NF.3`), Decimals as tenths & hundredths (`4.NF.6`), Angle measurement with protractors (`4.MD.6`). |
 | **5th Grade (G5)** | Operations (`5.OA`), Decimals & Base Ten (`5.NBT`), Unlike Fractions (`5.NF`), Measurement (`5.MD`), Geometry (`5.G`) | Order of operations with parentheses (PEMDAS) (`5.OA.1`), Decimal place value & operations ($+ - \times \div$) (`5.NBT.7`), Adding & subtracting unlike denominator fractions (`5.NF.1`), Rectangular prism volume ($V = l \times w \times h$) (`5.MD.5`), Coordinate plane plotting $(x, y)$ in Quadrant 1 (`5.G.1`). |
 
@@ -63,7 +72,7 @@ Built-in interactive visual models support conceptual clarity before procedural 
 
 ## 👥 Study Group / Tutor Portal & Zero-Dependency Excel (.xlsx) Reports
 
-Classroom and study group mode is built with **100% student privacy**:
+Classroom and study group records are stored locally in the browser. On a shared device, use nicknames and manage exports carefully:
 
 - **No Student Accounts or Cloud Tracking**: Runs completely in-browser without sending student data to third-party servers.
 - **Live Study Session HUD**: Facilitators can switch active learners with a single tap.
@@ -101,8 +110,8 @@ Classroom and study group mode is built with **100% student privacy**:
 
 ### Setup
 ```bash
-git clone https://github.com/tinouchemassinissa/california-math-quest.git
-cd california-math-quest
+git clone https://github.com/tinouchemassinissa/learn-with-bip.git
+cd learn-with-bip
 npm install
 npm run dev
 ```
@@ -118,3 +127,15 @@ npm run build
 ## 👤 Author
 
 Developed by **Massinissa TINOUCHE** for California student learning communities.
+
+### Learn with Bip: first learning paths
+
+Choose a grade and learner name on the home screen, then **Start my learning path**. Each grade currently has three focused mini-lessons, each with: a two-question starting check, a visual example, guided practice, an independent check and two later-review questions. The 180-item local bank uses original wording and pictures, with checked mathematical quantities. It is not full K–5 coverage or an endorsed Eureka Math product.
+
+Snapshots are saved only in this browser, separately by learner name and grade. Use distinct names on shared devices. The path provides a delete-snapshot control. Unfinished lessons are not saved. Review times are shown in the app; they do not send notifications. A short check is evidence about those questions, not a certified mastery score.
+
+The private pilot now offers **three mini-lessons per grade** (18 paths; 180 fixed item definitions). Bip reacts to learning events with existing local video clips; pause and read-aloud controls are included. This remains selected K–5 practice, not a complete publisher curriculum. Lesson snapshots are separated by learner, grade and lesson. The starter path retains access to the previous snapshot key.
+
+### Two worlds, one Bip
+
+The pilot opens with **Kids’ World** and **Family & Teacher Guide**. The family guide adds local learner folders, a homework shelf, notes/status, linked practice, short daily plans, teaching strategies and collection backup/restore. Uploaded family files stay in that browser. The separate private owner Studio lives under `admin/` and is never linked from the public navigation. See [family storage and private Studio](docs/FAMILY_AND_PRIVATE_STUDIO.md) for limits, setup and the explicit review/publishing workflow.

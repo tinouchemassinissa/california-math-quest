@@ -1,0 +1,136 @@
+{
+  "version": 2,
+  "width": 720,
+  "height": 720,
+  "fps": 30,
+  "codec": "h264",
+  "pixel_format": "yuv420p",
+  "audio": false,
+  "full_decode_passed": true,
+  "total_bytes": 2540181,
+  "takes": [
+    {
+      "name": "idle",
+      "file": "idle.mp4",
+      "bytes": 385401,
+      "sha256": "9fd5f9687ed67d38ce8ae3c58823c7fa884dff74c576b564c540b6614d90ff4f",
+      "frames": 180,
+      "seconds": 6.0
+    },
+    {
+      "name": "wave",
+      "file": "wave.mp4",
+      "bytes": 304514,
+      "sha256": "780ed072c38b7be0f19d4eba3628b27ee50c700dfbd987f6ae9b5dd54149e436",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "think",
+      "file": "think.mp4",
+      "bytes": 295908,
+      "sha256": "63bfed34fb5ea2bec1e0aa1d3b0282fe26ad5116718e80292cd1dfe6a22153f6",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "point",
+      "file": "point.mp4",
+      "bytes": 294640,
+      "sha256": "6bd551b0df5b3c5e7b1d9d05b5301879fce76dfed0f65f4fb835389eee0cb06a",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "nod",
+      "file": "nod.mp4",
+      "bytes": 342695,
+      "sha256": "4f562a8b0efdd20cc5c45f34e010c9403e6380243657ff73d7993f233a0907c5",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "encourage",
+      "file": "encourage.mp4",
+      "bytes": 328726,
+      "sha256": "fea7a5c14651b4a4015c941eeb3a0a17919fa5f39972558d62fc00435c692571",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "celebrate",
+      "file": "celebrate.mp4",
+      "bytes": 311222,
+      "sha256": "72742407902928091b3496adfc1d1d0592d09f6bc891733b5d003b72767dd4f0",
+      "frames": 96,
+      "seconds": 3.2
+    },
+    {
+      "name": "rest",
+      "file": "rest.mp4",
+      "bytes": 277075,
+      "sha256": "62fb6c60da4c1edd3af1f6e1328b8ad760cea99a3f2a37dabfa9d6cbd57980a2",
+      "frames": 96,
+      "seconds": 3.2
+    }
+  ],
+  "source_sha256": "bc92fe0f9dd81cd8b51409eb6c2fce9d8ad4d2cc78d03e93ca899e1e6e82b504",
+  "saved_scene_checks": [
+    {
+      "take": "idle",
+      "frames": 180,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "9fd5f9687ed67d38ce8ae3c58823c7fa884dff74c576b564c540b6614d90ff4f"
+    },
+    {
+      "take": "wave",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "780ed072c38b7be0f19d4eba3628b27ee50c700dfbd987f6ae9b5dd54149e436"
+    },
+    {
+      "take": "think",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "63bfed34fb5ea2bec1e0aa1d3b0282fe26ad5116718e80292cd1dfe6a22153f6"
+    },
+    {
+      "take": "point",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "6bd551b0df5b3c5e7b1d9d05b5301879fce76dfed0f65f4fb835389eee0cb06a"
+    },
+    {
+      "take": "nod",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "4f562a8b0efdd20cc5c45f34e010c9403e6380243657ff73d7993f233a0907c5"
+    },
+    {
+      "take": "encourage",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "fea7a5c14651b4a4015c941eeb3a0a17919fa5f39972558d62fc00435c692571"
+    },
+    {
+      "take": "celebrate",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "72742407902928091b3496adfc1d1d0592d09f6bc891733b5d003b72767dd4f0"
+    },
+    {
+      "take": "rest",
+      "frames": 96,
+      "foot_drift": 0,
+      "endpoint_error": 0,
+      "sha256": "62fb6c60da4c1edd3af1f6e1328b8ad760cea99a3f2a37dabfa9d6cbd57980a2"
+    }
+  ]
+}

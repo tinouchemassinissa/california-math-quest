@@ -1,3 +1,10 @@
+import ApprovedPractice from './components/ApprovedPractice.jsx';
+import WorldHome from './components/WorldHome.jsx';
+import KidsWorld from './components/KidsWorld.jsx';
+import FamilyWorld from './components/FamilyWorld.jsx';
+import LearningJourney from './components/LearningJourney.jsx';
+import { createQuestionLifecycle } from './game/questionLifecycle.js';
+import { isAnswerEquivalent } from './game/mathEngine/answerMath.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header.jsx';
 import { GAME_MODES } from './components/ModeSelector.jsx';
@@ -43,22 +50,6 @@ const STORAGE_KEYS = {
   PET_ID: 'california_math_pet_id_v3',
 };
 
-function isAnswerEquivalent(given, correct) {
-  const gNorm = String(given ?? '').trim().toLowerCase();
-  const cNorm = String(correct ?? '').trim().toLowerCase();
-  if (gNorm === cNorm) return true;
-
-  // Allow free-response numeric entry when correct answer has units or commas (e.g., "24" for "24 sq m" or "3000" for "3,000")
-  const stripCommas = (s) => s.replace(/,/g, '');
-  if (stripCommas(gNorm) === stripCommas(cNorm)) return true;
-
-  const numericOnlyC = stripCommas(cNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
-  const numericOnlyG = stripCommas(gNorm).replace(/^(\$)|(\s*(sq\s*\w+|cu\s*\w+|ft|m|cm|km|g|kg|ml|l|min|¢|°))$/gi, '').trim();
-  if (numericOnlyG && numericOnlyG === numericOnlyC) return true;
-
-  return false;
-}
-
 export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEYS.THEME) || 'dark');
   const [soundEnabled, setSoundEnabled] = useState(() => {
@@ -70,6 +61,10 @@ export default function App() {
     return saved !== null ? saved === 'true' : false;
   });
 
+  const [portal,setPortal] = useState('home');
+  const [activeFamilyLearner,setActiveFamilyLearner] = useState(null);
+  const [journeyLessonId, setJourneyLessonId] = useState('starter');
+  const [journeyOpen, setJourneyOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [studentName, setStudentName] = useState(() => localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || '');
   const [petId, setPetId] = useState(() => localStorage.getItem(STORAGE_KEYS.PET_ID) || 'bip');
@@ -88,6 +83,10 @@ export default function App() {
   const diffInfo = DIFFICULTY_PRESETS[difficulty] || DIFFICULTY_PRESETS.intermediate;
   const [lives, setLives] = useState(diffInfo.lives);
   const [feedback, setFeedback] = useState(null);
+  const [questionError, setQuestionError] = useState('');
+  const [guideOpen, setGuideOpen] = useState(false);
+  const helpUsedRef = useRef(false);
+  const questionLifecycleRef = useRef(createQuestionLifecycle());
   const [attemptKey, setAttemptKey] = useState(0);
   const [roundStats, setRoundStats] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(diffInfo.timerSeconds);
@@ -181,11 +180,15 @@ export default function App() {
 
   const nextQuestion = useCallback(
     async (customStandard = null, resetSprintClock = false) => {
+      const requestToken = questionLifecycleRef.current.begin();
+      setCurrentQuestion(null);
       if (autoNextTimerRef.current) {
         clearTimeout(autoNextTimerRef.current);
         autoNextTimerRef.current = null;
       }
       setFeedback(null);
+      setGuideOpen(false);
+      helpUsedRef.current = false;
       let targetStandard = customStandard || focusedStandard;
 
       if (!targetStandard) {
@@ -204,13 +207,21 @@ export default function App() {
 
       const activeGrade = targetStandard && STANDARDS[targetStandard] ? STANDARDS[targetStandard].grade : grade;
 
-      const res = await fetchEducationalQuestion({
+      setQuestionError('');
+      let res;
+      try { res = await fetchEducationalQuestion({
         grade: activeGrade,
         standardCode: targetStandard,
         mode,
         preferOnline: false,
-      });
+      }); } catch {
+        if (!questionLifecycleRef.current.isCurrent(requestToken)) return;
+        setCurrentQuestion(null);
+        setQuestionError('This question could not pass our checks. Please choose another skill or retry.');
+        return;
+      }
 
+      if (!questionLifecycleRef.current.publish(requestToken)) return;
       setCurrentQuestion(res.question);
       setEngineSource(res.source);
 
@@ -232,7 +243,7 @@ export default function App() {
     nextQuestion(focusedStandard, mode === 'speed-sprint');
   }, [grade, focusedStandard, mode, difficulty]);
 
-  const isTimerActive = !showWelcome && (mode === 'speed-sprint' || timedPractice);
+  const isTimerActive = portal==='play' && !journeyOpen && !showWelcome && !guideOpen && (mode === 'speed-sprint' || timedPractice);
 
   useEffect(() => {
     if (feedback || summaryOpen || !currentQuestion || !isTimerActive) return;
@@ -261,7 +272,7 @@ export default function App() {
   };
 
   const handleAnswer = (givenAnswer) => {
-    if (feedback || !currentQuestion) return;
+    if (feedback || !currentQuestion || !questionLifecycleRef.current.claim()) return;
 
     const isCorrect = isAnswerEquivalent(givenAnswer, currentQuestion.correctAnswer);
 
@@ -284,6 +295,7 @@ export default function App() {
     setFeedback({
       status: isCorrect ? 'correct' : 'incorrect',
       answer: givenAnswer,
+      assisted: helpUsedRef.current,
     });
 
     const isGameOver = mode !== 'speed-sprint' && !isCorrect && lives <= 1;
@@ -311,7 +323,7 @@ export default function App() {
     }
 
     setLearnerProfile((prev) =>
-      updateLearnerProfile(prev, currentQuestion.standard, isCorrect)
+      updateLearnerProfile(prev, currentQuestion.standard, isCorrect, Date.now(), { assisted: helpUsedRef.current })
     );
 
     if (classSession) {
@@ -330,21 +342,21 @@ export default function App() {
       );
     }
 
-    if (isGameOver) {
+    if (isGameOver && !guideOpen) {
       autoNextTimerRef.current = setTimeout(() => {
         if (soundEnabled) playVictorySound();
         setSummaryOpen(true);
       }, 2200);
-    } else if (isCorrect || mode === 'speed-sprint') {
+    } else if (mode === 'speed-sprint' && !guideOpen) {
       autoNextTimerRef.current = setTimeout(() => {
         nextQuestion(focusedStandard, false);
-      }, mode === 'speed-sprint' ? 750 : 6200);
+      }, 750);
     }
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (showWelcome || feedback || !currentQuestion?.options || summaryOpen) return;
+      if (portal!=='play' || journeyOpen || showWelcome || feedback || !currentQuestion?.options || summaryOpen) return;
       if (e.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
       const key = e.key;
       if (['1', '2', '3', '4'].includes(key)) {
@@ -356,7 +368,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showWelcome, currentQuestion, feedback, summaryOpen]);
+  }, [portal, journeyOpen, showWelcome, currentQuestion, feedback, summaryOpen]);
 
   const handleStartClassSession = ({ leaderName, groupName, leagueId }) => {
     const newSession = createClassSession({
@@ -384,9 +396,12 @@ export default function App() {
 
   const mistakeStandards = getMistakeReviewStandards(learnerProfile, grade);
 
+  const startFamilyLesson=(profile,lessonId='starter')=>{setActiveFamilyLearner(profile);setStudentName(profile.name);setGrade(profile.grade);setJourneyLessonId(lessonId);setPortal('kids');setJourneyOpen(true);};
+  const startFamilyPlay=profile=>{setActiveFamilyLearner(profile);setStudentName(profile.name);setGrade(profile.grade);setJourneyLessonId('starter');setPortal('play');setShowWelcome(true);};
+
   return (
     <div className="app-container">
-      {showWelcome ? (
+      {journeyOpen ? <LearningJourney key={`${activeFamilyLearner?.id||studentName}-${grade}-${journeyLessonId}`} grade={grade} learnerId={activeFamilyLearner?.id} lessonId={journeyLessonId} onSelectLesson={setJourneyLessonId} studentName={studentName} onClose={()=>setJourneyOpen(false)} /> : portal==='published'&&activeFamilyLearner ? <ApprovedPractice profile={activeFamilyLearner} onClose={()=>setPortal('kids')}/> : portal==='home' ? <WorldHome onKids={()=>setPortal('kids')} onFamily={()=>setPortal('family')}/> : portal==='family' ? <FamilyWorld onHome={()=>setPortal('home')} onLearn={startFamilyLesson}/> : portal==='kids' ? <KidsWorld initialLearner={activeFamilyLearner} onPublished={profile=>{setActiveFamilyLearner(profile);setPortal('published');}} onHome={()=>setPortal('home')} onLearn={startFamilyLesson} onPlay={startFamilyPlay}/> : showWelcome ? (
         <WelcomeDashboard
           studentName={studentName}
           onStudentNameChange={setStudentName}
@@ -395,6 +410,7 @@ export default function App() {
           grade={grade}
           onSelectGrade={(g) => {
             setGrade(g);
+            setJourneyLessonId('starter');
             setFocusedStandard(null);
           }}
           mode={mode}
@@ -411,6 +427,7 @@ export default function App() {
           onOpenAchievements={() => setAchievementsOpen(true)}
           onOpenClassroom={() => setClassroomOpen(true)}
           onOpenVault={() => setVaultOpen(true)}
+          onStartJourney={() => setJourneyOpen(true)}
         />
       ) : (
         <>
@@ -422,6 +439,7 @@ export default function App() {
               if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
               setFeedback(null);
               setShowWelcome(true);
+              setPortal(activeFamilyLearner?'kids':'home');
             }}
             difficulty={difficulty}
             onDifficultyChange={(d) => {
@@ -464,12 +482,19 @@ export default function App() {
           )}
 
           <main className="main-game-layout">
+            {questionError && <div role="alert" className="hint-callout">{questionError} <button onClick={() => nextQuestion()}>Retry</button></div>}
             <QuestionCard
               key={currentQuestion?.id || currentQuestion?.prompt || 'q'}
               question={currentQuestion}
               onAnswer={handleAnswer}
               onSkip={() => nextQuestion(focusedStandard, false)}
               onNextAfterAnswer={() => nextQuestion(focusedStandard, false)}
+              onPracticeSimilar={(code) => nextQuestion(code, false)}
+              onGuideOpen={(open) => {
+                setGuideOpen(open);
+                if (open && !feedback) helpUsedRef.current = true;
+                if (open && autoNextTimerRef.current) { clearTimeout(autoNextTimerRef.current); autoNextTimerRef.current = null; }
+              }}
               timeLeft={timeLeft}
               totalTime={isTimerActive ? (mode === 'speed-sprint' ? 60 : diffInfo.timerSeconds) : 0}
               feedback={feedback}
@@ -486,7 +511,7 @@ export default function App() {
 
       <footer className="app-footer">
         <p>
-          <strong>California Elementary Math Quest</strong> • Official California CCSS-M, Cambrian School District (San Jose, CA) K–5 Eureka Math & CAASPP Claims 1–4
+          <strong>Learn with Bip</strong> • Independent practice mapped to selected California K–5 standards • Not school- or state-endorsed
         </p>
       </footer>
 
