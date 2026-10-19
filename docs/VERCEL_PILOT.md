@@ -1,6 +1,6 @@
 # Bip Vercel pilot
 
-Ready source: `feat/bip-school-math-correctness` in `tinouchemassinissa/learn-with-bip`. Do not deploy the older default branch by mistake; PR #1 has not been assumed merged.
+Release source: `main` in `tinouchemassinissa/learn-with-bip`, after merging PR #1. Confirm the latest main commit includes Kids’ World, Family & Teacher Guide and the Learn with Bip name before importing it into Vercel. Use feature branches for preview builds, not as the long-term production branch.
 
 `vercel.json` selects Vite, installs the lockfile with `npm ci`, runs the JavaScript tests before building, and serves only `dist`. The `public: false` property concerns Vercel's source/log visibility; it does **not** make the app URL private.
 

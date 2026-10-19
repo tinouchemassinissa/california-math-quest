@@ -6,9 +6,9 @@ Studio's authenticated **Release** panel shows its own source revision and revie
 
 ## Before a release
 
-1. Export the family backup from each browser that holds private family work. Check the download. It includes saved learner folders, attachments, plans, lesson results and unfinished lessons for those folders. Guest nickname sessions are excluded. Keep backups privately; they are not encrypted.
+1. Export the family backup from each browser that holds private family work. Check the download. It includes saved learner folders, attachments, plans, lesson results and unfinished lessons for those folders. Guest nickname sessions are excluded. Keep backups privately. Exports are unencrypted unless optional passphrase protection is enabled.
 2. Run `npm ci`, `npm test`, `python3 -m unittest discover -s admin -p 'test_*.py'` and `npm run build` in the exact release checkout.
-3. Review the GitHub change and preview. Publishing from Studio creates a review branch/PR and never merges or deploys automatically. PR #1 must land before main supports these features; a configured stacked review branch is also supported.
+3. Review the GitHub change and preview. Publishing from Studio creates a review branch/PR and never merges or deploys automatically. Use main after PR #1 is merged; a configured stacked review branch is also supported during development.
 4. Record the existing deployment's saved version ID and the new version's ID. Preserve the Site audience.
 5. After deployment, compare the app version to the intended source. Confirm a synthetic learner can open a lesson, resume it and export/restore a backup. A build passing does not establish a real phone passed.
 

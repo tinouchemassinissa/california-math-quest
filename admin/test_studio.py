@@ -21,7 +21,7 @@ class StudioTests(unittest.TestCase):
   if body:headers['Content-Type']='application/json'
   client.request('POST' if body else 'GET',path,body,headers);res=client.getresponse();text=res.read().decode();result=(res.status,json.loads(text),res.getheader('Set-Cookie'));client.close();return result
  def login(self):
-  
+
   if studio.owner() is None:self.call('/api/setup',{'token':self.server.login_token,'username':'massi','password':'a long private password'})
   status,_,cookie=self.call('/api/login',{'username':'massi','password':'a long private password'});self.assertEqual(status,200);cookie=cookie.split(';')[0]
   status,data,_=self.call('/api/drafts',cookie=cookie);self.assertEqual(status,200);return cookie,data['csrf']
