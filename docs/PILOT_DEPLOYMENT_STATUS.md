@@ -105,3 +105,12 @@ See `public/bip/gestures/validation.json` and `pose-checks.json` for measurement
 
 Live pilot deployment and Studio publishing are unchanged and still unverified
 in this follow-up. Do not infer that the owner's installed app has been updated.
+
+Additional browser smoke check: headless Microsoft Edge on MSI, local Vite
+checkout at `5adf202`, 390×844 viewport and reduced motion enabled. A synthetic
+Grade 3 explorer completed onboarding; Wave remained paused until Animate,
+decoded/played after Animate, and stopped on Pause. Both collections navigated,
+and the selected lesson opened. Sampled collection/lesson screens had no
+horizontal overflow or page errors; the lesson screenshot was visually reviewed.
+This does not certify physical phone/touch use, every grade, offline playback or
+the deployed pilot. See `docs/validation/bip-motion-browser-2026-10-19.json`.
