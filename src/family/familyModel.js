@@ -1,7 +1,7 @@
 import { journeyCatalog,journeyStorageKey,readJourneyRecord,readJourneyProgress } from '../game/learningJourney.js';
 export const FAMILY_VERSION=1;
-export const MAX_FILE_BYTES=8*1024*1024;
-export const MAX_TOTAL_BYTES=50*1024*1024;
+export const MAX_FILE_BYTES=25*1024*1024;
+export const MAX_TOTAL_BYTES=250*1024*1024;
 export const GRADES=['K','1','2','3','4','5'];
 export const WORK_STATUSES=['to-do','done','reviewed'];
 export function localDate(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
@@ -25,7 +25,7 @@ export function validateWork(record,learners){
 }
 export function validateFileBytes(bytes,type){
  const b=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes);
- if(!b.length||b.length>MAX_FILE_BYTES)throw new Error('Files must be no larger than 8 MB');
+ if(!b.length||b.length>MAX_FILE_BYTES)throw new Error('Files must be no larger than 25 MB');
  const ascii=(start,len)=>String.fromCharCode(...b.slice(start,start+len));
  const valid=type==='image/jpeg'?b[0]===255&&b[1]===216&&b[2]===255:type==='image/png'?b.slice(0,8).join(',')==='137,80,78,71,13,10,26,10':type==='image/webp'?ascii(0,4)==='RIFF'&&ascii(8,4)==='WEBP':type==='application/pdf'?ascii(0,5)==='%PDF-':false;
  if(!valid)throw new Error('Use a valid JPG, PNG, WebP or PDF file');return b;

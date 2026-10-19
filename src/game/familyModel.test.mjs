@@ -12,7 +12,7 @@ test('local learner and homework schemas reject invalid references and dates',()
 test('family file validation rejects disguised HTML and bounds attachment size',()=>{
  assert.ok(validateFileBytes(new TextEncoder().encode('%PDF-test'),'application/pdf'));
  assert.throws(()=>validateFileBytes(new TextEncoder().encode('<html>'),'application/pdf'));
- assert.throws(()=>validateFileBytes(new Uint8Array(8*1024*1024+1),'image/png'));
+ assert.throws(()=>validateFileBytes(new Uint8Array(25*1024*1024+1),'image/png'));
  assert.throws(()=>validateFileBytes(new Uint8Array(),'image/png'));
  assert.throws(()=>validateFileBytes(new TextEncoder().encode('<svg/>'),'image/svg+xml'));
 });

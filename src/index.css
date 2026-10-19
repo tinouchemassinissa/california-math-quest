@@ -3859,3 +3859,14 @@ button, input, select {
 .bip-video-frame .bip-video-stack video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 220ms ease-in-out}
 .bip-video-frame .bip-video-stack video.is-visible{opacity:1}
 @media(prefers-reduced-motion:reduce){.bip-video-frame .bip-video-stack video{transition:none}}
+
+/* Device-local library and portable homework controls */
+.family-storage,.family-transfer{padding:1.2rem;margin:1rem 0;border:1px solid var(--border-color,#b4c8c3);border-radius:18px;background:var(--card-bg,rgba(100,160,145,.08));}
+.family-storage progress{display:block;width:100%;height:18px;margin:.65rem 0;accent-color:#27846c;}
+.family-transfer label{display:block;margin:.8rem 0;}
+.family-transfer input[type=password]{display:block;width:100%;max-width:400px;padding:.7rem;border-radius:10px;}
+.family-transfer input[type=checkbox],.family-work-card input[type=checkbox]{width:auto;margin-right:.5rem;accent-color:#27846c;}
+.family-transfer small{display:block;max-width:65ch;}
+.family-transfer ul{max-height:240px;overflow:auto;overflow-wrap:anywhere;}
+.family-transfer hr{margin:1.5rem 0;opacity:.3;}
+.family-storage p,.family-transfer p{overflow-wrap:anywhere;}
