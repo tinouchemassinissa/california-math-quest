@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
+import DrawingChallenge from './DrawingChallenge.jsx';
 import { scratchpadPrompt } from '../game/guidedLesson.js';
 
 const PEN_COLORS = [
@@ -12,6 +13,8 @@ const PEN_COLORS = [
 
 export default function ScratchpadCanvas({ questionId, question }) {
   const canvasRef = useRef(null);
+  const [workspace,setWorkspace]=useState('question');
+  const [workStep,setWorkStep]=useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
   const [penColor, setPenColor] = useState(PEN_COLORS[0].color);
   const [penSize, setPenSize] = useState(4);
@@ -62,7 +65,7 @@ export default function ScratchpadCanvas({ questionId, question }) {
 
   // Clear scratchpad automatically when moving to a new question
   useEffect(() => {
-    setStrokes([]);setRedoStrokes([]);setNotes('');currentStrokeRef.current=null;setIsDrawing(false);
+    setStrokes([]);setRedoStrokes([]);setNotes('');setWorkStep(0);currentStrokeRef.current=null;setIsDrawing(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -209,7 +212,15 @@ export default function ScratchpadCanvas({ questionId, question }) {
         </div>
       </div>
 
-      <p className="scratchpad-prompt">{scratchpadPrompt(question)}</p>
+      <div className="drawing-step-actions" role="group" aria-label="Math workspace">
+        <button type="button" className="btn btn-secondary" aria-pressed={workspace==='question'} onClick={()=>setWorkspace('question')}>Work on this question</button>
+        <button type="button" className="btn btn-secondary" aria-pressed={workspace==='challenge'} onClick={()=>setWorkspace('challenge')}>Drawing challenges</button>
+      </div>
+      {workspace==='challenge'?<DrawingChallenge/>:<>
+        <ol className="drawing-step-list">{['Understand: what do I know and need to find?','Make a model: draw or write one small step.','Check: does my answer fit the question?'].map((text,i)=><li key={text} aria-current={workStep===i?'step':undefined} className={workStep===i?'current':''}><button type="button" onClick={()=>setWorkStep(i)}>{text}</button></li>)}</ol>
+        <p className="scratchpad-prompt">{workStep===0?'Read the question. Write the important numbers and their units.':workStep===1?scratchpadPrompt(question):'Count again or use the opposite operation. Explain why your answer makes sense.'}</p>
+        <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={workStep===0} onClick={()=>setWorkStep(s=>s-1)}>Back</button><button type="button" className="btn btn-primary" disabled={workStep===2} onClick={()=>setWorkStep(s=>s+1)}>Next small step →</button></div>
+      </>}
       <label className="scratchpad-notes">My thinking <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="I know… I need to find…" maxLength={2000} /></label>
       <p className="scratchpad-sub">Your paper stays for retries and clears on the next question. Bip cannot read your drawing.</p>
       <button type="button" className="scratch-tool-btn" disabled={!redoStrokes.length} onClick={()=>{setStrokes(prev=>[...prev,redoStrokes[redoStrokes.length-1]]);setRedoStrokes(prev=>prev.slice(0,-1));}}>↪️ Redo</button>
@@ -217,7 +228,7 @@ export default function ScratchpadCanvas({ questionId, question }) {
         <canvas
           ref={canvasRef}
           width={760}
-          height={210}
+          height={260}
           className="scratchpad-canvas" aria-label="Math drawing paper" role="img"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

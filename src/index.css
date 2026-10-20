@@ -3908,3 +3908,19 @@ button, input, select {
 .bip-guide-work form p,.bip-guide-work form>span {flex-basis:100%;}
 .scratchpad-tools button {min-height:40px;}
 .scratchpad-canvas {height:260px;}
+
+.drawing-challenge {padding:16px;border:1px solid #64748b;border-radius:16px;margin:14px 0;}
+.drawing-challenge label {display:grid;gap:8px;font-weight:700;}
+.drawing-challenge select {font:inherit;padding:12px;border-radius:10px;max-width:100%;background:var(--bg-secondary);color:var(--text-primary);}
+.drawing-step-list {display:grid;gap:8px;padding-left:24px;}
+.drawing-step-list li {padding:10px;border-radius:10px;}
+.drawing-step-list .current {background:#38bdf820;outline:1px solid #38bdf8;}
+.drawing-step-list button {color:inherit;background:transparent;border:0;font:inherit;text-align:left;cursor:pointer;}
+.drawing-step-actions {display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;}
+.shape-builder {position:relative;width:min(100%,540px);aspect-ratio:9/7;margin:12px auto;background:#0f172a;border-radius:12px;}
+.shape-builder svg {position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.shape-dot-grid {position:absolute;inset:0;display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(7,1fr);}
+.shape-dot-grid button {border:0;background:transparent;color:#cbd5e1;font:inherit;cursor:pointer;padding:0;}
+.shape-dot-grid button[aria-pressed="true"] {color:#fff;font-weight:900;}
+.shape-dot-grid button:focus-visible {outline:2px solid #fbbf24;outline-offset:-4px;}
+.shape-dot-grid button:disabled {opacity:1;cursor:default;}

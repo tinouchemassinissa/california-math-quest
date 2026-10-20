@@ -365,7 +365,7 @@ export default function QuestionCard({
               onClick={() => setScratchpadOpen((prev) => !prev)}
               title="Open drawing pad to draw number bonds, area models, or column math"
             >
-              ✏️ {scratchpadOpen ? 'Hide Scratchpad' : 'Draw / Scratchpad'}
+              ✏️ {scratchpadOpen ? 'Hide math workspace' : 'Draw & solve'}
             </button>
 
             {showHints && question.hint && (
@@ -388,7 +388,7 @@ export default function QuestionCard({
                 className={`kid-helper-pill proof-pill ${explanationVisible ? 'active' : ''}`}
                 onClick={() => { if (!explanationVisible) onGuideOpen?.(true); setExplanationVisible((prev) => !prev); }}
               >
-                📐 {explanationVisible ? 'Hide How to Solve' : 'Show How to Solve'}
+                📐 {explanationVisible ? 'Hide worked answer' : 'Worked answer (reveals solution)'}
               </button>
             )}
 

@@ -58,6 +58,19 @@ export function advanceLesson(stage) { return Math.min(2, Math.max(0, stage + 1)
 
 // Small, checked turns before a worked solution; unsupported formats use a thinking prompt.
 export function buildTogetherTurns(question) {
+  const division=question?.prompt?.match(/(\d+)\s*÷\s*(\d+)/);
+  if(division) {
+    const total=Number(division[1]),groups=Number(division[2]),answer=total/groups;
+    if(groups>0&&total<=10000&&Number.isInteger(answer)&&answer>=10&&isAnswerEquivalent(answer,question.correctAnswer)) {
+      const first=Math.floor(answer/10)*10,used=groups*first,left=total-used;
+      return [
+        {prompt:`We are sharing ${total} equally among ${groups} groups. Try ${first} in each group. How many does that use? (${groups} × ${first})`,answer:used,hint:'Multiply the number of groups by this first amount in each group.'},
+        {prompt:`You used ${used} out of ${total}. How many are left?`,answer:left,hint:'Subtract the amount used from the total.'},
+        {prompt:`Share the remaining ${left} among ${groups} groups. How many more does each group get?`,answer:left/groups,hint:'Think: number of groups × what number equals the amount left? Zero left means zero more.'},
+        {prompt:`Combine the first ${first} in each group with the extra amount you found. How many are in each group altogether?`,answer,hint:'Add your two amounts. Then multiply your total per group by the number of groups to check.'},
+      ];
+    }
+  }
   const m=question?.manipulative;
   if(m?.type==='coordinate' && Number.isInteger(m.x) && Number.isInteger(m.y)) return [
     {prompt:'Start at zero. How many spaces across is the star?',answer:m.x,hint:'Follow the horizontal axis from zero to below the star.'},
