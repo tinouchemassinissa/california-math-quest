@@ -32,5 +32,13 @@ test('interactive fraction, counter, symmetry and area models check and reset sa
  for(let y=2;y<=4;y++)for(let x=2;x<=5;x++)await cell('Area tile row '+y+', column '+x);
  await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/area tiles fit/);
  assert.equal(document.querySelectorAll('.filled').length,12);
+ await click('Help me count outside edges');assert.equal(document.querySelectorAll('.unit-edge').length,14);
+ for(const edge of [...document.querySelectorAll('.unit-edge')])await act(async()=>edge.click());
+ assert.match(document.body.textContent,/14 unit edges marked/);
+ await click('Next exercise →');assert.match(document.body.textContent,/Exercise 2 of 6/);
+ assert.equal(document.querySelectorAll('.filled').length,0);assert.equal(document.querySelector('input').value,'');assert.equal(document.querySelector('.unit-edge'),null);
+ await click('Help me count outside edges');assert.equal(document.querySelectorAll('.unit-edge').length,8);
+ await render('shade');await click('Next exercise →');assert.match(document.body.textContent,/Make 1\/2/);assert.equal(document.querySelectorAll('.visual-cell-grid button').length,2);
+ 
  }finally{if(root)await act(async()=>root.unmount());dom.window.close();for(const [k,v]of Object.entries(old)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}await rm(temp,{recursive:true,force:true});}
 });

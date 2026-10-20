@@ -1,6 +1,6 @@
 export const DRAWING_ACTIVITIES = [
- {id:'shade',label:'Shade a fraction',steps:['Notice the eight equal parts in one whole.','Shade the number of parts in the numerator.','Check your fraction.']},
- {id:'counters',label:'Move and share counters',steps:['Find all 12 counters in the tray.','Share them across three groups.','Compare the groups and check.']},
+ {id:'shade',label:'Shade a fraction',steps:['Notice the equal parts in one whole.','Shade the number of parts in the numerator.','Check your fraction.']},
+ {id:'counters',label:'Move and share counters',steps:['Find all the counters in the tray.','Share them across the groups.','Compare the groups and check.']},
  {id:'symmetry',label:'Make a mirror picture',steps:['Find the mirror line.','Match each square on the opposite side.','Check distances from the mirror line.']},
  {id:'area',label:'Explore area and perimeter',steps:['Cover the inside with unit squares.','Count unit edges around the outside.','Check the area and perimeter.']},
  {id:'triangle',label:'Build a triangle',steps:['Choose three corners that do not lie on one straight line.','Join the corners by closing your shape.','Check: three straight sides and three corners.']},

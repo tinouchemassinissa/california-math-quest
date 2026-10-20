@@ -3944,3 +3944,12 @@ button, input, select {
 .math-lab .kids-activity-grid {grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-top:20px;}
 .math-lab>h2 {margin-top:20px;}
 .math-lab .drawing-challenge {margin-top:16px;}
+.lab-exercise-nav {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0;}
+.area-counting-picture {position:relative;width:min(100%,420px);margin:16px auto;}
+.area-counting-picture .visual-cell-grid {margin:0;}
+.area-edge-overlay {position:absolute;inset:0;pointer-events:none;}
+.unit-edge {position:absolute;pointer-events:auto;z-index:1;padding:0;border:0;background:#fbbf2455;color:#0f172a;font-weight:700;cursor:pointer;border-radius:5px;}
+.unit-edge.horizontal {transform:translateY(-50%);}
+.unit-edge.vertical {transform:translateX(-50%);}
+.unit-edge[aria-pressed="true"] {background:#fbbf24;}
+.lab-model-clue {padding:12px;background:#38bdf820;border-radius:10px;}

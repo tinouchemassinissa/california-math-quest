@@ -103,3 +103,13 @@ Independent drawing and model challenges now live at **Kids' World → Math Lab*
 The question's **Draw & solve** contains only paper and guidance for that question;
 it no longer includes a separate challenge selector. Math Lab has a visible return
 to My world and an activity chooser. Freehand lab activities include their own paper.
+
+### Math Lab exercise sets
+Fraction shading, equal sharing, symmetry, and rectangle area/perimeter each offer
+six reviewed exercises (24 total). Previous/Next changes the task and clears the
+current model. Start again clears only the current task. Practice is not saved as
+an assessment result.
+The optional perimeter helper marks actual outside unit edges, with a reversible
+count. Acceptance uses the rectangle dimensions, independently tested against
+exposed grid edges. For the initial 4-by-3 rectangle, 12 square units is the area,
+and 14 units is the perimeter; 18 is correctly rejected.
