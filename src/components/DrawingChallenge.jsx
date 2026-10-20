@@ -1,3 +1,4 @@
+import VisualMathActivity from './VisualMathActivity.jsx';
 import React,{useState,useEffect} from 'react';
 import {DRAWING_ACTIVITIES,checkDrawnShape} from '../game/drawingActivities.js';
 export default function DrawingChallenge({onActivityChange}) {
@@ -9,7 +10,7 @@ export default function DrawingChallenge({onActivityChange}) {
  <label>Choose a drawing challenge <select value={activity} onChange={e=>setActivity(e.target.value)}>{DRAWING_ACTIVITIES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>
  <ol className="drawing-step-list">{task.steps.map((text,i)=><li key={text} aria-current={i===step?'step':undefined} className={i===step?'current':''}>{i<step?'✓ ':''}{text}</li>)}</ol>
  <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={step===0} onClick={()=>setStep(s=>s-1)}>Back a step</button><button type="button" className="btn btn-primary" disabled={step===2} onClick={()=>setStep(s=>s+1)}>Next small step →</button></div>
- {structured ? <>
+ {['shade','counters','symmetry','area'].includes(activity)?<VisualMathActivity key={activity} activity={activity}/>:structured ? <>
  <p>Tap dots to choose corners in order. Then close your shape. You can also use a keyboard.</p>
  <div className="shape-builder">
  <svg viewBox="0 0 360 280" aria-hidden="true"><polyline points={points.concat(closed&&points.length?[points[0]]:[]).map(p=>`${20+p.x*40},${20+p.y*40}`).join(' ')} fill={closed?'#38bdf830':'none'} stroke="#38bdf8" strokeWidth="4" strokeLinejoin="round"/></svg>

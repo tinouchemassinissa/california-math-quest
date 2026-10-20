@@ -1,4 +1,8 @@
 export const DRAWING_ACTIVITIES = [
+ {id:'shade',label:'Shade a fraction',steps:['Notice the eight equal parts in one whole.','Shade the number of parts in the numerator.','Check your fraction.']},
+ {id:'counters',label:'Move and share counters',steps:['Find all 12 counters in the tray.','Share them across three groups.','Compare the groups and check.']},
+ {id:'symmetry',label:'Make a mirror picture',steps:['Find the mirror line.','Match each square on the opposite side.','Check distances from the mirror line.']},
+ {id:'area',label:'Explore area and perimeter',steps:['Cover the inside with unit squares.','Count unit edges around the outside.','Check the area and perimeter.']},
  {id:'triangle',label:'Build a triangle',steps:['Choose three corners that do not lie on one straight line.','Join the corners by closing your shape.','Check: three straight sides and three corners.']},
  {id:'rectangle',label:'Build a rectangle',steps:['Choose four corners in order around your shape.','Close the shape. Look for four square corners.','Check: opposite sides are equal and all four angles are right angles. A square also counts!']},
  {id:'square',label:'Build a square',steps:['Choose four corners in order.','Close the shape. Make all four sides equal.','Check: four equal sides and four right angles.']},

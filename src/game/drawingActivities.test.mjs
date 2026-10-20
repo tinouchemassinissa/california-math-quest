@@ -18,7 +18,7 @@ test('triangles and rectangles work in either orientation; square requires equal
  const rotated=p([2,0],[4,2],[2,4],[0,2]);
  assert.equal(checkDrawnShape(rotated,'square',true).ok,true);
  assert.equal(checkDrawnShape(rotated,'rectangle',true).ok,true);
- assert.equal(DRAWING_ACTIVITIES.length,6);
+ assert.equal(DRAWING_ACTIVITIES.length,10);
 });
 test('division coaching derives partial quotients from a verified final answer',()=>{
  const turns=buildTogetherTurns({prompt:'Each array? (800 ÷ 25)',correctAnswer:32});
