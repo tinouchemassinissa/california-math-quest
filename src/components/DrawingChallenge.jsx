@@ -1,13 +1,13 @@
 import VisualMathActivity from './VisualMathActivity.jsx';
 import React,{useState,useEffect} from 'react';
 import {DRAWING_ACTIVITIES,checkDrawnShape} from '../game/drawingActivities.js';
-export default function DrawingChallenge({onActivityChange}) {
- const [activity,setActivity]=useState('triangle'),[step,setStep]=useState(0),[points,setPoints]=useState([]),[closed,setClosed]=useState(false),[result,setResult]=useState(null);
+export default function DrawingChallenge({onActivityChange,initialActivity='triangle',hidePicker=false}) {
+ const [activity,setActivity]=useState(initialActivity),[step,setStep]=useState(0),[points,setPoints]=useState([]),[closed,setClosed]=useState(false),[result,setResult]=useState(null);
  const task=DRAWING_ACTIVITIES.find(a=>a.id===activity), structured=['triangle','square','rectangle'].includes(activity);
  useEffect(()=>{setStep(0);setPoints([]);setClosed(false);setResult(null);onActivityChange?.(activity);},[activity]);
  function addPoint(x,y){if(closed)return;setResult(null);setPoints(prev=>prev.some(p=>p.x===x&&p.y===y)?prev:[...prev,{x,y}]);}
  return <section className="drawing-challenge" aria-label="Drawing challenges">
- <label>Choose a drawing challenge <select value={activity} onChange={e=>setActivity(e.target.value)}>{DRAWING_ACTIVITIES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>
+ {!hidePicker&&<label>Choose a drawing challenge <select value={activity} onChange={e=>setActivity(e.target.value)}>{DRAWING_ACTIVITIES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>}
  <ol className="drawing-step-list">{task.steps.map((text,i)=><li key={text} aria-current={i===step?'step':undefined} className={i===step?'current':''}>{i<step?'✓ ':''}{text}</li>)}</ol>
  <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={step===0} onClick={()=>setStep(s=>s-1)}>Back a step</button><button type="button" className="btn btn-primary" disabled={step===2} onClick={()=>setStep(s=>s+1)}>Next small step →</button></div>
  {['shade','counters','symmetry','area'].includes(activity)?<VisualMathActivity key={activity} activity={activity}/>:structured ? <>

@@ -13,6 +13,7 @@ import {saveLearner,saveWork,loadFamily} from '../src/family/familyStore.js';
 test('child navigation contains no content imports or adult tools; adult tools remain in Family',async()=>{
  const temp=await mkdtemp(resolve('.bip-ui-test-'));const dom=new JSDOM('<div id="root"></div>',{url:'https://bip.test'});
  const previous={};for(const key of ['window','document','localStorage','IS_REACT_ACT_ENVIRONMENT']){previous[key]=globalThis[key];globalThis[key]=key==='IS_REACT_ACT_ENVIRONMENT'?true:dom.window[key];}
+ window.HTMLCanvasElement.prototype.getContext=()=>({clearRect(){},save(){},restore(){},beginPath(){},moveTo(){},lineTo(){},stroke(){}});
  window.matchMedia=()=>({matches:true,addEventListener(){},removeEventListener(){}});window.HTMLMediaElement.prototype.pause=function(){};window.HTMLMediaElement.prototype.play=function(){return Promise.resolve();};
  let root;
  const find=text=>[...document.querySelectorAll('button')].find(b=>b.textContent.includes(text));
@@ -25,9 +26,14 @@ test('child navigation contains no content imports or adult tools; adult tools r
   const output=resolve(temp,'app.mjs');await build({entryPoints:['src/App.jsx'],outfile:output,bundle:true,platform:'node',format:'esm',packages:'external'});
   const {default:App}=await import(pathToFileURL(output));root=createRoot(document.getElementById('root'));await act(async()=>root.render(React.createElement(App)));
   await click('Kids’ World');await click('TestExplorer');childClean();
+  await click('Math Lab');assert.ok(document.querySelector('.math-lab'));assert.equal(document.querySelector('.question-card'),null);
+  await click('Shade a fraction');assert.match(document.body.textContent,/Make 3\/8/);assert.equal(document.querySelector('.drawing-challenge select'),null);
+  await click('Choose another activity');await click('Build a triangle');assert.ok(document.querySelector('.shape-builder'));
+  await click('My world');assert.equal(document.querySelector('.math-lab'),null);
   await click('Play');await waitFor(()=>document.querySelector('.welcome-dashboard'));childClean();assert.doesNotMatch(document.body.textContent,/School|Teacher Review|Selected CA Skills/);
   await click('Badges');childClean();assert.match(document.body.textContent,/My badges/);await act(async()=>document.querySelector('.modal-overlay .close-btn').click());
   await click('Math Adventures with Bip!');await waitFor(()=>document.querySelector('.question-card'));childClean();assert.equal(document.querySelector('.standard-info-chip'),null);assert.equal(document.querySelector('.educator-standard-drawer'),null);
+  await click('Draw & solve');assert.ok(document.querySelector('.kid-scratchpad-box'));assert.equal(document.querySelector('.drawing-challenge'),null);assert.doesNotMatch(document.querySelector('.kid-scratchpad-box').textContent,/Drawing challenges|Build a triangle|Choose a drawing challenge/);
   await click('My world');await click('Learn');await click('Equal groups and fact families');childClean();assert.equal(document.querySelector('.journey-delete'),null);assert.equal(document.querySelector('.journey-privacy'),null);
   await click('Home');await click('Home');await click('Family & Teacher Guide');await waitFor(()=>document.querySelector('.family-adult-tools'));
   assert.match(document.body.textContent,/Study groups & Excel/);assert.match(document.body.textContent,/App version & recovery/);

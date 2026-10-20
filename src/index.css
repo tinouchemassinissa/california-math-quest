@@ -3941,3 +3941,6 @@ button, input, select {
 .counter-piece {font-size:28px;min-width:44px;min-height:44px;background:#0f172a;color:#38bdf8;border:1px solid #64748b;border-radius:50%;}
 .counter-piece[aria-pressed="true"] {outline:3px solid #fbbf24;}
 .visual-math-activity input {font:inherit;padding:10px;border-radius:8px;max-width:100%;box-sizing:border-box;}
+.math-lab .kids-activity-grid {grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-top:20px;}
+.math-lab>h2 {margin-top:20px;}
+.math-lab .drawing-challenge {margin-top:16px;}

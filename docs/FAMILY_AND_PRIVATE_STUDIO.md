@@ -89,7 +89,7 @@ Child arcade setup, play headers, lesson pages and badges do not expose AI Vault
 After an incorrect answer, arcade and learning paths offer Try again, Break it down with Bip, or Next question. No correct-option highlight or answer sentence is revealed by an incorrect attempt. Guided help is opt-in. Arcade retries keep the same question and do not add points, streak, lives penalties, profile mastery or duplicate classroom records; the original first attempt remains the recorded result. Learning-path retries are practice interactions and preserve the original saved attempt for assessment and resume. Incorrect answers do not trigger automatic advancement or an automatic game-over overlay; choosing Next can finish a round when no lives remain.
 
 ### Visual maths practice
-From a question, choose **Draw & solve → Drawing challenges**. The activity selector
+Choose **Kids’ World → Math Lab**. The activity selector
 includes fraction shading (3/8), sharing 12 counters into three equal groups,
 reflection across a vertical mirror line, and a 4-by-3 rectangle's area/perimeter.
 These are optional fixed practice tasks; they do not change the current quiz answer,
@@ -97,3 +97,9 @@ award assessment credit, or demonstrate mastery. Counter movement uses select-th
 so it works with touch and keyboard without requiring drag gestures.
 Geometry and these structured models use deterministic checks. Freehand paper is not
 recognized or graded. No photos, external AI service, or account is needed.
+
+### Focused navigation
+Independent drawing and model challenges now live at **Kids' World → Math Lab**.
+The question's **Draw & solve** contains only paper and guidance for that question;
+it no longer includes a separate challenge selector. Math Lab has a visible return
+to My world and an activity chooser. Freehand lab activities include their own paper.
