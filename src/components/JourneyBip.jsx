@@ -2,7 +2,7 @@ import SmoothBipVideo from './SmoothBipVideo.jsx';
 import React,{useEffect,useState} from 'react';
 import { bipLessonReaction, BIP_IDLE_CLIP, BIP_WAVE_CLIP, BIP_FALLBACK_CLIP } from '../game/bipLessonReaction.js';
 
-export default function JourneyBip({phase,feedback,help,eventKey,cue}){
+export default function JourneyBip({phase,feedback,help,eventKey,cue,message}){
   const [paused,setPaused]=useState(()=>typeof window!=='undefined'&&Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches));
   const [manual,setManual]=useState(null);
   const [failed,setFailed]=useState(0);
@@ -10,6 +10,7 @@ export default function JourneyBip({phase,feedback,help,eventKey,cue}){
   const [replay,setReplay]=useState(0);
   const reaction=bipLessonReaction({phase,feedback,help});
   if(cue&&(help||phase==='lesson'||phase==='guided'||(feedback&&!feedback.correct)))reaction.label=feedback&&!feedback.correct?`Not quite yet, and that’s okay. Let’s break it down together. ${cue}`:cue;
+  if(message)reaction.label=message;
   const clip=failed===1?BIP_FALLBACK_CLIP:manual==='wave'?BIP_WAVE_CLIP:settled?BIP_IDLE_CLIP:reaction.clip;
   const gesture=paused?'still':manual==='wave'?'wave':settled?'breathe':reaction.gesture;
   useEffect(()=>{setManual(null);setFailed(0);setSettled(false);},[eventKey,phase,help,feedback?.correct]);

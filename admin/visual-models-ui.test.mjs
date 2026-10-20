@@ -11,6 +11,7 @@ import {createQuestionLifecycle} from '../src/game/questionLifecycle.js';
 test('interactive fraction, counter, symmetry and area models check and reset safely',async()=>{
  const temp=await mkdtemp(resolve('.bip-ui-test-'));const dom=new JSDOM('<div id="root"></div>',{url:'https://bip.test'});const old={};
  for(const key of ['window','document','IS_REACT_ACT_ENVIRONMENT']){old[key]=globalThis[key];globalThis[key]=key==='IS_REACT_ACT_ENVIRONMENT'?true:dom.window[key];}
+ window.HTMLMediaElement.prototype.pause=function(){};window.HTMLMediaElement.prototype.play=function(){return Promise.resolve();};
  let root;
  try{
  const out=resolve(temp,'models.mjs');await build({entryPoints:['src/components/VisualMathActivity.jsx'],outfile:out,bundle:true,format:'esm',platform:'node',packages:'external'});const {default:Model}=await import(pathToFileURL(out));
@@ -20,7 +21,7 @@ test('interactive fraction, counter, symmetry and area models check and reset sa
  const cell=async label=>act(async()=>document.querySelector('[aria-label="'+label+'"]').click());
  await render('shade');await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/numerator/);
  for(let i=1;i<=3;i++)await cell('Fraction part '+i);
- await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/Yes!/);
+ await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/Yes!/);assert.ok(document.querySelector('.lab-feedback-success .gesture-nod'));
  await click('Start model again');assert.equal(document.querySelectorAll('[aria-pressed="true"]').length,0);
  await render('counters');await cell('Counter 1');await act(async()=>document.querySelectorAll('.counter-board section')[1].querySelector('.btn').click());
  assert.equal(document.querySelectorAll('.counter-board section')[1].querySelectorAll('.counter-piece').length,1);
@@ -31,6 +32,13 @@ test('interactive fraction, counter, symmetry and area models check and reset sa
  await render('area');await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/inside/);
  for(let y=2;y<=4;y++)for(let x=2;x<=5;x++)await cell('Area tile row '+y+', column '+x);
  await click('Check my model');assert.match(document.querySelector('[role="status"]').textContent,/area tiles fit/);
+ assert.ok(document.querySelector('.lab-feedback-retry'));
+ assert.match(document.querySelector('.lab-feedback h4').textContent,/Not quite yet/);
+ assert.equal(document.querySelector('.lab-feedback'),document.activeElement);
+ assert.equal(document.querySelector('input').getAttribute('aria-invalid'),'true');
+ assert.ok(document.querySelector('.lab-feedback .gesture-encourage'));
+ assert.equal(document.querySelectorAll('.filled').length,12);
+ 
  assert.equal(document.querySelectorAll('.filled').length,12);
  await click('Help me count outside edges');assert.equal(document.querySelectorAll('.unit-edge').length,14);
  for(const edge of [...document.querySelectorAll('.unit-edge')])await act(async()=>edge.click());

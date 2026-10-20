@@ -36,6 +36,6 @@ export function boundaryEdges(w,h) {
 }
 export function checkAreaModel(selected,perimeter,q=VISUAL_EXERCISES.area[0]) {
  if(!matchesCells(selected,rectangleCells(q.width,q.height)))return {ok:false,message:'Cover only the inside of the outlined rectangle. Count rows and columns; leave no gaps.'};
- if(!isAnswerEquivalent(perimeter,2*(q.width+q.height)))return {ok:false,message:'Your area tiles fit! For perimeter, count unit edges around the outside. Include all four sides. Try the edge-counting helper.'};
+ if(!isAnswerEquivalent(perimeter,2*(q.width+q.height)))return {ok:false,field:'perimeter',message:'Your area tiles fit! For perimeter, count unit edges around the outside. Include all four sides. Try the edge-counting helper.'};
  return {ok:true,message:`You found both: area is ${q.width*q.height} square units; perimeter is ${2*(q.width+q.height)} units. Area covers the inside; perimeter measures the boundary.`};
 }

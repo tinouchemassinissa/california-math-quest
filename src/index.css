@@ -3953,3 +3953,22 @@ button, input, select {
 .unit-edge.vertical {transform:translateX(-50%);}
 .unit-edge[aria-pressed="true"] {background:#fbbf24;}
 .lab-model-clue {padding:12px;background:#38bdf820;border-radius:10px;}
+
+.kids-layout.kids-layout-lab {grid-template-columns:minmax(0,1fr);}
+.lab-feedback {margin:20px 0;padding:18px;border-radius:16px;scroll-margin:20px;outline-offset:4px;}
+.lab-feedback-retry {background:#482c12;border:2px solid #fbbf24;color:#fff4d6;}
+.lab-feedback-success {background:#123c30;border:2px solid #34d399;color:#e0fff2;}
+.lab-feedback h4 {font-size:1.2rem;margin:0 0 12px;}
+.lab-feedback .journey-bip {display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px;align-items:center;position:static;max-width:none;width:auto;padding:0;border:0;background:transparent;box-shadow:none;}
+.lab-feedback .journey-bip-scene {width:140px;height:140px;min-height:0;margin:0;}
+.lab-feedback .journey-bip-message {min-width:0;color:inherit;}
+.lab-feedback .journey-bip-message p {font-size:1.05rem;color:inherit;margin:6px 0;}
+.lab-feedback .journey-bip-controls {grid-column:1/-1;}
+.lab-feedback .journey-bip-note {grid-column:1/-1;}
+.visual-math-activity input[aria-invalid="true"] {border:3px solid #fbbf24;background:#482c12;color:#fff4d6;}
+.perimeter-retry-hint {font-weight:700;color:#fbbf24;}
+@media(max-width:440px){.lab-feedback .journey-bip{grid-template-columns:1fr;}.lab-feedback .journey-bip-scene{margin:auto;}}
+@media(prefers-reduced-motion:no-preference){.lab-feedback {animation:lab-feedback-in .25s ease-out;}@keyframes lab-feedback-in{from{transform:translateY(8px);}to{transform:translateY(0);}}}
+.lab-feedback .journey-bip.bip-rendered-motion .journey-bip-scene {width:140px;height:140px;grid-row:auto;aspect-ratio:1;}
+.lab-feedback .journey-bip.bip-rendered-motion .journey-bip-message p {font-size:1.05rem;color:inherit;}
+@media(max-width:440px){.lab-feedback .journey-bip.bip-rendered-motion{grid-template-columns:1fr;}}

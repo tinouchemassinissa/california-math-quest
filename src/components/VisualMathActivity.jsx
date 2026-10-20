@@ -1,3 +1,4 @@
+import LabFeedback from './LabFeedback.jsx';
 import React,{useState} from 'react';
 import {VISUAL_EXERCISES,fractionLayout,rectangleCells,boundaryEdges,cellKey,checkFractionShade,checkCounterGroups,checkSymmetry,checkAreaModel} from '../game/visualMathActivities.js';
 export default function VisualMathActivity({activity}) {
@@ -31,10 +32,11 @@ function VisualModel({activity,q}) {
  {edgeHelp&&<div className="area-edge-overlay">{boundaryEdges(width,height).map(edge=><button type="button" key={edge.id} aria-label={'Count unit edge '+edge.id} aria-pressed={edges.includes(edge.id)} className={'unit-edge '+(edge.horizontal?'horizontal':'vertical')} style={{left:(edge.x/6*100)+'%',top:(edge.y/5*100)+'%',width:edge.horizontal?(100/6)+'%':'24px',height:edge.horizontal?'24px':(100/5)+'%'}} onClick={()=>setEdges(prev=>prev.includes(edge.id)?prev.filter(id=>id!==edge.id):[...prev,edge.id])}>{edges.includes(edge.id)?'✓':''}</button>)}</div>}</div>
  <button type="button" className="btn btn-secondary" aria-pressed={edgeHelp} onClick={()=>setEdgeHelp(v=>!v)}>{edgeHelp?'Hide edge helper':'Help me count outside edges'}</button>
  {edgeHelp&&<p role="status">{edges.length} unit edges marked. Tap each outside edge once; tap again to undo. Interior grid lines are not part of the perimeter.</p>}
- <p>{selected.length} square units covered</p><label>Perimeter in units <input aria-label="Perimeter in units" inputMode="numeric" value={perimeter} onChange={e=>{setPerimeter(e.target.value);setResult(null);}}/></label></>}
+ <p>{selected.length} square units covered</p><label>Perimeter in units <input aria-label="Perimeter in units" aria-invalid={result?.field==='perimeter'?true:undefined} aria-describedby={result?.field==='perimeter'?'perimeter-retry-hint':undefined} inputMode="numeric" value={perimeter} onChange={e=>{setPerimeter(e.target.value);setResult(null);}}/></label></>}
  <button type="button" className="btn btn-secondary" onClick={()=>setClue(v=>!v)}>Give me a clue</button>
  {clue&&<p className="lab-model-clue">{activity==='area'?'Area counts squares inside. Perimeter counts edges outside: across the top, down the right, across the bottom and up the left.':activity==='shade'?'The bottom number is the number of equal parts in the whole. The top number tells how many parts to shade.':activity==='counters'?'Deal one counter to each group, then repeat. Compare the groups before checking.':'Start with one row. Count how far a shaded square is from the mirror line, then shade its partner the same distance away.'}</p>}
  <div className="drawing-step-actions"><button type="button" className="btn btn-primary" onClick={check}>Check my model</button><button type="button" className="btn btn-secondary" onClick={()=>{setSelected([]);setPositions(Array(total).fill(-1));setCounter(null);setPerimeter('');setEdges([]);setResult(null);}}>Start model again</button></div>
- <p role="status">{result?.message}</p><small>Bip checks this model only. This is practice, with no timer or lost hearts.</small>
+ <LabFeedback result={result} onHelp={()=>{setClue(true);if(activity==='area')setEdgeHelp(true);}}/>
+ {result?.field==='perimeter'&&<p id="perimeter-retry-hint" className="perimeter-retry-hint">Try the perimeter again: count unit edges outside, not squares inside.</p>}<small>Bip checks this model only. This is practice, with no timer or lost hearts.</small>
  </div>;
 }

@@ -113,3 +113,11 @@ The optional perimeter helper marks actual outside unit edges, with a reversible
 count. Acceptance uses the rectangle dimensions, independently tested against
 exposed grid edges. For the initial 4-by-3 rectangle, 12 square units is the area,
 and 14 units is the perimeter; 18 is correctly rejected.
+
+### Visible feedback
+Checking a structured lab model now focuses and brings its feedback into view.
+A retry has an amber heading and an encouraging Bip clip; success has a green
+heading and a nod. Text and icons distinguish outcomes without relying on color.
+Incorrect perimeter input is marked and linked to a retry hint. Editing the model
+clears stale feedback and leaves the child's work in place. Read remains opt-in;
+reduced-motion settings pause the companion's motion.

@@ -1,3 +1,4 @@
+import LabFeedback from './LabFeedback.jsx';
 import VisualMathActivity from './VisualMathActivity.jsx';
 import React,{useState,useEffect} from 'react';
 import {DRAWING_ACTIVITIES,checkDrawnShape} from '../game/drawingActivities.js';
@@ -17,7 +18,7 @@ export default function DrawingChallenge({onActivityChange,initialActivity='tria
  <div className="shape-dot-grid">{Array.from({length:63},(_,i)=>{const x=i%9,y=Math.floor(i/9),chosen=points.findIndex(p=>p.x===x&&p.y===y);return <button key={i} type="button" disabled={closed} aria-label={`Corner at column ${x}, row ${y}`} aria-pressed={chosen>=0} onClick={()=>addPoint(x,y)}>{chosen>=0?chosen+1:'·'}</button>;})}</div>
  </div>
  <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={!points.length} onClick={()=>{if(closed)setClosed(false);else setPoints(p=>p.slice(0,-1));setResult(null);}}>Undo corner</button><button type="button" className="btn btn-secondary" disabled={points.length<3||closed} onClick={()=>{setClosed(true);setResult(null);}}>Close shape</button><button type="button" className="btn btn-primary" onClick={()=>setResult(checkDrawnShape(points,activity,closed))}>Check my shape</button><button type="button" className="btn btn-secondary" onClick={()=>{setPoints([]);setClosed(false);setResult(null);}}>Start shape again</button></div>
- <p role="status">{result?.message}</p><small>This checks the corners and straight sides you built here. It does not grade freehand drawings.</small>
+ <LabFeedback result={result} onHelp={()=>setStep(0)}/><small>This checks the corners and straight sides you built here. It does not grade freehand drawings.</small>
  </> : <p>Use the paper below for this challenge. Follow the checklist to review your own drawing. Bip cannot automatically check freehand marks.</p>}
  </section>;
 }
