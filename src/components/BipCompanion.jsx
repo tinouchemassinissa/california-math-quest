@@ -10,6 +10,7 @@ import {
 // Teaching gestures rendered from the original Bip Blender scene, 720px / 30fps.
 // Deliberately avoids Bip_critical_4K60.mp4 for wrong answers so children are never frightened or shamed.
 export const BIP_CLIPS = {
+  robot: ['gestures-v3/robot.mp4', false, 'Robot dance: pop, lock and wave!'],
   dance: ['gestures-v3/dance.mp4', false, 'A little robot floss!'],
   antennas: ['gestures-v3/antennas.mp4', false, 'My antennas say hello!'],
   walk: ['gestures-v3/walk.mp4', false, 'Taking a little walk.'],
@@ -445,7 +446,7 @@ export default function BipCompanion({
             )}
 
             {/* Shared finite robot gestures; selecting one never overrides pause. */}
-            {['wave','walk','jump','dance','antennas'].map(gesture=><button key={gesture} type="button" className="bip-ctrl-btn" onClick={()=>{setManualEvent(gesture);setManualTrigger(v=>v+1);setSettled(false);setCustomBubble(BIP_CLIPS[gesture][2]);}}>{gesture[0].toUpperCase()+gesture.slice(1)}</button>)}
+            {['wave','walk','jump','dance','robot','antennas'].map(gesture=><button key={gesture} type="button" className="bip-ctrl-btn" onClick={()=>{setManualEvent(gesture);setManualTrigger(v=>v+1);setSettled(false);setCustomBubble(BIP_CLIPS[gesture][2]);}}>{gesture==='robot'?'Robot dance':gesture==='dance'?'Floss':gesture[0].toUpperCase()+gesture.slice(1)}</button>)}
             {/* Interactive Celebration & Tamagotchi Action Buttons */}
             <button
               type="button"

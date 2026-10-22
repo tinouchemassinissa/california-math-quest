@@ -59,41 +59,22 @@ test('child UI resumes a lesson and exposes a useful picture after a mistake',as
  }
 });
 
-test('animation holds its previous frame until loaded, ignores stale loads and respects pause',async()=>{
- const temp=await mkdtemp(resolve('.bip-ui-test-'));
- const dom=new JSDOM('<div id="root"></div>',{url:'https://bip.test'});
+test('3D frame stays mounted across gestures, ignores stale completion and respects pause',async()=>{
+ const temp=await mkdtemp(resolve('.bip-ui-test-')),dom=new JSDOM('<div id="root"></div>',{url:'https://bip.test'});
  const previous={};for(const key of ['window','document','IS_REACT_ACT_ENVIRONMENT']){previous[key]=globalThis[key];globalThis[key]=key==='IS_REACT_ACT_ENVIRONMENT'?true:dom.window[key];}
- const plays=[],pauses=[];let failures=0;
- dom.window.HTMLMediaElement.prototype.play=function(){plays.push(this.getAttribute('src'));return Promise.resolve();};
- dom.window.HTMLMediaElement.prototype.pause=function(){pauses.push(this.getAttribute('src'));};
- let root;
+ let root,ended=0;
  try{
   const output=resolve(temp,'motion.mjs');await build({entryPoints:['src/components/SmoothBipVideo.jsx'],outfile:output,bundle:true,platform:'node',format:'esm',packages:'external'});
   const {default:Motion}=await import(pathToFileURL(output));root=createRoot(document.getElementById('root'));
-  const render=async props=>act(async()=>root.render(React.createElement(Motion,{onError:()=>failures++,...props})));
-  await render({src:'idle.mp4',eventKey:'a',paused:false,loop:true});
-  await act(async()=>document.querySelector('video').dispatchEvent(new dom.window.Event('loadeddata')));
-  await render({src:'wave.mp4',eventKey:'b',paused:false});
-  assert.equal(document.querySelector('video.is-visible').getAttribute('src'),'idle.mp4');
-  const stale=[...document.querySelectorAll('video')].find(v=>v.getAttribute('src')==='wave.mp4');
-  await render({src:'point.mp4',eventKey:'c',paused:true});
-  await act(async()=>stale.dispatchEvent(new dom.window.Event('loadeddata')));
-  assert.equal(document.querySelector('video.is-visible').getAttribute('src'),'idle.mp4');
-  const point=[...document.querySelectorAll('video')].find(v=>v.getAttribute('src')==='point.mp4');
-  await act(async()=>point.dispatchEvent(new dom.window.Event('loadeddata')));
-  assert.equal(document.querySelector('video.is-visible').getAttribute('src'),'point.mp4');
-  assert.ok(!plays.includes('point.mp4'));assert.ok(pauses.includes('idle.mp4'));
-  await render({src:'point.mp4',eventKey:'c',paused:false});assert.ok(plays.includes('point.mp4'));
-  assert.equal(document.querySelectorAll('video[aria-hidden="false"]').length,1);
-  await act(async()=>{point.dispatchEvent(new dom.window.Event('error'));point.dispatchEvent(new dom.window.Event('error'));});assert.equal(failures,1);
-  Object.defineProperty(document,'visibilityState',{configurable:true,value:'hidden'});
-  const playCount=plays.length;await act(async()=>document.dispatchEvent(new dom.window.Event('visibilitychange')));assert.equal(plays.length,playCount);
-  await render({src:'point.mp4',eventKey:'c',paused:true});
-  Object.defineProperty(document,'visibilityState',{configurable:true,value:'visible'});
-  await act(async()=>document.dispatchEvent(new dom.window.Event('visibilitychange')));assert.equal(plays.length,playCount);
- }finally{
-  if(root)await act(async()=>root.unmount());dom.window.close();
-  for(const [key,value]of Object.entries(previous)){if(value===undefined)delete globalThis[key];else globalThis[key]=value;}
-  await rm(temp,{recursive:true,force:true});
- }
+  const render=async props=>act(async()=>root.render(React.createElement(Motion,{onEnded:()=>ended++,...props})));
+  await render({src:'wave.mp4',eventKey:'a',paused:false,loop:false});
+  const frame=document.querySelector('iframe'),sent=[];frame.contentWindow.postMessage=(value,origin)=>sent.push({value,origin});
+  await render({src:'point.mp4',eventKey:'b',paused:true,loop:false});
+  assert.equal(document.querySelector('iframe'),frame);assert.equal(document.querySelector('video'),null);
+  assert.equal(sent.at(-1).value.paused,true);assert.equal(sent.at(-1).value.gesture,'point');assert.equal(sent.at(-1).origin,'https://bip.test');
+  await act(async()=>window.dispatchEvent(new window.MessageEvent('message',{source:frame.contentWindow,origin:'https://bip.test',data:{type:'bip-motion-ended',gesture:'wave'}})));
+  assert.equal(ended,0);
+  await act(async()=>window.dispatchEvent(new window.MessageEvent('message',{source:frame.contentWindow,origin:'https://bip.test',data:{type:'bip-motion-ended',gesture:'point'}})));
+  assert.equal(ended,1);
+ }finally{if(root)await act(async()=>root.unmount());dom.window.close();for(const [k,v]of Object.entries(previous)){if(v===undefined)delete globalThis[k];else globalThis[k]=v;}await rm(temp,{recursive:true,force:true});}
 });

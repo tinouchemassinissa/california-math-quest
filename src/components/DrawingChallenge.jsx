@@ -6,16 +6,24 @@ export default function DrawingChallenge({onActivityChange,initialActivity='tria
  const [activity,setActivity]=useState(initialActivity),[step,setStep]=useState(0),[points,setPoints]=useState([]),[closed,setClosed]=useState(false),[result,setResult]=useState(null);
  const task=DRAWING_ACTIVITIES.find(a=>a.id===activity), structured=['triangle','square','rectangle'].includes(activity);
  useEffect(()=>{setStep(0);setPoints([]);setClosed(false);setResult(null);onActivityChange?.(activity);},[activity]);
- function addPoint(x,y){if(closed)return;setResult(null);setPoints(prev=>prev.some(p=>p.x===x&&p.y===y)?prev:[...prev,{x,y}]);}
+ function addPoint(x,y){
+  if(closed)return;setResult(null);
+  const first=points[0];
+  if(first&&first.x===x&&first.y===y){
+   if(points.length>=3){setClosed(true);setStep(2);}
+   return;
+  }
+  if(!points.some(p=>p.x===x&&p.y===y))setPoints([...points,{x,y}]);
+ }
  return <section className="drawing-challenge" aria-label="Drawing challenges">
  {!hidePicker&&<label>Choose a drawing challenge <select value={activity} onChange={e=>setActivity(e.target.value)}>{DRAWING_ACTIVITIES.map(a=><option key={a.id} value={a.id}>{a.label}</option>)}</select></label>}
  <ol className="drawing-step-list">{task.steps.map((text,i)=><li key={text} aria-current={i===step?'step':undefined} className={i===step?'current':''}>{i<step?'✓ ':''}{text}</li>)}</ol>
  <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={step===0} onClick={()=>setStep(s=>s-1)}>Back a step</button><button type="button" className="btn btn-primary" disabled={step===2} onClick={()=>setStep(s=>s+1)}>Next small step →</button></div>
  {['shade','counters','symmetry','area'].includes(activity)?<VisualMathActivity key={activity} activity={activity}/>:structured ? <>
- <p>Tap dots to choose corners in order. Then close your shape. You can also use a keyboard.</p>
- <div className="shape-builder">
+ <p>Tap dots to choose corners in order. Return to the first corner to close your shape. You can also use a keyboard.</p>
+ <p role="status" className="shape-close-status">{closed?'Shape closed. Ready to check!':points.length>=3?'Tap corner 1 to close your shape.':'Choose at least three corners.'}</p><div className="shape-builder">
  <svg viewBox="0 0 360 280" aria-hidden="true"><polyline points={points.concat(closed&&points.length?[points[0]]:[]).map(p=>`${20+p.x*40},${20+p.y*40}`).join(' ')} fill={closed?'#38bdf830':'none'} stroke="#38bdf8" strokeWidth="4" strokeLinejoin="round"/></svg>
- <div className="shape-dot-grid">{Array.from({length:63},(_,i)=>{const x=i%9,y=Math.floor(i/9),chosen=points.findIndex(p=>p.x===x&&p.y===y);return <button key={i} type="button" disabled={closed} aria-label={`Corner at column ${x}, row ${y}`} aria-pressed={chosen>=0} onClick={()=>addPoint(x,y)}>{chosen>=0?chosen+1:'·'}</button>;})}</div>
+ <div className="shape-dot-grid">{Array.from({length:63},(_,i)=>{const x=i%9,y=Math.floor(i/9),chosen=points.findIndex(p=>p.x===x&&p.y===y);return <button key={i} type="button" disabled={closed} className={chosen===0&&!closed&&points.length>=3?'shape-start-close':undefined} title={chosen===0&&!closed&&points.length>=3?'Return here to close your shape':undefined} aria-label={`Corner at column ${x}, row ${y}`} aria-pressed={chosen>=0} onClick={()=>addPoint(x,y)}>{chosen>=0?chosen+1:'·'}</button>;})}</div>
  </div>
  <div className="drawing-step-actions"><button type="button" className="btn btn-secondary" disabled={!points.length} onClick={()=>{if(closed)setClosed(false);else setPoints(p=>p.slice(0,-1));setResult(null);}}>Undo corner</button><button type="button" className="btn btn-secondary" disabled={points.length<3||closed} onClick={()=>{setClosed(true);setResult(null);}}>Close shape</button><button type="button" className="btn btn-primary" onClick={()=>setResult(checkDrawnShape(points,activity,closed))}>Check my shape</button><button type="button" className="btn btn-secondary" onClick={()=>{setPoints([]);setClosed(false);setResult(null);}}>Start shape again</button></div>
  <LabFeedback result={result} onHelp={()=>setStep(0)}/><small>This checks the corners and straight sides you built here. It does not grade freehand drawings.</small>

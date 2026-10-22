@@ -12,7 +12,7 @@ let voice=null,externalPaused=false;
 const capture=new URLSearchParams(location.search).get('capture')==='1';
 let state='idle',action=null,actionTime=0,turn=0,paused=false;
 const nodes=new Map(), originals=new Map(), motionButtons=[...document.querySelectorAll('[data-gesture]')];
-const durations={point:2.6,nod:2.2,encourage:2.4,rest:3.0,wave:2.6,jump:1.5,walk:3.8,celebrate:2.2,dance:5.2,antennas:3.2};
+const durations={point:2.6,nod:2.2,encourage:2.4,rest:3.0,wave:2.6,jump:1.5,walk:3.8,celebrate:2.2,robot:5.6,dance:5.2,antennas:3.2};
 try{paused=localStorage.getItem('bip-character-paused')==='yes';}catch{}
 function canMove(){return !paused&&!externalPaused&&!reduced.matches;}
 function controls(){
@@ -21,7 +21,7 @@ function controls(){
  pauseButton.setAttribute('aria-pressed',String(paused||reduced.matches));
  motionButtons.forEach(b=>b.disabled=!ready||!canMove()||failed||state!=='idle');
 }
-function label(){const text=failed?'3D unavailable · still image':!ready?'Loading Bip…':!canMove()?'Bip · still mode':action?({point:'Let’s look here',nod:'Nice work!',encourage:'Let’s try together',rest:'A quiet moment',wave:'Hello there!',jump:'A little jump',walk:'Taking a little stroll',celebrate:'A little victory!',dance:'Robot floss!','antennas':'Antenna wiggle!'}[action]):({idle:'Drag to turn · say hello',think:'Thinking',listen:'Listening',speak:'Speaking',offline:'Waiting for your connection'}[state]||'Ready');if(stateLabel.textContent!==text)stateLabel.textContent=text;}
+function label(){const text=failed?'3D unavailable · still image':!ready?'Loading Bip…':!canMove()?'Bip · still mode':action?({point:'Let’s look here',nod:'Nice work!',encourage:'Let’s try together',rest:'A quiet moment',wave:'Hello there!',jump:'A little jump',walk:'Taking a little stroll',celebrate:'A little victory!',robot:'Robot dance · pop and lock!',dance:'Robot floss!','antennas':'Antenna wiggle!'}[action]):({idle:'Drag to turn · say hello',think:'Thinking',listen:'Listening',speak:'Speaking',offline:'Waiting for your connection'}[state]||'Ready');if(stateLabel.textContent!==text)stateLabel.textContent=text;}
 function restore(){
  for(const [name,o] of nodes){const b=originals.get(name);o.position.copy(b.p);o.quaternion.copy(b.q);o.scale.copy(b.s);}
 }
@@ -74,6 +74,10 @@ function pose(time,dt){
   addRotation('CTRL_arm_-1',0,(a==='celebrate'?1.1:.65)*e,0);
   addRotation('CTRL_arm_1',0,-(a==='celebrate'?1.1:.65)*e,0);
   addRotation('CTRL_head',-.04*flight,0,0);
+ }else if(a==='robot'){
+  const phase=u*4,part=Math.min(3,Math.floor(phase)),v=Math.min(1,Math.max(0,(phase-part-.22)/.56)),blend=v*v*v*(10+v*(-15+6*v));
+  applyRobotDance(nodes,originals,(part+blend)/4,e);
+  addRotation('CTRL_head',.025*Math.sin(u*Math.PI*8)*e);
  }else if(a==='dance'){
   applyRobotDance(nodes,originals,u,e);
  }else if(a==='antennas'){
@@ -104,7 +108,7 @@ function draw(now=0){
 }
 function wake(){if(ready&&!raf&&visible&&!document.hidden){frameTime=performance.now();raf=requestAnimationFrame(draw);}}
 function fail(){
- failed=true;ready=false;cancelAnimationFrame(raf);raf=0;
+ failed=true;ready=false;window.dispatchEvent(new Event('bip-motion-fallback'));cancelAnimationFrame(raf);raf=0;
  renderer?.dispose();renderer?.domElement.remove();
  host.dataset.mode='fallback';controls();label();
 }
