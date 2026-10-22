@@ -1,0 +1,7 @@
+{
+  "poses": 1249,
+  "geometry": "closest point of each hand and forearm triangle against the torso bounding ellipsoid",
+  "minimumTorsoEllipsoidSquared": 1.1869151271293692,
+  "where": "Ivory_forearm @ 0.000",
+  "maxVertexGroupStepAt240fps": 0.004938437658940157
+}

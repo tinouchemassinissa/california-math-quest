@@ -1,0 +1,109 @@
+{
+  "version": 3,
+  "width": 720,
+  "height": 720,
+  "fps": 60,
+  "codec": "h264",
+  "pixel_format": "yuv420p",
+  "audio": false,
+  "full_decode_passed": true,
+  "total_bytes": 3565126,
+  "takes": [
+    {
+      "name": "antennas",
+      "file": "antennas.mp4",
+      "frames": 192,
+      "seconds": 3.2,
+      "bytes": 214589,
+      "sha256": "60cc3e74903991b16cbb93aecc789e3cd134b67ec855ec76b5aa73b37f5c17f2"
+    },
+    {
+      "name": "celebrate",
+      "file": "celebrate.mp4",
+      "frames": 132,
+      "seconds": 2.2,
+      "bytes": 316044,
+      "sha256": "0d332c8558407c2d0b47fe5a1b6eaa8b54483940b160a3219aa5def18ab1266c"
+    },
+    {
+      "name": "dance",
+      "file": "dance.mp4",
+      "frames": 312,
+      "seconds": 5.2,
+      "bytes": 670667,
+      "sha256": "5ab946c2e069cd442eb197d5c9ad1596c65eae434316d738c5a1c116fc9187b6"
+    },
+    {
+      "name": "encourage",
+      "file": "encourage.mp4",
+      "frames": 144,
+      "seconds": 2.4,
+      "bytes": 185819,
+      "sha256": "b5825c11c50cba11430ea41c6b0333926d93e957d1494923fea70c2916f740a3"
+    },
+    {
+      "name": "idle",
+      "file": "idle.mp4",
+      "frames": 348,
+      "seconds": 5.8,
+      "bytes": 331538,
+      "sha256": "0acb91897bc41cc563b4327b98d1366bef6b99e79fbfaae1a35d342202d4e754"
+    },
+    {
+      "name": "jump",
+      "file": "jump.mp4",
+      "frames": 90,
+      "seconds": 1.5,
+      "bytes": 219913,
+      "sha256": "9dfc921fcb8e117db7d2df3d8b150ae872ba666f3a4503397b1298a5df5dcdb9"
+    },
+    {
+      "name": "nod",
+      "file": "nod.mp4",
+      "frames": 132,
+      "seconds": 2.2,
+      "bytes": 188388,
+      "sha256": "d5c710f2a294d3e029556303416f96a64d7b5e96ece069374c14e09cc3b8a406"
+    },
+    {
+      "name": "point",
+      "file": "point.mp4",
+      "frames": 156,
+      "seconds": 2.6,
+      "bytes": 206972,
+      "sha256": "6a58a54031f5d7bfa0b3002085a6963d2dd598b811641619c51a19fb9cf1d8e5"
+    },
+    {
+      "name": "rest",
+      "file": "rest.mp4",
+      "frames": 180,
+      "seconds": 3.0,
+      "bytes": 212718,
+      "sha256": "9fc5fb386c6772b8e704098aa4cd9c81bc49df64eb842a47688e7b80c89628ad"
+    },
+    {
+      "name": "think",
+      "file": "think.mp4",
+      "frames": 180,
+      "seconds": 3.0,
+      "bytes": 163594,
+      "sha256": "0f0e73c4c4e4daa03c4526c948194cf65c7f60677b4ad656c39530066986161c"
+    },
+    {
+      "name": "walk",
+      "file": "walk.mp4",
+      "frames": 228,
+      "seconds": 3.8,
+      "bytes": 635381,
+      "sha256": "45b6f7f6d9fff682c1dee9c561ac2f995f3f0ff8e621d878df0e2511f04088bc"
+    },
+    {
+      "name": "wave",
+      "file": "wave.mp4",
+      "frames": 156,
+      "seconds": 2.6,
+      "bytes": 219503,
+      "sha256": "8f9d04fe46f3668167d162b6558aaeb3d1305dfd0af5a8a77a04f5cf9f64b0ef"
+    }
+  ]
+}

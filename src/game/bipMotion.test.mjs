@@ -23,6 +23,7 @@ test('reduced motion, wave, feedback replay and video completion respect pause',
  const click=async text=>act(()=>[...document.querySelectorAll('button')].find(b=>b.textContent.includes(text)).click());
  try{
   await render();assert.equal(document.querySelector('aside').dataset.motion,'paused');
+  for(const action of ['Walk','Jump','Dance','Antennas']){await click(action);assert.equal(document.querySelector('aside').dataset.motion,'paused');assert.ok([...document.querySelectorAll('video')].some(v=>v.getAttribute('src').includes(action.toLowerCase())));}
   await click('Wave');assert.equal(document.querySelector('aside').dataset.motion,'paused');assert.equal(document.querySelector('video').autoplay,false);
   await click('Animate');assert.equal(document.querySelector('aside').dataset.motion,'playing');
   await render({feedback:{correct:false}});assert.ok(document.querySelector('aside').classList.contains('gesture-encourage'));
@@ -30,7 +31,7 @@ test('reduced motion, wave, feedback replay and video completion respect pause',
   await act(()=>clip('encourage').dispatchEvent(new window.Event('loadeddata')));
   await act(()=>clip('encourage').dispatchEvent(new window.Event('ended',{bubbles:true})));
   await act(()=>clip('/idle').dispatchEvent(new window.Event('loadeddata')));
-  assert.match(document.querySelector('video.is-visible').getAttribute('src'),/gestures-v2\/idle/);assert.equal(document.querySelector('video.is-visible').loop,true);
+  assert.match(document.querySelector('video.is-visible').getAttribute('src'),/gestures-v3\/idle/);assert.equal(document.querySelector('video.is-visible').loop,true);
   await render({feedback:{correct:true}});
   await act(()=>clip('/nod').dispatchEvent(new window.Event('error')));
   assert.ok(clip('healthy'));
@@ -53,7 +54,7 @@ test('arcade gesture buttons respect pause and all events use school renders',as
  const root=createRoot(document.getElementById('root'));
  try{
   await act(()=>root.render(React.createElement(BipCompanion,{soundEnabled:false})));
-  for(const text of ['Celebrate','Fire Mode','Feed Treat','High-Five']){
+  for(const text of ['Celebrate','Fire Mode','Feed Treat','High-Five','Walk','Jump','Dance','Antennas']){
    await act(()=>[...document.querySelectorAll('button')].find(b=>b.textContent.includes(text)).click());
    assert.equal(document.querySelector('section').dataset.motion,'paused');
    assert.equal(document.querySelector('video').autoplay,false);
@@ -63,6 +64,6 @@ test('arcade gesture buttons respect pause and all events use school renders',as
   await act(()=>document.querySelector('[aria-label="Resume Bip animation"]').click());
   assert.equal(document.querySelector('section').dataset.motion,'playing');
   await act(()=>listener({matches:true}));assert.equal(document.querySelector('section').dataset.motion,'paused');
-  for(const [path] of Object.values(BIP_CLIPS))assert.match(path,/^gestures-v2\//);
+  for(const [path] of Object.values(BIP_CLIPS))assert.match(path,/^gestures-v3\//);
  }finally{await act(()=>root.unmount());dom.window.close();Object.assign(globalThis,previous);}
 });

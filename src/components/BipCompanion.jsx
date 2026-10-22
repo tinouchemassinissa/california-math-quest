@@ -10,17 +10,21 @@ import {
 // Teaching gestures rendered from the original Bip Blender scene, 720px / 30fps.
 // Deliberately avoids Bip_critical_4K60.mp4 for wrong answers so children are never frightened or shamed.
 export const BIP_CLIPS = {
-  idle: ['gestures-v2/idle.mp4', true, 'Bip is ready to help you solve this question!'],
-  thinking: ['gestures-v2/think.mp4', false, 'Scanning the math numbers step by step...'],
-  correct: ['gestures-v2/nod.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
-  celebrate: ['gestures-v2/celebrate.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
-  fireStreak: ['gestures-v2/celebrate.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
-  starVault: ['gestures-v2/nod.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
-  wave: ['gestures-v2/wave.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
-  tryAgain: ['gestures-v2/encourage.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
-  recovery: ['gestures-v2/nod.mp4', false, 'You bounced right back! Keep going!'],
-  rest: ['gestures-v2/rest.mp4', true, 'Time for a calm little power nap.'],
-  saving: ['gestures-v2/think.mp4', true, 'Saving your math progress safely.'],
+  dance: ['gestures-v3/dance.mp4', false, 'A little robot floss!'],
+  antennas: ['gestures-v3/antennas.mp4', false, 'My antennas say hello!'],
+  walk: ['gestures-v3/walk.mp4', false, 'Taking a little walk.'],
+  jump: ['gestures-v3/jump.mp4', false, 'A little jump for the little wins.'],
+  idle: ['gestures-v3/idle.mp4', true, 'Bip is ready to help you solve this question!'],
+  thinking: ['gestures-v3/think.mp4', false, 'Scanning the math numbers step by step...'],
+  correct: ['gestures-v3/nod.mp4', false, 'BOOM! Power-Up Celebration! You nailed it!'],
+  celebrate: ['gestures-v3/celebrate.mp4', false, '🎉 PARTY TIME! Bip is doing a victory power-up for you!'],
+  fireStreak: ['gestures-v3/celebrate.mp4', false, '🔥 OVERDRIVE STREAK! Bip is on fire from your math combo!'],
+  starVault: ['gestures-v3/nod.mp4', false, '🌟 STAR LOCKED IN! Bip beamed your points into the Trophy Vault!'],
+  wave: ['gestures-v3/wave.mp4', false, 'Hi friend! Ready for your next big math adventure?'],
+  tryAgain: ['gestures-v3/encourage.mp4', false, 'Good try! Let’s bounce right back and see how it works!'],
+  recovery: ['gestures-v3/nod.mp4', false, 'You bounced right back! Keep going!'],
+  rest: ['gestures-v3/rest.mp4', true, 'Time for a calm little power nap.'],
+  saving: ['gestures-v3/think.mp4', true, 'Saving your math progress safely.'],
 };
 
 const CELEBRATION_SHOWS = [
@@ -440,6 +444,8 @@ export default function BipCompanion({
               </button>
             )}
 
+            {/* Shared finite robot gestures; selecting one never overrides pause. */}
+            {['wave','walk','jump','dance','antennas'].map(gesture=><button key={gesture} type="button" className="bip-ctrl-btn" onClick={()=>{setManualEvent(gesture);setManualTrigger(v=>v+1);setSettled(false);setCustomBubble(BIP_CLIPS[gesture][2]);}}>{gesture[0].toUpperCase()+gesture.slice(1)}</button>)}
             {/* Interactive Celebration & Tamagotchi Action Buttons */}
             <button
               type="button"
