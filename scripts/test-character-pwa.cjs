@@ -18,6 +18,8 @@ const server=process.env.BIP_TEST_ORIGIN?null:spawn(process.execPath,[path.join(
   await frame.locator('#bip-stage[data-mode="3d"]').waitFor({timeout:25000});
   assert.equal(await frame.locator('#root').count(),0,'React app shell must never render inside Bip');
   assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Page overflow at '+viewport.width);
+  const mainBox=await p.locator('.kids-main').boundingBox(),bipBox=await p.locator('.journey-bip').boundingBox();
+  if(viewport.width<=760)assert(mainBox.y<bipBox.y,'Mobile learner choices come first');else assert(bipBox.x<mainBox.x,'Desktop has aligned columns');
   assert.equal(await p.locator('.journey-bip').first().evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)');
   await p.locator('.bip-moves summary').first().click();
   await p.getByRole('button',{name:'Robot dance',exact:true}).first().click();

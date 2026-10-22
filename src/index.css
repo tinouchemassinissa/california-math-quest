@@ -4002,3 +4002,74 @@ button, input, select {
 .bip-moves-list{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 12px}
 .bip-moves summary:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
 .journey-bip-controls>button{border-radius:14px;padding:10px 16px}
+
+
+/* Kids' World: clear task area, calm companion, and compact mobile controls. */
+.kids-world{width:100%;max-width:1180px;margin-inline:auto;padding:clamp(20px,3.5vw,44px);box-sizing:border-box}
+.kids-header{gap:16px;min-height:48px;padding-bottom:20px;border-bottom:1px solid #818cf824}
+.kids-header>span:nth-child(2){letter-spacing:.12em;font-size:.72rem}
+.kids-header>button:last-child:not(:first-child){margin-left:auto}
+.kids-world .kids-layout{grid-template-columns:minmax(240px,280px) minmax(0,1fr);gap:clamp(28px,4vw,56px);margin-top:36px;align-items:start}
+.kids-world .kids-main{padding:8px 0 24px;min-width:0}
+.kids-world .kids-main h1{font-size:clamp(1.9rem,3.3vw,2.8rem);line-height:1.16;margin:14px 0 16px;text-wrap:balance;letter-spacing:-.035em}
+.kids-world .kids-main>p{max-width:54ch;font-size:1rem;line-height:1.7;margin:0 0 24px}
+.kids-world .kids-explorers{grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:14px;margin:26px 0 0;max-width:640px}
+.kids-world .kid-explorer{min-height:160px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:22px;min-width:0;transition:border-color .18s,background-color .18s}
+.kids-world .kid-explorer>span{margin:0 0 8px;font-size:2rem;line-height:1.1}
+.kids-world .kid-explorer strong{font-size:1.05rem;overflow-wrap:anywhere;line-height:1.4}
+.kids-world .kid-explorer small{font-size:.82rem;margin:0}
+.kids-world .kids-explorers:has(>.kid-new:only-child){max-width:210px}
+.kids-world .kid-explorer:hover{border-color:#a5b4fc;background:#818cf81c}
+.kids-world .kids-layout>.journey-bip.bip-rendered-motion{position:sticky;top:24px;display:flex;flex-direction:column;gap:0}
+.kids-world .kids-layout>.journey-bip.bip-rendered-motion .journey-bip-scene{width:100%;height:265px;aspect-ratio:auto;min-height:0;margin:0 0 12px;flex:none}
+.kids-world .journey-bip.bip-rendered-motion .journey-bip-message{padding:8px 4px 0}
+.kids-world .journey-bip.bip-rendered-motion .journey-bip-message strong{font-size:.95rem;line-height:1.5}
+.kids-world .journey-bip.bip-rendered-motion .journey-bip-message p{font-size:.9rem;line-height:1.65;margin:8px 0 16px}
+.kids-world .journey-bip-controls{padding:0 4px;gap:8px;align-items:start}
+.kids-world .bip-moves summary{font-size:.85rem;border-radius:14px;padding:12px 14px;background:var(--bg-secondary,#172033)}
+.kids-world .bip-moves-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding-top:2px}
+.kids-world .journey-bip-controls .bip-moves-list button{width:100%;min-width:0;padding:9px 5px;min-height:44px;font-size:.78rem;line-height:1.35}
+.kids-world .journey-bip-controls>button{flex:1;min-height:44px;padding:10px 12px;font-size:.8rem}
+.kids-world .journey-bip.bip-rendered-motion .journey-bip-note{font-size:.68rem;line-height:1.55;margin:10px 4px 0}
+.kids-world .kids-activity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.kids-world .kids-activity-grid button{padding:20px;min-height:140px}
+.kids-world .kids-continue{padding:22px;gap:18px;margin:24px 0}
+.kids-world .kids-continue strong{font-size:1.35rem}
+.kids-world .kids-local-note{border-top:1px solid #818cf824;padding-top:18px;margin:28px 0 0;line-height:1.7;font-size:.72rem}
+@media(max-width:760px){
+ .kids-world{padding:20px}
+ .kids-header{gap:12px;padding-bottom:16px}
+ .kids-header .btn{padding:10px 14px;min-height:44px}
+ .kids-header>button:last-child:not(:first-child){margin-left:0}
+ .kids-world .kids-layout{grid-template-columns:minmax(0,1fr);gap:28px;margin-top:24px}
+ .kids-world .kids-main{order:0;padding:0}
+ .kids-world .kids-main h1{font-size:clamp(1.8rem,6.7vw,2.4rem);margin-top:12px}
+ .kids-world .kids-main>p{font-size:.95rem;margin-bottom:20px}
+ .kids-world .kids-explorers{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+ .kids-world .kid-explorer{min-height:140px;padding:18px 12px;border-radius:18px}
+ .kids-world .kids-explorers:has(>.kid-new:only-child){max-width:none;grid-template-columns:minmax(0,1fr)}
+ .kids-world .kids-explorers>.kid-new:only-child{min-height:106px;flex-direction:row;gap:18px;justify-content:flex-start;padding:22px}
+ .kids-world .kids-explorers>.kid-new:only-child>span{margin:0}
+ .kids-world .kids-layout>.journey-bip.bip-rendered-motion{order:1;position:static;display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px 14px;padding-top:20px;border-top:1px solid #818cf824!important}
+ .kids-world .kids-layout>.journey-bip.bip-rendered-motion .journey-bip-scene{width:112px;height:145px;grid-column:1;grid-row:1/3;margin:0}
+ .kids-world .journey-bip.bip-rendered-motion .journey-bip-message{grid-column:2;padding:4px 0 0;align-self:center}
+ .kids-world .journey-bip.bip-rendered-motion .journey-bip-message p{font-size:.85rem;margin:6px 0 0}
+ .kids-world .journey-bip-controls{grid-column:1/-1;grid-row:3;padding:4px 0 0;display:flex;flex-wrap:wrap}
+ .kids-world .bip-moves{flex:1 1 100%}
+ .kids-world .bip-moves-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .kids-world .journey-bip.bip-rendered-motion .journey-bip-note{grid-column:1/-1;grid-row:4;margin:0;text-align:center}
+ .kids-world .kids-local-note{margin-top:22px}
+ .kids-world .kids-activity-grid button{min-height:120px;padding:16px}
+ .kids-world .kids-activity-grid span{font-size:1.7rem}
+ .kids-world .kids-continue{padding:18px;gap:12px}
+ .kids-world .kids-continue>span{font-size:2.2rem}
+}
+@media(max-width:360px){.kids-world{padding:16px}.kids-world .kids-activity-grid{grid-template-columns:1fr}.kids-world .kids-header>span:nth-child(2){font-size:.65rem}}
+@media(prefers-reduced-motion:reduce){.kids-world .kid-explorer{transition:none}}
+
+.kids-world .kids-layout.kids-layout-lab{grid-template-columns:minmax(0,1fr)}
+
+@media(max-width:760px){
+ .kids-world .kids-explorers>.kid-new:last-child:nth-child(odd){grid-column:1/-1;min-height:84px;flex-direction:row;gap:16px;justify-content:center;padding:18px}
+ .kids-world .kids-explorers>.kid-new:last-child:nth-child(odd)>span{margin:0}
+}
