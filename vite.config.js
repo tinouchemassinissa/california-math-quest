@@ -17,6 +17,9 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png', 'bip/*.mp4', 'bip/events/*.mp4', 'bip/gestures/*.mp4', 'bip/gestures-v2/*.mp4', 'bip/gestures-v3/*.mp4', 'bip/character/*', 'bip/gestures/*.webp'],
       workbox: {
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        // Character iframe navigations must never receive the React app shell.
+        navigateFallbackDenylist: [/^\/bip\/character\//],
+        ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^controls$/, /^theme$/],
       },
       manifest: {
         name: 'Learn with Bip',

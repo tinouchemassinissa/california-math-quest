@@ -3985,3 +3985,20 @@ button, input, select {
 @media(max-width:800px){.journey-bip.bip-rendered-motion{display:block}.journey-bip.bip-rendered-motion .journey-bip-scene{width:min(100%,320px);height:280px;margin:auto;grid-row:auto}.lab-feedback .journey-bip.bip-rendered-motion .journey-bip-scene{width:140px;height:140px;min-height:0}.journey-bip-controls{gap:6px}}
 
 .journey-bip:focus-within{outline:none}.journey-bip button:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+
+
+/* Keep the character column and learning content inside the available viewport. */
+.kids-layout,.journey-workspace{grid-template-columns:minmax(220px,300px) minmax(0,1fr)}
+.kids-main,.journey-bip,.journey-bip-message,.journey-workspace>*,.kids-layout>*{min-width:0;overflow-wrap:anywhere}
+.kids-main h1{font-size:clamp(1.8rem,3.5vw,3.2rem);overflow-wrap:normal}
+.journey-bip-scene{overflow:hidden}
+.bip-character-frame{overflow:hidden}
+@media(max-width:1000px){.kids-layout{gap:24px;grid-template-columns:minmax(200px,260px) minmax(0,1fr)}.kids-explorers{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}}
+@media(max-width:850px){.kids-layout,.journey-workspace{grid-template-columns:minmax(0,1fr)}}
+
+.bip-moves{flex:1 1 100%;min-width:0}
+.bip-moves summary{display:list-item;list-style-position:inside;padding:12px 16px;border:1px solid var(--border-color,#64748b);border-radius:16px;cursor:pointer;font-weight:650;background:var(--bg-secondary,#172033);color:inherit}
+.bip-moves[open] summary{margin-bottom:10px}
+.bip-moves-list{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 12px}
+.bip-moves summary:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}
+.journey-bip-controls>button{border-radius:14px;padding:10px 16px}

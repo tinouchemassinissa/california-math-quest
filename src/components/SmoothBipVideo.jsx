@@ -7,6 +7,10 @@ export default function BipCharacter({src,eventKey,paused,loop,onError,onEnded,o
  const key=(src||'').split('/').pop()?.replace('.mp4','')||'idle';
  const gesture={healthy:'idle',recovery:'nod',busy:'think',sleep:'rest'}[key]||key;
  latest.current={type:'bip-motion',paused:paused===true,state:gesture==='think'?'think':'idle',gesture:['idle','think'].includes(gesture)?undefined:gesture};
+ const loaded=()=>{
+  try{if(!frame.current?.contentDocument?.getElementById("bip-stage")){callbacks.current.onError?.();return;}}catch{callbacks.current.onError?.();return;}
+  send();
+ };
  const send=()=>frame.current?.contentWindow?.postMessage(latest.current,window.location.origin);
  useEffect(()=>{send();},[src,eventKey,paused]);
  useEffect(()=>{
@@ -18,5 +22,5 @@ export default function BipCharacter({src,eventKey,paused,loop,onError,onEnded,o
   };
   window.addEventListener('message',receive);return()=>window.removeEventListener('message',receive);
  },[loop]);
- return <iframe ref={frame} src="/bip/character/index.html?controls=none" title="Bip 3D companion" className="bip-character-frame" loading="lazy" sandbox="allow-scripts allow-same-origin" onLoad={send}/>;
+ return <iframe ref={frame} src="/bip/character/index.html?controls=none" title="Bip 3D companion" className="bip-character-frame" loading="lazy" sandbox="allow-scripts allow-same-origin" onLoad={loaded}/>;
 }
